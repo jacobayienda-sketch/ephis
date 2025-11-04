@@ -110,6 +110,10 @@
     const tableBody = document.getElementById("tableBody");
     const form = document.getElementById("complaintForm");
 
+    // filter controls
+    const filterStatus = document.getElementById("filterStatus");
+    const filterSub = document.getElementById("filterSub");
+
     // --- Auth Guard ---
     const { data:{session} } = await supabase.auth.getSession();
     if (!session) window.location = "login.html";
@@ -122,10 +126,19 @@
     async function loadComplaints() {
       tableBody.innerHTML = "<tr><td colspan='7' align='center'>Loading…</td></tr>";
 
-      const { data, error } = await supabase
+      const statusFilter = filterStatus.value;
+      const subFilter = filterSub.value;
+
+      // build query and apply filters if selected
+      let query = supabase
         .from("complaints")
         .select("complaint_date,complainant_name,category,description,sub_county,status,officer_name")
         .order("complaint_date", { ascending: false });
+
+      if (statusFilter) query = query.eq("status", statusFilter);
+      if (subFilter) query = query.eq("sub_county", subFilter);
+
+      const { data, error } = await query;
 
       if (error) {
         tableBody.innerHTML = `<tr><td colspan='7'>${error.message}</td></tr>`;
@@ -149,6 +162,10 @@
         </tr>
       `).join("");
     }
+
+    // --- Filter listeners ---
+    filterStatus.addEventListener("change", loadComplaints);
+    filterSub.addEventListener("change", loadComplaints);
 
     // --- Add Complaint ---
     btnAdd.onclick = () => formSec.classList.toggle("hidden");
