@@ -103,19 +103,38 @@
     const tableBody = document.getElementById("tableBody");
     const form = document.getElementById("foodForm");
 
+    // filter elements
+    const filterStatus = document.getElementById("filterStatus");
+    const filterSub = document.getElementById("filterSub");
+
     // --- Auth guard ---
     const { data:{session} } = await supabase.auth.getSession();
     if (!session) window.location = "login.html";
     logoutBtn.onclick = async()=>{ await supabase.auth.signOut(); window.location="login.html"; };
 
-    // --- Load records ---
+    // --- Load records (with filters) ---
     async function loadInspections() {
       tableBody.innerHTML = "<tr><td colspan='7' align='center'>Loading…</td></tr>";
 
-      const { data, error } = await supabase
+      // read current filter values
+      const statusFilter = filterStatus.value?.trim();
+      const subFilter = filterSub.value?.trim();
+
+      // start building query
+      let query = supabase
         .from("food_safety")
-        .select("inspection_date,establishment_name,establishment_type,sub_county,status,inspector_name,remarks")
-        .order("inspection_date", { ascending:false });
+        .select("inspection_date,establishment_name,establishment_type,sub_county,status,inspector_name,remarks");
+
+      // apply filters only when set
+      if (statusFilter) {
+        query = query.eq("status", statusFilter);
+      }
+      if (subFilter) {
+        query = query.eq("sub_county", subFilter);
+      }
+
+      // apply ordering and execute
+      const { data, error } = await query.order("inspection_date", { ascending:false });
 
       if (error) {
         tableBody.innerHTML = `<tr><td colspan='7'>${error.message}</td></tr>`;
@@ -143,6 +162,10 @@
     // --- Add record ---
     btnAdd.onclick = () => formSec.classList.toggle("hidden");
     cancelBtn.onclick = () => formSec.classList.add("hidden");
+
+    // wire filters to reload on change
+    filterStatus.onchange = () => loadInspections();
+    filterSub.onchange = () => loadInspections();
 
     form.onsubmit = async e => {
       e.preventDefault();
