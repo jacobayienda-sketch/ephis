@@ -108,19 +108,55 @@
     const form = document.getElementById("premiseForm");
     const tableBody = document.getElementById("tableBody");
 
+    // filter elements
+    const filterSub = document.getElementById("filterSub");
+    const filterStatus = document.getElementById("filterStatus");
+    const filterExpiry = document.getElementById("filterExpiry");
+
+    // form fields (explicit references — don't rely on global ids)
+    const premise_name = document.getElementById("premise_name");
+    const premise_type = document.getElementById("premise_type");
+    const owner_name = document.getElementById("owner_name");
+    const contact_phone = document.getElementById("contact_phone");
+    const sub_county = document.getElementById("sub_county");
+    const ward = document.getElementById("ward");
+    const status = document.getElementById("status");
+    const license_expiry = document.getElementById("license_expiry");
+    const remarks = document.getElementById("remarks");
+
     // --- Auth guard ---
     const { data:{session} } = await supabase.auth.getSession();
     if (!session) window.location = "login.html";
     logoutBtn.onclick = async()=>{ await supabase.auth.signOut(); window.location="login.html"; };
 
-    // --- Load Premises ---
+    // --- Load Premises (with filters) ---
     async function loadPremises() {
       tableBody.innerHTML = "<tr><td colspan='7' align='center'>Loading…</td></tr>";
 
-      const { data, error } = await supabase
+      // base query
+      let q = supabase
         .from("premises")
         .select("premise_name,premise_type,owner_name,sub_county,status,license_expiry,remarks")
         .order("license_expiry", { ascending:false });
+
+      // apply filters if set
+      const subVal = filterSub.value?.trim();
+      const statusVal = filterStatus.value?.trim();
+      const expiryVal = filterExpiry.value?.trim();
+
+      if (subVal) {
+        q = q.eq("sub_county", subVal);
+      }
+      if (statusVal) {
+        q = q.eq("status", statusVal);
+      }
+      if (expiryVal) {
+        // if the DB field is timestamp, compare up to end of selected day to include records on that day
+        const expiryIso = expiryVal.length === 10 ? expiryVal + "T23:59:59" : expiryVal;
+        q = q.lte("license_expiry", expiryIso);
+      }
+
+      const { data, error } = await q;
 
       if (error) {
         tableBody.innerHTML = `<tr><td colspan='7'>${error.message}</td></tr>`;
@@ -148,6 +184,11 @@
     // --- Add Premise ---
     btnAdd.onclick = () => formSec.classList.toggle("hidden");
     cancelBtn.onclick = () => formSec.classList.add("hidden");
+
+    // wire filters -> reload
+    filterSub.addEventListener("change", loadPremises);
+    filterStatus.addEventListener("change", loadPremises);
+    filterExpiry.addEventListener("change", loadPremises);
 
     form.onsubmit = async e => {
       e.preventDefault();
