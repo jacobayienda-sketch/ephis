@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EPHIS Portal | Waste Management</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+
+<body>
+  <!-- ===== Header ===== -->
+  <header>
+    <h1>EPHIS Portal</h1>
+  </header>
+
+  <!-- ===== Navigation ===== -->
+  <nav class="top-nav">
+    <a href="dashboard.html">Dashboard</a>
+    <button id="logoutBtn">Logout</button>
+  </nav>
+
+  <main>
+    <!-- ===== Filters & Add ===== -->
+    <section class="card">
+      <h2>Waste Facilities</h2>
+      <div class="grid four">
+        <div>
+          <label>Facility Type</label>
+          <select id="filterType">
+            <option value="">All</option>
+            <option>Landfill</option><option>Transfer Station</option>
+            <option>Recycling Plant</option><option>Collection Site</option>
+          </select>
+        </div>
+        <div>
+          <label>Status</label>
+          <select id="filterStatus">
+            <option value="">All</option>
+            <option>Operational</option><option>Closed</option><option>Under Maintenance</option>
+          </select>
+        </div>
+        <div>
+          <label>Permit Expiry Before</label>
+          <input type="date" id="filterExpiry" />
+        </div>
+      </div>
+      <button class="btn-primary" id="btnAdd" style="margin-top:1rem;">Add Facility</button>
+    </section>
+
+    <!-- ===== Table ===== -->
+    <section class="card">
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th><th>Type</th><th>Sub-County</th><th>Status</th>
+              <th>Permit Expiry</th><th>Contact</th><th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="7" align="center">Loading records…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== Map ===== -->
+    <section class="card">
+      <h3>Waste Facilities Map</h3>
+      <div id="map" style="height:300px;width:100%;border-radius:8px;"></div>
+    </section>
+
+    <!-- ===== Form ===== -->
+    <section id="formSection" class="card hidden">
+      <h3>Register Waste Facility</h3>
+      <form id="wasteForm" class="grid two" autocomplete="off">
+        <label>Facility Name</label>
+        <input type="text" id="facility_name" required />
+        <label>Type</label>
+        <select id="facility_type" required>
+          <option>Landfill</option><option>Transfer Station</option>
+          <option>Recycling Plant</option><option>Collection Site</option>
+        </select>
+        <label>Sub-County</label>
+        <select id="sub_county" required>
+          <option>Keiyo North</option><option>Keiyo South</option>
+          <option>Marakwet East</option><option>Marakwet West</option>
+        </select>
+        <label>Ward</label>
+        <input type="text" id="ward" />
+        <label>Coordinates (lat,lng)</label>
+        <input type="text" id="geo" placeholder="0.1234,35.6789" />
+        <label>Status</label>
+        <select id="status" required>
+          <option>Operational</option><option>Closed</option><option>Under Maintenance</option>
+        </select>
+        <label>Permit Expiry</label>
+        <input type="date" id="permit_expiry" />
+        <label>Contact Person</label>
+        <input type="text" id="contact_person" />
+        <label>Contact Phone</label>
+        <input type="tel" id="contact_phone" />
+        <label>Remarks</label>
+        <textarea id="remarks" rows="2"></textarea>
+        <button type="submit" class="btn-primary">Save</button>
+        <button type="button" id="cancelBtn" class="btn-secondary">Cancel</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- ===== Scripts ===== -->
+  <script type="module">
+    import { supabase } from "./supabaseClient.js";
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    const btnAdd = document.getElementById("btnAdd");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const formSec = document.getElementById("formSection");
+    const tableBody = document.getElementById("tableBody");
+    const form = document.getElementById("wasteForm");
+    const map = L.map("map").setView([0.45, 35.5], 9);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+      attribution: "© OpenStreetMap"
+    }).addTo(map);
+
+    // --- Auth guard ---
+    const { data:{session} } = await supabase.auth.getSession();
+    if (!session) window.location = "login.html";
+    logoutBtn.onclick = async()=>{ await supabase.auth.signOut(); window.location="login.html"; };
+
+    // --- Load facilities ---
+    async function loadFacilities() {
+      tableBody.innerHTML = "<tr><td colspan='7' align='center'>Loading…</td></tr>";
+      const { data, error } = await supabase
+        .from("waste_facilities")
+        .select("facility_name,facility_type,sub_county,status,permit_expiry,contact_person,remarks,geo")
+        .order("permit_expiry",{ascending:false});
+
+      if (error) {
+        tableBody.innerHTML = `<tr><td colspan='7'>${error.message}</td></tr>`;
+        return;
+      }
+      if (!data?.length) {
+        tableBody.innerHTML = "<tr><td colspan='7' align='center'>No records found</td></tr>";
+        return;
+      }
+
+      tableBody.innerHTML = data.map(f => `
+        <tr>
+          <td>${f.facility_name || ""}</td>
+          <td>${f.facility_type || ""}</td>
+          <td>${f.sub_county || ""}</td>
+          <td>${f.status || ""}</td>
+          <td>${f.permit_expiry?.split("T")[0] || ""}</td>
+          <td>${f.contact_person || ""}</td>
+          <td>${f.remarks || ""}</td>
+        </tr>
+      `).join("");
+
+      map.eachLayer(l => { if (l instanceof L.Marker) map.removeLayer(l); });
+
+      data.forEach(f => {
+        if (!f.geo) return;
+        const [lat, lng] = f.geo.split(",").map(Number);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          L.marker([lat, lng])
+            .addTo(map)
+            .bindPopup(`<b>${f.facility_name}</b><br>${f.facility_type}<br>${f.sub_county}`);
+        }
+      });
+    }
+
+    // --- Add facility ---
+    btnAdd.onclick = () => formSec.classList.toggle("hidden");
+    cancelBtn.onclick = () => formSec.classList.add("hidden");
+
+    form.onsubmit = async e => {
+      e.preventDefault();
+      const record = {
+        facility_name: facility_name.value,
+        facility_type: facility_type.value,
+        sub_county: sub_county.value,
+        ward: ward.value,
+        geo: geo.value,
+        status: status.value,
+        permit_expiry: permit_expiry.value,
+        contact_person: contact_person.value,
+        contact_phone: contact_phone.value,
+        remarks: remarks.value,
+        created_by: session.user.id
+      };
+      const { error } = await supabase.from("waste_facilities").insert([record]);
+      if (error) alert("Save failed: " + error.message);
+      else {
+        alert("Facility saved");
+        form.reset();
+        formSec.classList.add("hidden");
+        loadFacilities();
+      }
+    };
+
+    await loadFacilities();
+  </script>
+</body>
+</html>
