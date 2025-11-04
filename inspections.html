@@ -108,6 +108,12 @@
     const tableBody = document.getElementById("tableBody");
     const form = document.getElementById("inspectionForm");
 
+    // Filter elements
+    const filterSub = document.getElementById("filterSub");
+    const filterStatus = document.getElementById("filterStatus");
+    const fromDate = document.getElementById("fromDate");
+    const toDate = document.getElementById("toDate");
+
     // --- Auth guard ---
     const { data:{session} } = await supabase.auth.getSession();
     if (!session) window.location = "login.html";
@@ -117,14 +123,39 @@
       window.location = "login.html";
     };
 
-    // --- Load inspections ---
+    // --- Load inspections (with filters) ---
     async function loadInspections() {
       tableBody.innerHTML = "<tr><td colspan='7' align='center'>Loading…</td></tr>";
 
-      const { data, error } = await supabase
+      // Start building query
+      let query = supabase
         .from("inspections")
         .select("inspection_date,facility_name,facility_type,sub_county,status,officer_name,remarks")
         .order("inspection_date", { ascending: false });
+
+      // Apply filters only when values are present
+      if (filterSub.value) {
+        query = query.eq("sub_county", filterSub.value);
+      }
+
+      if (filterStatus.value) {
+        query = query.eq("status", filterStatus.value);
+      }
+
+      // Date filtering: make toDate inclusive by setting end of day
+      if (fromDate.value) {
+        // fromDate.value is "YYYY-MM-DD"
+        // it's fine to use as-is; Supabase/Postgres will compare correctly for date/timestamps
+        query = query.gte("inspection_date", fromDate.value);
+      }
+
+      if (toDate.value) {
+        // include the entire toDate day by appending end time
+        const toEnd = toDate.value + "T23:59:59";
+        query = query.lte("inspection_date", toEnd);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         tableBody.innerHTML = `<tr><td colspan="7">${error.message}</td></tr>`;
@@ -148,6 +179,11 @@
         </tr>
       `).join("");
     }
+
+    // Call loadInspections when any filter changes
+    [filterSub, filterStatus, fromDate, toDate].forEach(el => {
+      el.addEventListener("change", () => loadInspections());
+    });
 
     // --- Add new inspection ---
     btnAdd.onclick = () => formSec.classList.toggle("hidden");
