@@ -27,6 +27,10 @@
       <h2>Waste Facilities</h2>
       <div class="grid four">
         <div>
+          <label>Search</label>
+          <input type="search" id="searchInput" placeholder="Search name, sub-county, ward, contact..." />
+        </div>
+        <div>
           <label>Facility Type</label>
           <select id="filterType">
             <option value="">All</option>
@@ -46,7 +50,22 @@
           <input type="date" id="filterExpiry" />
         </div>
       </div>
-      <button class="btn-primary" id="btnAdd" style="margin-top:1rem;">Add Facility</button>
+
+      <div style="margin-top:1rem;display:flex;gap:0.5rem;align-items:center;">
+        <button class="btn-primary" id="btnAdd">Add Facility</button>
+        <button class="btn-secondary" id="clearFilters">Clear Filters</button>
+
+        <!-- Pagination controls -->
+        <div id="pagination" style="margin-left:auto;display:flex;align-items:center;gap:0.5rem;">
+          <button id="prevPage" class="btn-secondary">Prev</button>
+          <span id="pageInfo">Page 1 / 1</span>
+          <button id="nextPage" class="btn-secondary">Next</button>
+          <label style="margin-left:0.5rem;">Page size</label>
+          <select id="pageSizeSelect">
+            <option>10</option><option>25</option><option>50</option><option>100</option>
+          </select>
+        </div>
+      </div>
     </section>
 
     <!-- ===== Table ===== -->
@@ -127,52 +146,160 @@
       attribution: "© OpenStreetMap"
     }).addTo(map);
 
+    // filter & pagination controls
+    const searchInput = document.getElementById('searchInput');
+    const filterType = document.getElementById('filterType');
+    const filterStatus = document.getElementById('filterStatus');
+    const filterExpiry = document.getElementById('filterExpiry');
+    const clearFiltersBtn = document.getElementById('clearFilters');
+
+    const prevPageBtn = document.getElementById('prevPage');
+    const nextPageBtn = document.getElementById('nextPage');
+    const pageInfo = document.getElementById('pageInfo');
+    const pageSizeSelect = document.getElementById('pageSizeSelect');
+
+    let page = 1;
+    let pageSize = parseInt(pageSizeSelect.value, 10) || 25;
+    let totalCount = 0;
+    let totalPages = 1;
+
     // --- Auth guard ---
     const { data:{session} } = await supabase.auth.getSession();
     if (!session) window.location = "login.html";
     logoutBtn.onclick = async()=>{ await supabase.auth.signOut(); window.location="login.html"; };
 
-    // --- Load facilities ---
-    async function loadFacilities() {
-      tableBody.innerHTML = "<tr><td colspan='7' align='center'>Loading…</td></tr>";
-      const { data, error } = await supabase
-        .from("waste_facilities")
-        .select("facility_name,facility_type,sub_county,status,permit_expiry,contact_person,remarks,geo")
-        .order("permit_expiry",{ascending:false});
+    // --- Helpers ---
+    function clearMapMarkers(){
+      map.eachLayer(l => { if (l instanceof L.Marker) map.removeLayer(l); });
+    }
 
-      if (error) {
-        tableBody.innerHTML = `<tr><td colspan='7'>${error.message}</td></tr>`;
-        return;
-      }
-      if (!data?.length) {
+    function escapeHtml(unsafe){
+      if (!unsafe) return '';
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function escapeRegExp(s){
+      return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function highlight(text, q){
+      const safe = escapeHtml(text || '');
+      if (!q) return safe;
+      const terms = q.trim().split(/\s+/).filter(Boolean);
+      if (!terms.length) return safe;
+      // highlight every term (case-insensitive)
+      const re = new RegExp(terms.map(escapeRegExp).join('|'), 'gi');
+      return safe.replace(re, m => `<mark class="search-highlight">${m}</mark>`);
+    }
+
+    function renderTableAndMap(data, q){
+      if (!data?.length){
         tableBody.innerHTML = "<tr><td colspan='7' align='center'>No records found</td></tr>";
+        clearMapMarkers();
         return;
       }
 
       tableBody.innerHTML = data.map(f => `
         <tr>
-          <td>${f.facility_name || ""}</td>
-          <td>${f.facility_type || ""}</td>
-          <td>${f.sub_county || ""}</td>
-          <td>${f.status || ""}</td>
-          <td>${f.permit_expiry?.split("T")[0] || ""}</td>
-          <td>${f.contact_person || ""}</td>
-          <td>${f.remarks || ""}</td>
+          <td>${highlight(f.facility_name, q)}</td>
+          <td>${highlight(f.facility_type, q)}</td>
+          <td>${highlight(f.sub_county, q)}</td>
+          <td>${highlight(f.status, q)}</td>
+          <td>${f.permit_expiry ? f.permit_expiry.split('T')[0] : ''}</td>
+          <td>${highlight(f.contact_person, q)}</td>
+          <td>${highlight(f.remarks, q)}</td>
         </tr>
       `).join("");
 
-      map.eachLayer(l => { if (l instanceof L.Marker) map.removeLayer(l); });
-
+      clearMapMarkers();
       data.forEach(f => {
         if (!f.geo) return;
-        const [lat, lng] = f.geo.split(",").map(Number);
-        if (!isNaN(lat) && !isNaN(lng)) {
+        const parts = f.geo.split(",").map(s => s.trim());
+        const lat = Number(parts[0]);
+        const lng = Number(parts[1]);
+        if (!isNaN(lat) && !isNaN(lng)){
           L.marker([lat, lng])
-            .addTo(map)
-            .bindPopup(`<b>${f.facility_name}</b><br>${f.facility_type}<br>${f.sub_county}`);
+           .addTo(map)
+           .bindPopup(`<b>${escapeHtml(f.facility_name)}</b><br>${escapeHtml(f.facility_type)}<br>${escapeHtml(f.sub_county)}`);
         }
       });
     }
+
+    // --- Server-side paginated search using a Postgres FTS function ---
+    // This page expects a Postgres function named `search_waste_facilities` (see SQL migration in repo).
+    // The function returns rows with an extra column `total_count` (same value repeated) to help pagination.
+    async function loadPage(p = 1){
+      page = Math.max(1, p);
+      pageSize = parseInt(pageSizeSelect.value, 10) || 25;
+      const offset = (page - 1) * pageSize;
+
+      tableBody.innerHTML = "<tr><td colspan='7' align='center'>Loading…</td></tr>";
+
+      const q = (searchInput.value || '').trim();
+      const type = filterType.value || null;
+      const status = filterStatus.value || null;
+      const expiry = filterExpiry.value || null; // YYYY-MM-DD or null
+
+      // call the RPC defined server-side; parameters must match function signature
+      const { data, error } = await supabase
+        .rpc('search_waste_facilities', {
+          in_q: q || null,
+          in_type: type,
+          in_status: status,
+          in_expiry: expiry,
+          in_limit: pageSize,
+          in_offset: offset
+        });
+
+      if (error){
+        tableBody.innerHTML = `<tr><td colspan='7'>${escapeHtml(error.message)}</td></tr>`;
+        clearMapMarkers();
+        return;
+      }
+
+      // function returns rows and includes total_count column (same for each row) — grab it for pagination
+      const rows = data || [];
+      totalCount = rows.length ? Number(rows[0].total_count || 0) : 0;
+      totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+
+      // If function returns empty rows but total_count is available via a separate call (older deployments),
+      // we can handle that later. For now we assume total_count is on the returned rows.
+      renderTableAndMap(rows, q);
+
+      pageInfo.textContent = `Page ${page} / ${totalPages} (${totalCount} records)`;
+      prevPageBtn.disabled = page <= 1;
+      nextPageBtn.disabled = page >= totalPages;
+    }
+
+    // Pagination controls
+    prevPageBtn.addEventListener('click', ()=> loadPage(page - 1));
+    nextPageBtn.addEventListener('click', ()=> loadPage(page + 1));
+    pageSizeSelect.addEventListener('change', ()=> loadPage(1));
+
+    // debounce search changes to reduce RPC calls
+    let loaderTimer = null;
+    function scheduleReload(){
+      clearTimeout(loaderTimer);
+      loaderTimer = setTimeout(()=> loadPage(1), 300);
+    }
+
+    searchInput.addEventListener('input', scheduleReload);
+    filterType.addEventListener('change', () => loadPage(1));
+    filterStatus.addEventListener('change', () => loadPage(1));
+    filterExpiry.addEventListener('change', () => loadPage(1));
+
+    clearFiltersBtn.addEventListener('click', ()=> {
+      searchInput.value = '';
+      filterType.value = '';
+      filterStatus.value = '';
+      filterExpiry.value = '';
+      loadPage(1);
+    });
 
     // --- Add facility ---
     btnAdd.onclick = () => formSec.classList.toggle("hidden");
@@ -199,11 +326,13 @@
         alert("Facility saved");
         form.reset();
         formSec.classList.add("hidden");
-        loadFacilities();
+        // reload current page (to see new record where it belongs)
+        await loadPage(page);
       }
     };
 
-    await loadFacilities();
+    // initial load
+    await loadPage(1);
   </script>
 </body>
 </html>
