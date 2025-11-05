@@ -48,6 +48,10 @@
             <option>Marakwet East</option><option>Marakwet West</option>
           </select>
         </div>
+        <div>
+          <label>Search (officer, ward, remarks)</label>
+          <input id="searchBox" type="search" placeholder="Search officer, ward or remarks..." />
+        </div>
       </div>
       <button class="btn-primary" id="btnAdd" style="margin-top:1rem;">Add Site</button>
     </section>
@@ -124,6 +128,12 @@
     const formSec = document.getElementById("formSection");
     const tableBody = document.getElementById("tableBody");
     const form = document.getElementById("vectorForm");
+
+    const filterType = document.getElementById("filterType");
+    const filterStatus = document.getElementById("filterStatus");
+    const filterSub = document.getElementById("filterSub");
+    const searchBox = document.getElementById("searchBox");
+
     const map = L.map("map").setView([0.45, 35.5], 9);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -136,23 +146,58 @@
     if (!session) window.location = "login.html";
     logoutBtn.onclick = async()=>{ await supabase.auth.signOut(); window.location="login.html"; };
 
-    // --- Load records ---
+    // --- Helpers ---
+    function clearMapMarkers() {
+      map.eachLayer(layer => {
+        if (layer instanceof L.Marker) map.removeLayer(layer);
+      });
+    }
+
+    // --- Load records (with filters & search) ---
+    let lastSearch = "";
     async function loadVectors() {
       tableBody.innerHTML = "<tr><td colspan='7' align='center'>Loading…</td></tr>";
-      const { data, error } = await supabase
+
+      // collect filters
+      const type = filterType.value;
+      const status = filterStatus.value;
+      const sub = filterSub.value;
+      const search = searchBox.value.trim();
+
+      // build supabase query and chain filters
+      let query = supabase
         .from("vector_surveillance")
-        .select("created_at,vector_type,risk_level,sub_county,status,officer_name,remarks,geo")
+        .select("created_at,vector_type,risk_level,sub_county,status,officer_name,remarks,geo,ward")
         .order("created_at",{ascending:false});
+
+      if (type) query = query.eq("vector_type", type);
+      if (status) query = query.eq("status", status);
+      if (sub) query = query.eq("sub_county", sub);
+
+      // apply search across officer_name, remarks and ward using ilike OR
+      if (search) {
+        // sanitize search by removing trailing/leading percent characters to avoid user injection of wildcard
+        const s = search.replace(/^%+|%+$/g, "").replace(/"/g, '\\"');
+        // supabase .or expects a string of conditions separated by commas
+        // note: fields with nulls are ignored in ilike matches but that's ok for search
+        const orExpr = `officer_name.ilike.%${s}%,remarks.ilike.%${s}%,ward.ilike.%${s}%`;
+        query = query.or(orExpr);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         tableBody.innerHTML = `<tr><td colspan='7'>${error.message}</td></tr>`;
+        clearMapMarkers();
         return;
       }
       if (!data?.length) {
         tableBody.innerHTML = "<tr><td colspan='7' align='center'>No records found</td></tr>";
+        clearMapMarkers();
         return;
       }
 
+      // render table
       tableBody.innerHTML = data.map(v => `
         <tr>
           <td>${v.created_at?.split("T")[0]||""}</td>
@@ -165,7 +210,8 @@
         </tr>
       `).join("");
 
-      map.eachLayer(layer => { if (layer instanceof L.Marker) map.removeLayer(layer); });
+      // update map markers
+      clearMapMarkers();
 
       data.forEach(v => {
         if (!v.geo) return;
@@ -173,12 +219,28 @@
         if (!isNaN(lat) && !isNaN(lng)) {
           L.marker([lat, lng])
             .addTo(map)
-            .bindPopup(`<b>${v.vector_type}</b><br>${v.sub_county}<br>Risk: ${v.risk_level}`);
+            .bindPopup(`<b>${v.vector_type || ""}</b><br>${v.sub_county || ""}<br>Risk: ${v.risk_level || ""}<br>Officer: ${v.officer_name || ""}`);
         }
       });
     }
 
-    // --- Add new record ---
+    // --- Wiring filters & search (debounced) ---
+    let searchTimeout = null;
+    const debounceMs = 350;
+    function triggerLoadDebounced() {
+      if (searchTimeout) clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        loadVectors();
+        searchTimeout = null;
+      }, debounceMs);
+    }
+
+    filterType.addEventListener("change", loadVectors);
+    filterStatus.addEventListener("change", loadVectors);
+    filterSub.addEventListener("change", loadVectors);
+    searchBox.addEventListener("input", triggerLoadDebounced);
+
+    // --- Add new record UI ---
     btnAdd.onclick = () => formSec.classList.toggle("hidden");
     cancelBtn.onclick = () => formSec.classList.add("hidden");
 
@@ -186,11 +248,12 @@
       e.preventDefault();
       const larvae = parseInt(larvae_count.value) || 0;
       const risk = larvae > 20 ? "High Risk" : larvae > 5 ? "Moderate" : "Controlled";
+      const effVal = effectiveness.value === "" ? null : (parseFloat(effectiveness.value) || 0);
       const record = {
         vector_type: vector_type.value,
         larvae_count: larvae,
         control_measure: control_measure.value,
-        effectiveness: effectiveness.value,
+        effectiveness: effVal,
         sub_county: sub_county.value,
         ward: ward.value,
         geo: geo.value,
@@ -206,10 +269,12 @@
         alert("Site record saved");
         form.reset();
         formSec.classList.add("hidden");
+        // reload with current filters/search applied
         loadVectors();
       }
     };
 
+    // initial load
     await loadVectors();
   </script>
 </body>
