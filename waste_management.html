@@ -10,19 +10,14 @@
 </head>
 
 <body>
-  <!-- ===== Header ===== -->
-  <header>
-    <h1>EPHIS Portal</h1>
-  </header>
+  <header><h1>EPHIS Portal</h1></header>
 
-  <!-- ===== Navigation ===== -->
   <nav class="top-nav">
     <a href="dashboard.html">Dashboard</a>
     <button id="logoutBtn">Logout</button>
   </nav>
 
   <main>
-    <!-- ===== Filters & Add ===== -->
     <section class="card">
       <h2>Waste Facilities</h2>
       <div class="grid four">
@@ -55,7 +50,6 @@
         <button class="btn-primary" id="btnAdd">Add Facility</button>
         <button class="btn-secondary" id="clearFilters">Clear Filters</button>
 
-        <!-- Pagination controls -->
         <div id="pagination" style="margin-left:auto;display:flex;align-items:center;gap:0.5rem;">
           <button id="prevPage" class="btn-secondary">Prev</button>
           <span id="pageInfo">Page 1 / 1</span>
@@ -68,7 +62,6 @@
       </div>
     </section>
 
-    <!-- ===== Table ===== -->
     <section class="card">
       <div class="table-responsive">
         <table>
@@ -85,13 +78,11 @@
       </div>
     </section>
 
-    <!-- ===== Map ===== -->
     <section class="card">
       <h3>Waste Facilities Map</h3>
       <div id="map" style="height:300px;width:100%;border-radius:8px;"></div>
     </section>
 
-    <!-- ===== Form ===== -->
     <section id="formSection" class="card hidden">
       <h3>Register Waste Facility</h3>
       <form id="wasteForm" class="grid two" autocomplete="off">
@@ -129,7 +120,6 @@
     </section>
   </main>
 
-  <!-- ===== Scripts ===== -->
   <script type="module">
     import { supabase } from "./supabaseClient.js";
 
@@ -146,7 +136,6 @@
       attribution: "© OpenStreetMap"
     }).addTo(map);
 
-    // filter & pagination controls
     const searchInput = document.getElementById('searchInput');
     const filterType = document.getElementById('filterType');
     const filterStatus = document.getElementById('filterStatus');
@@ -163,12 +152,10 @@
     let totalCount = 0;
     let totalPages = 1;
 
-    // --- Auth guard ---
     const { data:{session} } = await supabase.auth.getSession();
     if (!session) window.location = "login.html";
     logoutBtn.onclick = async()=>{ await supabase.auth.signOut(); window.location="login.html"; };
 
-    // --- Helpers ---
     function clearMapMarkers(){
       map.eachLayer(l => { if (l instanceof L.Marker) map.removeLayer(l); });
     }
@@ -192,7 +179,6 @@
       if (!q) return safe;
       const terms = q.trim().split(/\s+/).filter(Boolean);
       if (!terms.length) return safe;
-      // highlight every term (case-insensitive)
       const re = new RegExp(terms.map(escapeRegExp).join('|'), 'gi');
       return safe.replace(re, m => `<mark class="search-highlight">${m}</mark>`);
     }
@@ -230,9 +216,7 @@
       });
     }
 
-    // --- Server-side paginated search using a Postgres FTS function ---
-    // This page expects a Postgres function named `search_waste_facilities` (see SQL migration in repo).
-    // The function returns rows with an extra column `total_count` (same value repeated) to help pagination.
+    // RPC uses JSONB response { rows: [...], total_count: n }
     async function loadPage(p = 1){
       page = Math.max(1, p);
       pageSize = parseInt(pageSizeSelect.value, 10) || 25;
@@ -243,10 +227,9 @@
       const q = (searchInput.value || '').trim();
       const type = filterType.value || null;
       const status = filterStatus.value || null;
-      const expiry = filterExpiry.value || null; // YYYY-MM-DD or null
+      const expiry = filterExpiry.value || null;
 
-      // call the RPC defined server-side; parameters must match function signature
-      const { data, error } = await supabase
+      const { data: result, error } = await supabase
         .rpc('search_waste_facilities', {
           in_q: q || null,
           in_type: type,
@@ -262,13 +245,13 @@
         return;
       }
 
-      // function returns rows and includes total_count column (same for each row) — grab it for pagination
-      const rows = data || [];
-      totalCount = rows.length ? Number(rows[0].total_count || 0) : 0;
+      // result should be an object like { rows: [...], total_count: n }
+      // supabase-js will return parsed JSON - guard for older driver shapes too
+      const payload = (result && typeof result === 'object') ? result : null;
+      const rows = (payload && Array.isArray(payload.rows)) ? payload.rows : [];
+      totalCount = (payload && typeof payload.total_count !== 'undefined') ? Number(payload.total_count) : (rows.length || 0);
       totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
-      // If function returns empty rows but total_count is available via a separate call (older deployments),
-      // we can handle that later. For now we assume total_count is on the returned rows.
       renderTableAndMap(rows, q);
 
       pageInfo.textContent = `Page ${page} / ${totalPages} (${totalCount} records)`;
@@ -276,12 +259,10 @@
       nextPageBtn.disabled = page >= totalPages;
     }
 
-    // Pagination controls
     prevPageBtn.addEventListener('click', ()=> loadPage(page - 1));
     nextPageBtn.addEventListener('click', ()=> loadPage(page + 1));
     pageSizeSelect.addEventListener('change', ()=> loadPage(1));
 
-    // debounce search changes to reduce RPC calls
     let loaderTimer = null;
     function scheduleReload(){
       clearTimeout(loaderTimer);
@@ -301,7 +282,6 @@
       loadPage(1);
     });
 
-    // --- Add facility ---
     btnAdd.onclick = () => formSec.classList.toggle("hidden");
     cancelBtn.onclick = () => formSec.classList.add("hidden");
 
@@ -326,12 +306,10 @@
         alert("Facility saved");
         form.reset();
         formSec.classList.add("hidden");
-        // reload current page (to see new record where it belongs)
         await loadPage(page);
       }
     };
 
-    // initial load
     await loadPage(1);
   </script>
 </body>
