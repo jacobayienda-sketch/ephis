@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complaints & Incidents | EPHIS</title>
+  <script type="module" src="main.js"></script>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f6fa;
+      margin: 0;
+      color: #222;
+    }
+    header {
+      background: #1976d2;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    .btn {
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0.6rem 1rem;
+    }
+    .btn-primary {
+      background: #1976d2;
+      color: #fff;
+    }
+    .btn-danger {
+      background: #c62828;
+      color: #fff;
+    }
+    .btn-secondary {
+      background: #eee;
+      color: #333;
+    }
+    main {
+      padding: 1rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .toolbar input {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+    th {
+      background: #f1f1f1;
+      font-weight: 600;
+    }
+    tr:hover {
+      background: #f9f9f9;
+    }
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      tr {
+        margin-bottom: 1rem;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      }
+      th { display: none; }
+      td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 12px;
+      }
+      td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #555;
+      }
+    }
+  </style>
+</head>
+
+<body data-module="complaints">
+  <header>
+    <h1>Complaints & Incident Reporting</h1>
+    <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <button id="add-btn" class="btn btn-primary">+ New Complaint</button>
+      <input type="search" id="search" placeholder="Search complaints..." />
+    </div>
+    <div id="table"></div>
+  </main>
+
+  <script type="module">
+    import { supabase, showToast, fetchAll, deleteRecord, requireLogin } from "./main.js";
+
+    const addBtn = document.getElementById("add-btn");
+    const searchInput = document.getElementById("search");
+    const tableDiv = document.getElementById("table");
+
+    // Protect page
+    await requireLogin();
+
+    // Load all complaints
+    async function loadComplaints() {
+      try {
+        const data = await fetchAll("complaints", "id, complaint_type, incident_date, location, urgency, resolution_status");
+        renderTable(data);
+      } catch (err) {
+        showToast("Error loading data: " + err.message, "error");
+      }
+    }
+
+    function renderTable(rows) {
+      if (!rows.length) {
+        tableDiv.innerHTML = "<p style='text-align:center;margin-top:2rem;'>No complaints found.</p>";
+        return;
+      }
+
+      const html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Complaint Type</th>
+              <th>Date</th>
+              <th>Location</th>
+              <th>Urgency</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows
+              .map(
+                (r) => `
+                <tr>
+                  <td data-label="Type">${r.complaint_type || "-"}</td>
+                  <td data-label="Date">${r.incident_date || "-"}</td>
+                  <td data-label="Location">${r.location || "-"}</td>
+                  <td data-label="Urgency">${r.urgency || "-"}</td>
+                  <td data-label="Status">${r.resolution_status || "-"}</td>
+                  <td data-label="Actions">
+                    <button class="btn btn-primary" onclick="window.location.href='complaint_form.html?id=${r.id}'">Edit</button>
+                    <button class="btn btn-danger" data-id="${r.id}">Delete</button>
+                  </td>
+                </tr>`
+              )
+              .join("")}
+          </tbody>
+        </table>
+      `;
+      tableDiv.innerHTML = html;
+
+      document.querySelectorAll(".btn-danger").forEach((b) =>
+        b.addEventListener("click", () => handleDelete(b.dataset.id))
+      );
+    }
+
+    async function handleDelete(id) {
+      if (!confirm("Are you sure you want to delete this complaint?")) return;
+      try {
+        await deleteRecord("complaints", id);
+        showToast("Complaint deleted successfully", "success");
+        loadComplaints();
+      } catch (err) {
+        showToast("Delete failed: " + err.message, "error");
+      }
+    }
+
+    // Search filter
+    searchInput.addEventListener("input", (e) => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll("tbody tr").forEach((r) => {
+        r.style.display = r.innerText.toLowerCase().includes(term) ? "" : "none";
+      });
+    });
+
+    // Navigation
+    addBtn.addEventListener("click", () => {
+      window.location.href = "complaint_form.html";
+    });
+
+    // Initialize
+    loadComplaints();
+  </script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Water Quality Form | EPHIS</title>
+  <script type="module" src="main.js"></script>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;color:#222;}
+    header{
+      background:#1976d2;color:#fff;padding:1rem;
+      display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;
+    }
+    header h1{margin:0;font-size:1.1rem;}
+    main{padding:1rem;max-width:700px;margin:auto;}
+    form{
+      background:#fff;padding:1rem;border-radius:8px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.05);
+    }
+    label{display:block;font-weight:600;margin-top:0.8rem;}
+    input,select,textarea{
+      width:100%;padding:0.6rem;border:1px solid #ccc;border-radius:6px;
+      margin-top:0.3rem;font-size:0.95rem;
+    }
+    .actions{display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.6rem;margin-top:1.5rem;}
+    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.6rem 1rem;}
+    .btn-primary{background:#1976d2;color:#fff;}
+    .btn-danger{background:#c62828;color:#fff;}
+    .btn-secondary{background:#eee;color:#333;}
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1 id="form-title">New Water Source Record</h1>
+    <button class="btn btn-secondary" onclick="window.location.href='water_quality.html'">← Back to List</button>
+  </header>
+
+  <main>
+    <form id="water-form">
+      <label for="water_source_name">Water Source Name</label>
+      <input type="text" id="water_source_name" name="water_source_name" required>
+
+      <label for="water_source_type">Water Source Type</label>
+      <select id="water_source_type" name="water_source_type">
+        <option value="">Select</option>
+        <option>River</option>
+        <option>Borehole</option>
+        <option>Spring</option>
+        <option>Reservoir</option>
+        <option>Tap</option>
+        <option>Other</option>
+      </select>
+
+      <label for="sampling_date">Sampling Date</label>
+      <input type="date" id="sampling_date" name="sampling_date">
+
+      <label for="classification">Classification</label>
+      <select id="classification" name="classification">
+        <option value="">Select</option>
+        <option>Safe</option>
+        <option>Moderate Risk</option>
+        <option>Unsafe</option>
+      </select>
+
+      <label for="contamination_alert_status">Contamination Alert</label>
+      <select id="contamination_alert_status" name="contamination_alert_status">
+        <option value="false">No</option>
+        <option value="true">Yes</option>
+      </select>
+
+      <label for="remarks">Remarks</label>
+      <textarea id="remarks" name="remarks" rows="3"></textarea>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="delete-btn">Delete</button>
+      </div>
+    </form>
+  </main>
+
+  <script type="module">
+    import { supabase, showToast, getFormData, populateForm, insertRecord, updateRecord, deleteRecord, fetchById, requireLogin } from "./main.js";
+
+    const form=document.getElementById("water-form");
+    const cancelBtn=document.getElementById("cancel-btn");
+    const deleteBtn=document.getElementById("delete-btn");
+    const title=document.getElementById("form-title");
+    const params=new URLSearchParams(window.location.search);
+    const recordId=params.get("id");
+
+    await requireLogin();
+
+    cancelBtn.onclick=()=>window.location.href="water_quality.html";
+    if(!recordId)deleteBtn.style.display="none";
+
+    if(recordId){
+      try{
+        const record=await fetchById("water_quality",recordId);
+        populateForm(form,record);
+        title.textContent="Edit Water Record";
+      }catch(err){showToast("Error loading record: "+err.message,"error");}
+    }
+
+    form.onsubmit=async e=>{
+      e.preventDefault();
+      const payload=getFormData(form);
+      payload.contamination_alert_status=(payload.contamination_alert_status==="true");
+      try{
+        const {data:userData}=await supabase.auth.getUser();
+        payload.created_by=userData?.user?.id||null;
+        if(recordId){
+          await updateRecord("water_quality",recordId,payload);
+          showToast("Record updated","success");
+        }else{
+          await insertRecord("water_quality",payload);
+          showToast("Record added","success");
+        }
+        window.location.href="water_quality.html";
+      }catch(err){showToast("Save failed: "+err.message,"error");}
+    };
+
+    deleteBtn.onclick=async()=>{
+      if(!confirm("Delete this record?"))return;
+      try{
+        await deleteRecord("water_quality",recordId);
+        showToast("Record deleted","success");
+        window.location.href="water_quality.html";
+      }catch(err){showToast("Delete failed: "+err.message,"error");}
+    };
+  </script>
+</body>
+</html>

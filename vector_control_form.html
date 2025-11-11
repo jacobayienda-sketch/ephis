@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Vector Control Form | EPHIS</title>
+  <script type="module" src="main.js"></script>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;color:#222;}
+    header{
+      background:#1976d2;color:#fff;padding:1rem;
+      display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;
+    }
+    header h1{margin:0;font-size:1.1rem;}
+    main{padding:1rem;max-width:700px;margin:auto;}
+    form{
+      background:#fff;padding:1rem;border-radius:8px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.05);
+    }
+    label{display:block;font-weight:600;margin-top:0.8rem;}
+    input,select,textarea{
+      width:100%;padding:0.6rem;border:1px solid #ccc;border-radius:6px;
+      margin-top:0.3rem;font-size:0.95rem;
+    }
+    .actions{display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.6rem;margin-top:1.5rem;}
+    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.6rem 1rem;}
+    .btn-primary{background:#1976d2;color:#fff;}
+    .btn-danger{background:#c62828;color:#fff;}
+    .btn-secondary{background:#eee;color:#333;}
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1 id="form-title">New Vector Control Record</h1>
+    <button class="btn btn-secondary" onclick="window.location.href='vector_control.html'">← Back to List</button>
+  </header>
+
+  <main>
+    <form id="vector-form">
+      <label for="location_name">Location</label>
+      <input type="text" id="location_name" name="location_name" required>
+
+      <label for="vector_type">Vector Type</label>
+      <select id="vector_type" name="vector_type">
+        <option value="">Select</option>
+        <option>Mosquito</option>
+        <option>Rodent</option>
+        <option>Fly</option>
+        <option>Other</option>
+      </select>
+
+      <label for="risk_level">Risk Level</label>
+      <select id="risk_level" name="risk_level">
+        <option value="">Select</option>
+        <option>Low</option>
+        <option>Medium</option>
+        <option>High</option>
+      </select>
+
+      <label for="intervention_date">Intervention Date</label>
+      <input type="date" id="intervention_date" name="intervention_date">
+
+      <label for="intervention_type">Intervention Type</label>
+      <select id="intervention_type" name="intervention_type">
+        <option value="">Select</option>
+        <option>Fumigation</option>
+        <option>Drainage Clearance</option>
+        <option>Public Awareness</option>
+        <option>Environmental Cleanup</option>
+      </select>
+
+      <label for="responsible_officer">Responsible Officer</label>
+      <input type="text" id="responsible_officer" name="responsible_officer">
+
+      <label for="remarks">Remarks</label>
+      <textarea id="remarks" name="remarks" rows="3"></textarea>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="delete-btn">Delete</button>
+      </div>
+    </form>
+  </main>
+
+  <script type="module">
+    import { supabase, showToast, getFormData, populateForm, insertRecord, updateRecord, deleteRecord, fetchById, requireLogin } from "./main.js";
+
+    const form=document.getElementById("vector-form");
+    const cancelBtn=document.getElementById("cancel-btn");
+    const deleteBtn=document.getElementById("delete-btn");
+    const title=document.getElementById("form-title");
+    const params=new URLSearchParams(window.location.search);
+    const recordId=params.get("id");
+
+    await requireLogin();
+
+    cancelBtn.onclick=()=>window.location.href="vector_control.html";
+    if(!recordId)deleteBtn.style.display="none";
+
+    if(recordId){
+      try{
+        const record=await fetchById("vector_control",recordId);
+        populateForm(form,record);
+        title.textContent="Edit Vector Control Record";
+      }catch(err){showToast("Error loading record: "+err.message,"error");}
+    }
+
+    form.onsubmit=async e=>{
+      e.preventDefault();
+      const payload=getFormData(form);
+      try{
+        const {data:userData}=await supabase.auth.getUser();
+        payload.created_by=userData?.user?.id||null;
+        if(recordId){
+          await updateRecord("vector_control",recordId,payload);
+          showToast("Record updated","success");
+        }else{
+          await insertRecord("vector_control",payload);
+          showToast("Record added","success");
+        }
+        window.location.href="vector_control.html";
+      }catch(err){showToast("Save failed: "+err.message,"error");}
+    };
+
+    deleteBtn.onclick=async()=>{
+      if(!confirm("Delete this record?"))return;
+      try{
+        await deleteRecord("vector_control",recordId);
+        showToast("Record deleted","success");
+        window.location.href="vector_control.html";
+      }catch(err){showToast("Delete failed: "+err.message,"error");}
+    };
+  </script>
+</body>
+</html>

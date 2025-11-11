@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Premises Licenses | EPHIS</title>
+  <script type="module" src="main.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f5f6fa; margin: 0; color: #222; }
+    header { background: #1976d2; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+    header h1 { margin: 0; font-size: 1.1rem; }
+    .btn { border: none; border-radius: 6px; cursor: pointer; font-weight: 600; padding: 0.6rem 1rem; }
+    .btn-primary { background: #1976d2; color: #fff; }
+    .btn-danger { background: #c62828; color: #fff; }
+    .btn-secondary { background: #eee; color: #333; }
+    main { padding: 1rem; max-width: 1000px; margin: auto; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    .toolbar input { flex: 1; min-width: 200px; padding: 0.6rem; border: 1px solid #ccc; border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+    th { background: #f1f1f1; font-weight: 600; }
+    tr:hover { background: #f9f9f9; }
+    form { background: #fff; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.05); display: none; }
+    form input, form select, form textarea { width: 100%; padding: 0.6rem; margin: 0.4rem 0; border: 1px solid #ccc; border-radius: 6px; }
+    .status-active { color: green; font-weight: 600; }
+    .status-expiring { color: #e68a00; font-weight: 600; }
+    .status-expired { color: red; font-weight: 600; }
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      tr { margin-bottom: 1rem; background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+      th { display: none; }
+      td { display: flex; justify-content: space-between; padding: 8px 12px; }
+      td::before { content: attr(data-label); font-weight: 600; color: #555; }
+    }
+  </style>
+</head>
+
+<body data-module="premises_licenses">
+  <header>
+    <h1>Premises Licenses</h1>
+    <div>
+      <button class="btn btn-secondary" id="back-premises">← Back to Premises</button>
+      <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'">🏠 Dashboard</button>
+    </div>
+  </header>
+
+  <main>
+    <h2 id="premises-name">Loading premises...</h2>
+
+    <div class="toolbar">
+      <button id="add-btn" class="btn btn-primary">+ Add License</button>
+      <input type="search" id="search" placeholder="Search licenses..." />
+    </div>
+
+    <form id="license-form">
+      <h3 id="form-title">Add New License</h3>
+      <input type="hidden" id="license-id" />
+      <label>Registration Number</label><input id="registration_number" />
+      <label>Registration Date</label><input id="registration_date" type="date" />
+      <label>License Number</label><input id="license_number" />
+      <label>License Expiry</label><input id="license_expiry" type="date" />
+      <label>License Type</label><input id="license_type" />
+      <label>Status</label>
+      <select id="license_status">
+        <option value="">Select status</option>
+        <option value="Active">Active</option>
+        <option value="Expired">Expired</option>
+        <option value="Pending Renewal">Pending Renewal</option>
+      </select>
+      <label>Renewal History</label><textarea id="renewal_history"></textarea>
+      <label>Licensing Officer</label><input id="licensing_officer" />
+      <label>Licensing Fee (KES)</label><input id="licensing_fee" type="number" step="0.01" />
+      <label>Payment Method</label>
+      <select id="payment_method">
+        <option value="">Select method</option>
+        <option value="MPESA">MPESA</option>
+        <option value="Bank">Bank</option>
+        <option value="Cash">Cash</option>
+      </select>
+      <div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" id="cancel-btn" class="btn btn-secondary">Cancel</button>
+      </div>
+    </form>
+
+    <div id="table"></div>
+  </main>
+
+  <script type="module">
+    import { supabase, insertRecord, updateRecord, deleteRecord, showToast, requireLogin } from "./main.js";
+    await requireLogin();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const premisesId = urlParams.get("id");
+    const addBtn = document.getElementById("add-btn");
+    const form = document.getElementById("license-form");
+    const cancelBtn = document.getElementById("cancel-btn");
+    const tableDiv = document.getElementById("table");
+    const searchInput = document.getElementById("search");
+    const backPremises = document.getElementById("back-premises");
+    const premisesName = document.getElementById("premises-name");
+    let editingId = null;
+
+    async function loadPremisesName() {
+      const { data } = await supabase.from("premises").select("name").eq("id", premisesId).single();
+      premisesName.textContent = data ? data.name : "Premises not found";
+    }
+
+    async function loadLicenses() {
+      const { data, error } = await supabase.from("premises_licenses")
+        .select("*")
+        .eq("premises_id", premisesId)
+        .order("license_expiry", { ascending: false });
+      if (error) showToast("Error loading licenses: " + error.message, "error");
+      else renderTable(data);
+    }
+
+    function getStatusClass(expiryDate) {
+      if (!expiryDate) return "status-expired";
+      const now = new Date();
+      const exp = new Date(expiryDate);
+      const diffDays = (exp - now) / (1000 * 60 * 60 * 24);
+      if (diffDays < 0) return "status-expired";
+      if (diffDays <= 30) return "status-expiring";
+      return "status-active";
+    }
+
+    function renderTable(rows) {
+      if (!rows.length) {
+        tableDiv.innerHTML = "<p style='text-align:center;margin-top:2rem;'>No licenses found.</p>";
+        return;
+      }
+      const html = `
+        <table>
+          <thead><tr><th>License Number</th><th>Type</th><th>Expiry</th><th>Status</th><th>Fee</th><th>Payment</th><th>Actions</th></tr></thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                <td data-label="License No.">${r.license_number || "-"}</td>
+                <td data-label="Type">${r.license_type || "-"}</td>
+                <td data-label="Expiry">${r.license_expiry || "-"}</td>
+                <td data-label="Status"><span class="${getStatusClass(r.license_expiry)}">${r.license_status || "-"}</span></td>
+                <td data-label="Fee">${r.licensing_fee ? "KES " + r.licensing_fee.toLocaleString() : "-"}</td>
+                <td data-label="Payment">${r.payment_method || "-"}</td>
+                <td data-label="Actions">
+                  <button class="btn btn-primary" data-edit="${r.id}">Edit</button>
+                  <button class="btn btn-danger" data-del="${r.id}">Delete</button>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>`;
+      tableDiv.innerHTML = html;
+      document.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", () => editLicense(b.dataset.edit)));
+      document.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => removeLicense(b.dataset.del)));
+    }
+
+    addBtn.onclick = () => { form.reset(); form.style.display = "block"; editingId = null; };
+    cancelBtn.onclick = () => { form.style.display = "none"; };
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const data = {
+        premises_id: premisesId,
+        registration_number: registration_number.value,
+        registration_date: registration_date.value,
+        license_number: license_number.value,
+        license_expiry: license_expiry.value,
+        license_type: license_type.value,
+        license_status: license_status.value,
+        renewal_history: renewal_history.value,
+        licensing_officer: licensing_officer.value,
+        licensing_fee: licensing_fee.value,
+        payment_method: payment_method.value
+      };
+      try {
+        if (editingId) await updateRecord("premises_licenses", editingId, data);
+        else await insertRecord("premises_licenses", data);
+        showToast("License saved successfully", "success");
+        form.style.display = "none";
+        loadLicenses();
+      } catch (err) {
+        showToast("Error saving: " + err.message, "error");
+      }
+    };
+
+    async function editLicense(id) {
+      const { data, error } = await supabase.from("premises_licenses").select("*").eq("id", id).single();
+      if (error) return showToast("Error loading record: " + error.message, "error");
+      Object.keys(data).forEach(k => { if (form[k]) form[k].value = data[k] || ""; });
+      form.style.display = "block"; editingId = id;
+    }
+
+    async function removeLicense(id) {
+      if (!confirm("Delete this license record?")) return;
+      await deleteRecord("premises_licenses", id);
+      showToast("License deleted", "success");
+      loadLicenses();
+    }
+
+    searchInput.addEventListener("input", e => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll("tbody tr").forEach(r => {
+        r.style.display = r.innerText.toLowerCase().includes(term) ? "" : "none";
+      });
+    });
+
+    backPremises.onclick = () => window.location.href = "premises_management.html";
+    loadPremisesName();
+    loadLicenses();
+  </script>
+</body>
+</html>

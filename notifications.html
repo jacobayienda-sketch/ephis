@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EPHIS Notifications</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="main.js"></script>
+</head>
+<body>
+  <header class="header">
+    <h2>Notification Center</h2>
+    <div>
+      <button class="export-btn" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+      <button id="logoutBtn" class="export-btn">Logout</button>
+    </div>
+  </header>
+
+  <main class="module-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <input type="text" id="notifSearch" placeholder="Search notifications..." style="flex:1;margin-right:10px;">
+      <select id="notifFilter">
+        <option value="all">All</option>
+        <option value="unread">Unread</option>
+        <option value="read">Read</option>
+      </select>
+    </div>
+
+    <table class="module-table" id="notifTable" style="margin-top:10px;">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Message</th>
+          <th>Module</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="notifTableBody"></tbody>
+    </table>
+  </main>
+</body>
+</html>

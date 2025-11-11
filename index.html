@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EPHIS Login</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="main.js"></script>
+  <style>
+    .login-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .login-header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      color: var(--accent);
+    }
+    .login-header p {
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    .error-message {
+      color: #e74c3c;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-box">
+      <div class="login-header">
+        <h1>EPHIS</h1>
+        <p>Environmental Public Health Information System</p>
+      </div>
+
+      <form id="loginForm">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="user@domain.com" required />
+
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" required />
+
+        <button type="submit">Login</button>
+        <div id="loginError" class="error-message"></div>
+      </form>
+
+      <div style="text-align:center;margin-top:1rem;">
+        <button id="themeToggle" class="export-btn">🌓 Toggle Theme</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from "./main.js";
+
+    const loginForm = document.getElementById("loginForm");
+    const errorBox = document.getElementById("loginError");
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBox.textContent = "";
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        errorBox.textContent = "Login failed. Please check your credentials.";
+        console.error("Login error:", error.message);
+      } else {
+        window.location.href = "dashboard.html";
+      }
+    });
+
+    // Optional: check existing session
+    const { data: session } = await supabase.auth.getSession();
+    if (session?.session) {
+      window.location.href = "dashboard.html";
+    }
+  </script>
+</body>
+</html>

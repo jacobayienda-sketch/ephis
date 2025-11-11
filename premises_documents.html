@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Premises Documents | EPHIS</title>
+  <script type="module" src="main.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f5f6fa; margin: 0; color: #222; }
+    header { background: #1976d2; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+    header h1 { margin: 0; font-size: 1.1rem; }
+    .btn { border: none; border-radius: 6px; cursor: pointer; font-weight: 600; padding: 0.6rem 1rem; }
+    .btn-primary { background: #1976d2; color: #fff; }
+    .btn-secondary { background: #eee; color: #333; }
+    .btn-danger { background: #c62828; color: #fff; }
+    main { padding: 1rem; max-width: 1000px; margin: auto; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    .toolbar input { flex: 1; min-width: 200px; padding: 0.6rem; border: 1px solid #ccc; border-radius: 6px; }
+    form { background: #fff; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    form input { width: 100%; padding: 0.5rem; margin: 0.4rem 0; border: 1px solid #ccc; border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+    th { background: #f1f1f1; font-weight: 600; }
+    tr:hover { background: #f9f9f9; }
+    #premises-name { font-weight: 700; font-size: 1.2rem; color: #1976d2; margin-bottom: 0.5rem; }
+    a.doc-link { color: #1976d2; text-decoration: none; }
+    a.doc-link:hover { text-decoration: underline; }
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      tr { margin-bottom: 1rem; background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+      th { display: none; }
+      td { display: flex; justify-content: space-between; padding: 8px 12px; }
+      td::before { content: attr(data-label); font-weight: 600; color: #555; }
+    }
+  </style>
+</head>
+
+<body data-module="premises_documents">
+  <header>
+    <h1>Premises Documents</h1>
+    <button class="btn btn-secondary" onclick="window.location.href='premises_management.html'">← Back to Premises</button>
+  </header>
+
+  <main>
+    <div id="premises-name">Loading premises...</div>
+
+    <div class="toolbar">
+      <button id="add-btn" class="btn btn-primary">+ New Document</button>
+      <input type="search" id="search" placeholder="Search documents..." />
+    </div>
+
+    <form id="document-form" style="display:none;">
+      <h3 id="form-title">Add Document Links</h3>
+      <input type="hidden" id="document-id" />
+      <label>Registration Form URL</label><input id="registration_form_url" type="url" />
+      <label>License Document URL</label><input id="license_doc_url" type="url" />
+      <label>Inspection Report URL</label><input id="inspection_report_url" type="url" />
+      <label>Compliance Action URL</label><input id="compliance_action_url" type="url" />
+      <label>Photos URL</label><input id="photos_url" type="url" />
+      <label>Supporting Documents URL</label><input id="supporting_docs_url" type="url" />
+      <div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" id="cancel-btn" class="btn btn-secondary">Cancel</button>
+      </div>
+    </form>
+
+    <div id="table"></div>
+    <div style="text-align:center;margin-top:1rem;">
+      <button id="load-more" class="btn btn-secondary">Load More</button>
+    </div>
+  </main>
+
+  <script type="module">
+    import { supabase, insertRecord, updateRecord, deleteRecord, showToast, requireLogin } from "./main.js";
+    await requireLogin();
+
+    const params = new URLSearchParams(window.location.search);
+    const premisesId = params.get("id");
+    const premisesNameDiv = document.getElementById("premises-name");
+    const form = document.getElementById("document-form");
+    const addBtn = document.getElementById("add-btn");
+    const cancelBtn = document.getElementById("cancel-btn");
+    const tableDiv = document.getElementById("table");
+    const searchInput = document.getElementById("search");
+    const loadMoreBtn = document.getElementById("load-more");
+
+    let editingId = null, offset = 0, limit = 10, allLoaded = false;
+
+    async function fetchPremisesName() {
+      const { data } = await supabase.from("premises").select("name").eq("id", premisesId).single();
+      premisesNameDiv.textContent = data ? "Premises: " + data.name : "Premises not found";
+    }
+
+    async function loadDocuments(reset = false) {
+      if (reset) { offset = 0; allLoaded = false; tableDiv.innerHTML = ""; }
+      if (allLoaded) return;
+
+      const { data, error } = await supabase
+        .from("premises_documents")
+        .select("*")
+        .eq("premises_id", premisesId)
+        .order("created_at", { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (error) return showToast("Error loading documents: " + error.message, "error");
+      if (!data.length) { allLoaded = true; return; }
+
+      offset += data.length;
+      renderTable(data, reset);
+    }
+
+    function renderTable(rows, reset) {
+      if (!rows.length && reset) {
+        tableDiv.innerHTML = "<p style='text-align:center;margin-top:2rem;'>No documents found.</p>";
+        return;
+      }
+
+      const tbody = rows.map(r => `
+        <tr>
+          <td data-label="Registration Form">${r.registration_form_url ? `<a href="${r.registration_form_url}" class="doc-link" target="_blank">Open</a>` : "-"}</td>
+          <td data-label="License Doc">${r.license_doc_url ? `<a href="${r.license_doc_url}" class="doc-link" target="_blank">Open</a>` : "-"}</td>
+          <td data-label="Inspection Report">${r.inspection_report_url ? `<a href="${r.inspection_report_url}" class="doc-link" target="_blank">Open</a>` : "-"}</td>
+          <td data-label="Compliance Action">${r.compliance_action_url ? `<a href="${r.compliance_action_url}" class="doc-link" target="_blank">Open</a>` : "-"}</td>
+          <td data-label="Photos">${r.photos_url ? `<a href="${r.photos_url}" class="doc-link" target="_blank">Open</a>` : "-"}</td>
+          <td data-label="Supporting Docs">${r.supporting_docs_url ? `<a href="${r.supporting_docs_url}" class="doc-link" target="_blank">Open</a>` : "-"}</td>
+          <td data-label="Action">
+            <button class="btn btn-primary" data-edit="${r.id}">Edit</button>
+            <button class="btn btn-danger" data-del="${r.id}">Delete</button>
+          </td>
+        </tr>`).join("");
+
+      const tableExists = tableDiv.querySelector("table");
+      if (tableExists && !reset) tableDiv.querySelector("tbody").insertAdjacentHTML("beforeend", tbody);
+      else tableDiv.innerHTML = `
+        <table>
+          <thead><tr><th>Registration Form</th><th>License Doc</th><th>Inspection Report</th><th>Compliance</th><th>Photos</th><th>Supporting</th><th>Action</th></tr></thead>
+          <tbody>${tbody}</tbody>
+        </table>
+      `;
+
+      document.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", () => editDocument(b.dataset.edit)));
+      document.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => removeDocument(b.dataset.del)));
+    }
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const data = {
+        premises_id: premisesId,
+        registration_form_url: registration_form_url.value,
+        license_doc_url: license_doc_url.value,
+        inspection_report_url: inspection_report_url.value,
+        compliance_action_url: compliance_action_url.value,
+        photos_url: photos_url.value,
+        supporting_docs_url: supporting_docs_url.value
+      };
+      try {
+        if (editingId) await updateRecord("premises_documents", editingId, data);
+        else await insertRecord("premises_documents", data);
+        showToast("Saved successfully", "success");
+        form.style.display = "none";
+        loadDocuments(true);
+      } catch (err) {
+        showToast("Error saving: " + err.message, "error");
+      }
+    };
+
+    async function editDocument(id) {
+      const { data } = await supabase.from("premises_documents").select("*").eq("id", id).single();
+      Object.keys(data).forEach(k => { if (form[k]) form[k].value = data[k] || ""; });
+      form.style.display = "block"; editingId = id;
+    }
+
+    async function removeDocument(id) {
+      if (!confirm("Delete this document record?")) return;
+      await deleteRecord("premises_documents", id);
+      showToast("Deleted successfully", "success");
+      loadDocuments(true);
+    }
+
+    addBtn.onclick = () => { form.reset(); editingId = null; form.style.display = "block"; };
+    cancelBtn.onclick = () => form.style.display = "none";
+    loadMoreBtn.onclick = () => loadDocuments();
+    searchInput.addEventListener("input", e => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll("tbody tr").forEach(r => {
+        r.style.display = r.innerText.toLowerCase().includes(term) ? "" : "none";
+      });
+    });
+
+    fetchPremisesName();
+    loadDocuments(true);
+  </script>
+</body>
+</html>

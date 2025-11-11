@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Premises Form | EPHIS</title>
+  <script type="module" src="main.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; background: #f5f6fa; color: #222; }
+    header { background: #1976d2; color: #fff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+    header h1 { margin: 0; font-size: 1.1rem; }
+    .btn { border: none; border-radius: 6px; cursor: pointer; font-weight: 600; padding: 0.6rem 1rem; }
+    .btn-primary { background: #1976d2; color: #fff; }
+    .btn-secondary { background: #eee; color: #333; }
+    .btn-danger { background: #c62828; color: #fff; }
+    main { padding: 1rem; max-width: 700px; margin: auto; }
+    form { background: #fff; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    form h3 { margin-top: 0; }
+    label { display: block; margin-top: 1rem; font-weight: 600; }
+    input, textarea, select { width: 100%; padding: 0.6rem; border: 1px solid #ccc; border-radius: 6px; margin-top: 0.3rem; }
+    .form-actions { display: flex; gap: 0.5rem; margin-top: 1.5rem; justify-content: flex-end; flex-wrap: wrap; }
+    @media (max-width: 600px) {
+      main { padding: 0.8rem; }
+      .form-actions { flex-direction: column; align-items: stretch; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+
+<body data-module="premises_form">
+  <header>
+    <h1>Premises Form</h1>
+    <button class="btn btn-secondary" onclick="window.location.href='premises_management.html'">← Back to Premises Management</button>
+  </header>
+
+  <main>
+    <form id="premises-form">
+      <h3 id="form-title">Add New Premises</h3>
+      <input type="hidden" id="premises-id">
+
+      <label for="name">Name</label>
+      <input id="name" required>
+
+      <label for="type">Type</label>
+      <input id="type">
+
+      <label for="category">Category</label>
+      <input id="category">
+
+      <label for="address">Address</label>
+      <input id="address">
+
+      <label for="latitude">Latitude</label>
+      <input id="latitude" type="number" step="0.000001">
+
+      <label for="longitude">Longitude</label>
+      <input id="longitude" type="number" step="0.000001">
+
+      <label for="ownership">Ownership</label>
+      <select id="ownership">
+        <option value="">Select Ownership</option>
+        <option value="Private">Private</option>
+        <option value="Public">Public</option>
+        <option value="Community">Community</option>
+      </select>
+
+      <label for="owner_details">Owner Details</label>
+      <textarea id="owner_details" rows="2"></textarea>
+
+      <label for="registration_status">Registration Status</label>
+      <select id="registration_status">
+        <option value="">Select Status</option>
+        <option value="Registered">Registered</option>
+        <option value="Pending">Pending</option>
+        <option value="Closed">Closed</option>
+      </select>
+
+      <label for="sub_county_office">Sub-County Office</label>
+      <input id="sub_county_office">
+
+      <label for="remarks">Remarks</label>
+      <textarea id="remarks" rows="3"></textarea>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
+      </div>
+    </form>
+  </main>
+
+  <script type="module">
+    import { supabase, insertRecord, updateRecord, requireLogin, showToast } from "./main.js";
+    await requireLogin();
+
+    const form = document.getElementById("premises-form");
+    const cancelBtn = document.getElementById("cancel-btn");
+    const idInput = document.getElementById("premises-id");
+    const formTitle = document.getElementById("form-title");
+
+    const params = new URLSearchParams(window.location.search);
+    const premisesId = params.get("id");
+
+    // Load record if editing
+    if (premisesId) loadPremises(premisesId);
+
+    async function loadPremises(id) {
+      try {
+        const { data, error } = await supabase.from("premises").select("*").eq("id", id).single();
+        if (error) throw error;
+        Object.keys(data).forEach(k => { if (form[k]) form[k].value = data[k] || ""; });
+        idInput.value = id;
+        formTitle.textContent = "Edit Premises";
+      } catch (err) {
+        showToast("Error loading record: " + err.message, "error");
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = {
+        name: form.name.value.trim(),
+        type: form.type.value.trim(),
+        category: form.category.value.trim(),
+        address: form.address.value.trim(),
+        latitude: form.latitude.value || null,
+        longitude: form.longitude.value || null,
+        ownership: form.ownership.value,
+        owner_details: form.owner_details.value.trim(),
+        registration_status: form.registration_status.value,
+        sub_county_office: form.sub_county_office.value.trim(),
+        remarks: form.remarks.value.trim()
+      };
+
+      try {
+        if (idInput.value) {
+          await updateRecord("premises", idInput.value, data);
+          showToast("Premises updated successfully", "success");
+        } else {
+          await insertRecord("premises", data);
+          showToast("Premises added successfully", "success");
+        }
+        window.location.href = "premises_management.html";
+      } catch (err) {
+        showToast("Save failed: " + err.message, "error");
+      }
+    });
+
+    cancelBtn.onclick = () => {
+      window.location.href = "premises_management.html";
+    };
+  </script>
+</body>
+</html>

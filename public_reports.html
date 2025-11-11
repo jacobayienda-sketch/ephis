@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Public Reports – EPHIS</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+  <header>
+    EPHIS Public Reports
+    <select id="themePicker">
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+      <option value="county">County Green</option>
+    </select>
+  </header>
+
+  <main class="public-container">
+    <section class="intro">
+      <h1>Environmental Public Health Insights</h1>
+      <p>
+        Access verified public data from the Department of Health Services,
+        County Government of Elgeyo Marakwet.  
+        Only resolved and approved records are displayed.
+      </p>
+    </section>
+
+    <!-- Complaints and Incidents -->
+    <section class="public-section" id="public-complaints">
+      <h2>Resolved Complaints and Incidents</h2>
+      <input type="text" id="complaintSearch" class="search-input" placeholder="Search complaints..." />
+      <table id="complaintsTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Location</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- Safe Water Sources -->
+    <section class="public-section" id="public-water">
+      <h2>Safe Water Sources</h2>
+      <input type="text" id="waterSearch" class="search-input" placeholder="Search water source..." />
+      <table id="waterTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Ward</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- Licensed Food Premises -->
+    <section class="public-section" id="public-food">
+      <h2>Licensed Food Premises</h2>
+      <input type="text" id="foodSearch" class="search-input" placeholder="Search food premises..." />
+      <table id="foodTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Ward</th>
+            <th>License Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <p>© <span id="year"></span> County Government of Elgeyo Marakwet</p>
+  </footer>
+
+  <script>
+    const supabase = window.supabase.createClient(
+      "https://YOUR_SUPABASE_URL.supabase.co",
+      "YOUR_PUBLIC_ANON_KEY"
+    );
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    async function loadPublicData() {
+      // Complaints
+      const { data: complaints } = await supabase
+        .from("complaints")
+        .select("incident_date, complaint_type, incident_location, resolution_status")
+        .eq("resolution_status", "Resolved")
+        .order("incident_date", { ascending: false });
+
+      const complaintsBody = document.querySelector("#complaintsTable tbody");
+      complaintsBody.innerHTML = complaints?.map(c =>
+        `<tr>
+          <td>${new Date(c.incident_date).toLocaleDateString()}</td>
+          <td>${c.complaint_type}</td>
+          <td>${c.incident_location}</td>
+          <td>${c.resolution_status}</td>
+        </tr>`).join("") || "<tr><td colspan='4'>No resolved complaints found.</td></tr>";
+
+      // Water Sources
+      const { data: water } = await supabase
+        .from("water_quality_sources")
+        .select("water_source_name, water_source_type, physical_address, classification")
+        .eq("classification", "Safe");
+
+      const waterBody = document.querySelector("#waterTable tbody");
+      waterBody.innerHTML = water?.map(w =>
+        `<tr>
+          <td>${w.water_source_name}</td>
+          <td>${w.water_source_type}</td>
+          <td>${w.physical_address}</td>
+          <td>${w.classification}</td>
+        </tr>`).join("") || "<tr><td colspan='4'>No safe sources listed.</td></tr>";
+
+      // Food Premises
+      const { data: food } = await supabase
+        .from("food_premises")
+        .select("premises_name, premises_type, physical_address, license_status")
+        .eq("license_status", "Active");
+
+      const foodBody = document.querySelector("#foodTable tbody");
+      foodBody.innerHTML = food?.map(f =>
+        `<tr>
+          <td>${f.premises_name}</td>
+          <td>${f.premises_type}</td>
+          <td>${f.physical_address}</td>
+          <td>${f.license_status}</td>
+        </tr>`).join("") || "<tr><td colspan='4'>No active food premises available.</td></tr>";
+    }
+
+    loadPublicData();
+  </script>
+
+  <script src="main.js"></script>
+</body>
+</html>

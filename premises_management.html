@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Premises Summary | EPHIS</title>
+  <script type="module" src="main.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; background:#f5f6fa; margin:0; color:#222; }
+    header { background:#1976d2; color:white; padding:1rem; display:flex; justify-content:space-between; align-items:center; }
+    header h1 { margin:0; font-size:1.2rem; }
+    .btn { border:none; border-radius:6px; cursor:pointer; font-weight:600; padding:0.5rem 0.8rem; }
+    .btn-primary { background:#1976d2; color:#fff; }
+    .btn-danger { background:#c62828; color:#fff; }
+    .btn-secondary { background:#eee; color:#333; }
+    main { padding:1rem; max-width:1000px; margin:auto; }
+    .card { background:#fff; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); margin-bottom:1rem; padding:1rem; transition:all 0.3s ease; }
+    .card h3 { margin:0 0 0.5rem 0; font-size:1.1rem; color:#1976d2; }
+    .card p { margin:0.2rem 0; font-size:0.9rem; }
+    .modules a { color:#1976d2; text-decoration:none; margin-right:0.5rem; font-size:0.9rem; }
+    .modules a:hover { text-decoration:underline; }
+    .inline-form { background:#fafafa; border-top:1px solid #ddd; margin-top:0.5rem; padding:0.8rem; display:none; border-radius:6px; }
+    .inline-form input, .inline-form textarea, .inline-form select {
+      width:100%; margin:0.3rem 0; padding:0.5rem; border:1px solid #ccc; border-radius:5px;
+    }
+    .inline-form-actions { display:flex; justify-content:flex-end; gap:0.5rem; margin-top:0.5rem; }
+    #loadMore { display:block; margin:1rem auto; }
+    @media(max-width:600px){
+      header { flex-direction:column; align-items:flex-start; }
+      .inline-form-actions { flex-direction:column; }
+      .inline-form-actions button { width:100%; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Premises Summary</h1>
+    <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'">🏠 Dashboard</button>
+  </header>
+
+  <main>
+    <input id="search" type="search" placeholder="Search premises..." style="width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;margin-bottom:1rem;">
+    <div id="cards"></div>
+    <button id="loadMore" class="btn btn-primary">Load More</button>
+  </main>
+
+  <script type="module">
+    import { supabase, insertRecord, updateRecord, deleteRecord, showToast, requireLogin } from "./main.js";
+    await requireLogin();
+
+    const cardsDiv = document.getElementById("cards");
+    const loadMoreBtn = document.getElementById("loadMore");
+    const searchInput = document.getElementById("search");
+
+    let from = 0, to = 9, searchTerm = "", loading = false, allLoaded = false;
+
+    async function fetchPremisesBatch(reset = false) {
+      if (loading || allLoaded) return;
+      loading = true;
+      if (reset) { from = 0; to = 9; cardsDiv.innerHTML = ""; allLoaded = false; }
+      const query = supabase.from("premises")
+        .select("id,name,type,category,address,latitude,longitude,ownership,owner_details,registration_status,sub_county_office,remarks")
+        .order("created_at", { ascending: false })
+        .range(from, to);
+
+      if (searchTerm) query.ilike("name", `%${searchTerm}%`);
+
+      const { data, error } = await query;
+      if (error) { showToast("Error: " + error.message, "error"); loading = false; return; }
+      if (!data.length) { allLoaded = true; loadMoreBtn.style.display = "none"; loading = false; return; }
+      renderCards(data);
+      from += 10; to += 10;
+      loading = false;
+    }
+
+    function renderCards(rows) {
+      rows.forEach(r => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h3>${r.name}</h3>
+          <p><b>Type:</b> ${r.type || "-"} | <b>Category:</b> ${r.category || "-"}</p>
+          <p><b>Address:</b> ${r.address || "-"} | <b>Sub-county:</b> ${r.sub_county_office || "-"}</p>
+          <p><b>Ownership:</b> ${r.ownership || "-"} | <b>Status:</b> ${r.registration_status || "-"}</p>
+          <p><b>Remarks:</b> ${r.remarks || "-"}</p>
+          <div class="modules">
+            <a href="premises_contacts.html?id=${r.id}">Contacts</a>|
+            <a href="premises_licenses.html?id=${r.id}">Licenses</a>|
+            <a href="premises_inspections.html?id=${r.id}">Inspections</a>|
+            <a href="premises_compliance.html?id=${r.id}">Compliance</a>|
+            <a href="premises_documents.html?id=${r.id}">Documents</a>
+          </div>
+          <div style="margin-top:0.6rem;">
+            <button class="btn btn-primary edit-btn" data-id="${r.id}">Edit</button>
+            <button class="btn btn-danger del-btn" data-id="${r.id}">Delete</button>
+          </div>
+          <div class="inline-form" id="form-${r.id}">
+            <input id="name-${r.id}" value="${r.name || ""}" placeholder="Name" />
+            <input id="type-${r.id}" value="${r.type || ""}" placeholder="Type" />
+            <input id="category-${r.id}" value="${r.category || ""}" placeholder="Category" />
+            <input id="address-${r.id}" value="${r.address || ""}" placeholder="Address" />
+            <input id="latitude-${r.id}" value="${r.latitude || ""}" placeholder="Latitude" />
+            <input id="longitude-${r.id}" value="${r.longitude || ""}" placeholder="Longitude" />
+            <input id="ownership-${r.id}" value="${r.ownership || ""}" placeholder="Ownership" />
+            <textarea id="owner_details-${r.id}" placeholder="Owner Details">${r.owner_details || ""}</textarea>
+            <input id="registration_status-${r.id}" value="${r.registration_status || ""}" placeholder="Registration Status" />
+            <input id="sub_county_office-${r.id}" value="${r.sub_county_office || ""}" placeholder="Sub County Office" />
+            <textarea id="remarks-${r.id}" placeholder="Remarks">${r.remarks || ""}</textarea>
+            <div class="inline-form-actions">
+              <button class="btn btn-primary save-btn" data-id="${r.id}">Save</button>
+              <button class="btn btn-secondary cancel-btn" data-id="${r.id}">Cancel</button>
+            </div>
+          </div>
+        `;
+        cardsDiv.appendChild(card);
+      });
+
+      document.querySelectorAll(".edit-btn").forEach(btn => btn.onclick = () => toggleForm(btn.dataset.id));
+      document.querySelectorAll(".cancel-btn").forEach(btn => btn.onclick = () => toggleForm(btn.dataset.id, false));
+      document.querySelectorAll(".save-btn").forEach(btn => btn.onclick = () => saveForm(btn.dataset.id));
+      document.querySelectorAll(".del-btn").forEach(btn => btn.onclick = () => removePremises(btn.dataset.id));
+    }
+
+    function toggleForm(id, open = true) {
+      const form = document.getElementById(`form-${id}`);
+      form.style.display = open ? "block" : "none";
+    }
+
+    async function saveForm(id) {
+      const data = {
+        name: document.getElementById(`name-${id}`).value.trim(),
+        type: document.getElementById(`type-${id}`).value.trim(),
+        category: document.getElementById(`category-${id}`).value.trim(),
+        address: document.getElementById(`address-${id}`).value.trim(),
+        latitude: document.getElementById(`latitude-${id}`).value || null,
+        longitude: document.getElementById(`longitude-${id}`).value || null,
+        ownership: document.getElementById(`ownership-${id}`).value.trim(),
+        owner_details: document.getElementById(`owner_details-${id}`).value.trim(),
+        registration_status: document.getElementById(`registration_status-${id}`).value.trim(),
+        sub_county_office: document.getElementById(`sub_county_office-${id}`).value.trim(),
+        remarks: document.getElementById(`remarks-${id}`).value.trim()
+      };
+      const { error } = await updateRecord("premises", id, data);
+      if (error) showToast("Save failed: " + error.message, "error");
+      else {
+        showToast("Updated successfully", "success");
+        toggleForm(id, false);
+        cardsDiv.innerHTML = "";
+        from = 0; to = 9; allLoaded = false;
+        fetchPremisesBatch(true);
+      }
+    }
+
+    async function removePremises(id) {
+      if (!confirm("Delete this record?")) return;
+      const { error } = await deleteRecord("premises", id);
+      if (error) showToast("Delete failed: " + error.message, "error");
+      else {
+        showToast("Deleted successfully", "success");
+        document.querySelector(`#form-${id}`)?.closest(".card")?.remove();
+      }
+    }
+
+    searchInput.addEventListener("input", e => {
+      searchTerm = e.target.value.trim();
+      from = 0; to = 9; cardsDiv.innerHTML = ""; allLoaded = false;
+      fetchPremisesBatch(true);
+    });
+
+    loadMoreBtn.addEventListener("click", () => fetchPremisesBatch());
+
+    fetchPremisesBatch();
+  </script>
+</body>
+</html>

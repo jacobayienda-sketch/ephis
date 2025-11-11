@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Food Premises Form | EPHIS</title>
+  <script type="module" src="main.js"></script>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f6fa;
+      margin: 0;
+      color: #222;
+    }
+    header {
+      background: #1976d2;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    header h1 { margin: 0; font-size: 1.1rem; }
+    main { padding: 1rem; max-width: 700px; margin: auto; }
+    form {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-top: 0.8rem;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-top: 0.3rem;
+      font-size: 0.95rem;
+    }
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1.5rem;
+    }
+    .btn {
+      border: none; border-radius: 6px;
+      cursor: pointer; font-weight: 600;
+      padding: 0.6rem 1rem;
+    }
+    .btn-primary { background: #1976d2; color: #fff; }
+    .btn-danger { background: #c62828; color: #fff; }
+    .btn-secondary { background: #eee; color: #333; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1 id="form-title">New Food Premises</h1>
+    <button class="btn btn-secondary" onclick="window.location.href='food_control.html'">← Back to List</button>
+  </header>
+
+  <main>
+    <form id="food-form">
+      <label for="premises_name">Premises Name</label>
+      <input type="text" id="premises_name" name="premises_name" required />
+
+      <label for="premises_type">Premises Type</label>
+      <input type="text" id="premises_type" name="premises_type" required />
+
+      <label for="license_type">License Type</label>
+      <select name="license_type" id="license_type">
+        <option value="">Select</option>
+        <option>Annual</option>
+        <option>Temporary</option>
+        <option>Provisional</option>
+      </select>
+
+      <label for="inspection_date">Inspection Date</label>
+      <input type="date" id="inspection_date" name="inspection_date" />
+
+      <label for="hygiene_score">Hygiene Score (%)</label>
+      <input type="number" id="hygiene_score" name="hygiene_score" min="0" max="100" />
+
+      <label for="risk_category">Risk Category</label>
+      <select name="risk_category" id="risk_category">
+        <option value="">Select</option>
+        <option>Low</option>
+        <option>Medium</option>
+        <option>High</option>
+      </select>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="delete-btn">Delete</button>
+      </div>
+    </form>
+  </main>
+
+  <script type="module">
+    import { supabase, showToast, getFormData, populateForm, insertRecord, updateRecord, deleteRecord, fetchById, requireLogin } from "./main.js";
+
+    const form = document.getElementById("food-form");
+    const cancelBtn = document.getElementById("cancel-btn");
+    const deleteBtn = document.getElementById("delete-btn");
+    const title = document.getElementById("form-title");
+    const params = new URLSearchParams(window.location.search);
+    const recordId = params.get("id");
+
+    await requireLogin();
+
+    cancelBtn.onclick = () => window.location.href = "food_control.html";
+    if (!recordId) deleteBtn.style.display = "none";
+
+    if (recordId) {
+      try {
+        const record = await fetchById("food_control", recordId);
+        populateForm(form, record);
+        title.textContent = "Edit Food Premises";
+      } catch (err) {
+        showToast("Error loading record: " + err.message, "error");
+      }
+    }
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const payload = getFormData(form);
+      try {
+        const { data: userData } = await supabase.auth.getUser();
+        payload.created_by = userData?.user?.id || null;
+
+        if (recordId) {
+          await updateRecord("food_control", recordId, payload);
+          showToast("Record updated", "success");
+        } else {
+          await insertRecord("food_control", payload);
+          showToast("Record added", "success");
+        }
+        window.location.href = "food_control.html";
+      } catch (err) {
+        showToast("Save failed: " + err.message, "error");
+      }
+    };
+
+    deleteBtn.onclick = async () => {
+      if (!confirm("Delete this record?")) return;
+      try {
+        await deleteRecord("food_control", recordId);
+        showToast("Record deleted", "success");
+        window.location.href = "food_control.html";
+      } catch (err) {
+        showToast("Delete failed: " + err.message, "error");
+      }
+    };
+  </script>
+</body>
+</html>

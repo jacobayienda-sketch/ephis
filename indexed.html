@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EPHIS – Elgeyo Marakwet County</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+  <header>
+    Environmental Public Health Information System (EPHIS)
+    <select id="themePicker">
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+      <option value="county">County Green</option>
+    </select>
+  </header>
+
+  <main class="landing-container">
+    <section class="hero">
+      <h1>Welcome to EPHIS</h1>
+      <p>
+        A unified system for managing environmental and public health data across
+        Elgeyo Marakwet County. Access reliable insights, monitor compliance,
+        and promote a healthier community.
+      </p>
+      <div class="cta-buttons">
+        <a href="login.html" class="btn primary">Staff Login</a>
+        <a href="public_reports.html" class="btn secondary">Public Reports</a>
+      </div>
+    </section>
+
+    <section class="modules">
+      <h2>Core Modules</h2>
+      <div class="module-list">
+        <div class="module-item">
+          <h3>Complaints & Incidents</h3>
+          <p>Submit and track environmental or public health complaints.</p>
+        </div>
+        <div class="module-item">
+          <h3>Premises Management</h3>
+          <p>Registration and inspection of business and health premises.</p>
+        </div>
+        <div class="module-item">
+          <h3>Inspections</h3>
+          <p>Risk-based inspections for compliance and quality assurance.</p>
+        </div>
+        <div class="module-item">
+          <h3>Food Control</h3>
+          <p>Ensure food safety and hygiene standards in all establishments.</p>
+        </div>
+        <div class="module-item">
+          <h3>Water Quality Monitoring</h3>
+          <p>Monitor safety of water sources and track laboratory results.</p>
+        </div>
+        <div class="module-item">
+          <h3>Waste Management</h3>
+          <p>Track waste collection, disposal, and enforcement actions.</p>
+        </div>
+        <div class="module-item">
+          <h3>Vector & Vermin Control</h3>
+          <p>Map high-risk areas and coordinate vector control interventions.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="about">
+      <h2>About the System</h2>
+      <p>
+        EPHIS is developed under the Department of Health Services,
+        County Government of Elgeyo Marakwet, to strengthen public health
+        surveillance, improve service delivery, and enable data-driven decision
+        making at all levels.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>© <span id="year"></span> County Government of Elgeyo Marakwet</p>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+  <script src="main.js"></script>
+</body>
+</html>
