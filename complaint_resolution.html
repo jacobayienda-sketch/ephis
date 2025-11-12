@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complaint Resolution | EPHIS</title>
+  <script type="module" src="main.js"></script>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;padding:1rem;}
+    header{background:#1976d2;color:white;padding:1rem;display:flex;justify-content:space-between;align-items:center;}
+    form{background:white;border-radius:8px;padding:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.1);margin-top:1rem;}
+    label{font-weight:600;display:block;margin-top:0.8rem;}
+    input,textarea,select{width:100%;padding:0.6rem;border:1px solid #ccc;border-radius:6px;margin-top:0.3rem;}
+    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.6rem 1rem;background:#1976d2;color:white;width:100%;margin-top:1rem;}
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Complaint Resolution</h1>
+    <button onclick="history.back()" style="background:white;color:#1976d2;padding:0.4rem 0.8rem;border:none;border-radius:6px;">Back</button>
+  </header>
+
+  <form id="resForm">
+    <label>Resolution Status</label>
+    <select id="resolution_status" required>
+      <option>Resolved</option>
+      <option>Unresolved</option>
+      <option>Escalated</option>
+    </select>
+
+    <label>Resolution Description</label>
+    <textarea id="resolution_description" rows="3"></textarea>
+
+    <label>Verification Officer</label>
+    <input id="verification_officer" />
+
+    <label>Verified by Supervisor</label>
+    <select id="verified_by_supervisor">
+      <option value="true">Yes</option>
+      <option value="false">No</option>
+    </select>
+
+    <button type="submit" class="btn">Save Resolution</button>
+  </form>
+
+  <script type="module">
+    import { supabase, showToast, requireLogin } from './main.js';
+    const params=new URLSearchParams(window.location.search);
+    const complaintId=params.get('id');
+    const form=document.getElementById('resForm');
+    await requireLogin();
+
+    form.onsubmit=async e=>{
+      e.preventDefault();
+      const payload={
+        complaint_id:complaintId,
+        resolution_status:document.getElementById('resolution_status').value,
+        resolution_description:document.getElementById('resolution_description').value,
+        verification_officer:document.getElementById('verification_officer').value,
+        verified_by_supervisor:document.getElementById('verified_by_supervisor').value==='true',
+        resolution_date:new Date().toISOString().split('T')[0]
+      };
+      const {error}=await supabase.from('complaint_resolution').insert([payload]);
+      if(error)showToast('Save failed','error');
+      else{showToast('Resolution saved','success');history.back();}
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EPHIS Staff Login</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#1976d2" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="main.js"></script>
+  <style>
+    :root {
+      --primary: #1976d2;
+      --accent: #2e7d32;
+      --bg: #f5f6fa;
+      --text: #333;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: var(--bg);
+      margin: 0;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .login-box {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 400px;
+      padding: 2rem;
+      text-align: center;
+      animation: fadeIn 0.4s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      color: var(--primary);
+    }
+
+    .login-header p {
+      color: #555;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      text-align: left;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    input {
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+
+    button[type="submit"] {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.2s ease;
+    }
+
+    button[type="submit"]:hover {
+      background: #1565c0;
+    }
+
+    .forgot-link {
+      text-align: center;
+      margin-top: 0.8rem;
+    }
+
+    .forgot-link a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .forgot-link a:hover {
+      text-decoration: underline;
+    }
+
+    .error-message {
+      color: #e74c3c;
+      font-size: 0.85rem;
+      text-align: center;
+      margin-top: 0.3rem;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.8rem;
+      background: #e3f2fd;
+      color: #555;
+    }
+
+    .footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    #themeToggle {
+      background: transparent;
+      border: none;
+      color: var(--primary);
+      font-size: 0.9rem;
+      margin-top: 0.8rem;
+      cursor: pointer;
+    }
+
+    @media (max-width: 480px) {
+      .login-box { padding: 1.5rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>Environmental Public Health Information System (EPHIS)</header>
+
+  <main>
+    <div class="login-box">
+      <div class="login-header">
+        <h1>Staff Login</h1>
+        <p>Authorized Access – Department of Health Services</p>
+      </div>
+
+      <form id="loginForm">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="user@domain.com" required />
+
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="••••••••" required />
+
+        <button type="submit">Login</button>
+        <div id="loginError" class="error-message"></div>
+      </form>
+
+      <div class="forgot-link">
+        <a href="reset_password.html">Forgot Password?</a>
+      </div>
+
+      <button id="themeToggle">🌓 Toggle Theme</button>
+    </div>
+  </main>
+
+  <footer class="footer">
+    © <span id="year"></span> County Health Services |
+    <a href="index.html">Return to Home</a>
+  </footer>
+
+  <script type="module">
+    import { supabase } from "./main.js";
+
+    const loginForm = document.getElementById("loginForm");
+    const errorBox = document.getElementById("loginError");
+
+    // Auto redirect if session exists
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (data?.session) {
+        window.location.href = "dashboard.html";
+      }
+    }
+    checkSession();
+
+    // Login handler
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBox.textContent = "";
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        errorBox.textContent = "Invalid credentials. Please try again.";
+      } else {
+        window.location.href = "dashboard.html";
+      }
+    });
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

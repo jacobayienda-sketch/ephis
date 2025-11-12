@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complaint Feedback | EPHIS</title>
+  <script type="module" src="main.js"></script>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;padding:1rem;}
+    header{background:#1976d2;color:white;padding:1rem;display:flex;justify-content:space-between;align-items:center;}
+    form{background:white;border-radius:8px;padding:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.1);margin-top:1rem;}
+    label{font-weight:600;display:block;margin-top:0.8rem;}
+    select,textarea{width:100%;padding:0.6rem;border:1px solid #ccc;border-radius:6px;margin-top:0.3rem;}
+    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.6rem 1rem;background:#1976d2;color:white;width:100%;margin-top:1rem;}
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Complaint Feedback</h1>
+    <button onclick="history.back()" style="background:white;color:#1976d2;padding:0.4rem 0.8rem;border:none;border-radius:6px;">Back</button>
+  </header>
+
+  <form id="feedbackForm">
+    <label>Satisfaction Level</label>
+    <select id="satisfaction_level">
+      <option>Satisfied</option><option>Neutral</option><option>Dissatisfied</option>
+    </select>
+
+    <label>Additional Comments</label>
+    <textarea id="additional_comments"></textarea>
+
+    <button type="submit" class="btn">Submit Feedback</button>
+  </form>
+
+  <script type="module">
+    import { supabase, showToast, requireLogin } from './main.js';
+    const params=new URLSearchParams(window.location.search);
+    const complaintId=params.get('id');
+    const form=document.getElementById('feedbackForm');
+    await requireLogin();
+
+    form.onsubmit=async e=>{
+      e.preventDefault();
+      const payload={
+        complaint_id:complaintId,
+        satisfaction_level:document.getElementById('satisfaction_level').value,
+        additional_comments:document.getElementById('additional_comments').value,
+        feedback_date:new Date().toISOString().split('T')[0]
+      };
+      const {error}=await supabase.from('complaint_feedback').insert([payload]);
+      if(error)showToast('Save failed','error');
+      else{showToast('Feedback saved','success');history.back();}
+    };
+  </script>
+</body>
+</html>

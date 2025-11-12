@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Public Complaints | EPHIS</title>
+  <script type="module" src="main.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;color:#222;}
+    header{background:#1976d2;color:white;padding:1rem;text-align:center;font-weight:600;}
+    .container{max-width:480px;margin:auto;padding:1rem;}
+    .tabs{display:flex;justify-content:space-around;margin-bottom:1rem;}
+    .tab{flex:1;text-align:center;padding:0.6rem;cursor:pointer;border-bottom:3px solid transparent;font-weight:600;}
+    .tab.active{border-color:#1976d2;color:#1976d2;}
+    form{background:white;padding:1rem;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+    label{font-weight:600;display:block;margin-top:0.8rem;}
+    input,select,textarea{width:100%;padding:0.6rem;border:1px solid #ccc;border-radius:6px;margin-top:0.3rem;}
+    textarea{min-height:80px;resize:vertical;}
+    #map{height:250px;border-radius:8px;margin-top:0.5rem;}
+    .btn{border:none;background:#1976d2;color:white;font-weight:600;width:100%;padding:0.8rem;border-radius:6px;margin-top:1rem;cursor:pointer;}
+    .card{background:white;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.1);padding:1rem;margin-top:1rem;}
+    .tag{display:inline-block;padding:0.2rem 0.5rem;border-radius:5px;font-size:0.8rem;font-weight:600;text-transform:capitalize;}
+    .tag.pending{background:#fff3cd;color:#856404;}
+    .tag.resolved{background:#d4edda;color:#155724;}
+    .tag.inprogress{background:#cce5ff;color:#004085;}
+    .alert{background:#e3f2fd;color:#004085;padding:0.8rem;border-radius:6px;margin-top:1rem;font-weight:600;}
+  </style>
+</head>
+
+<body>
+<header>EPHIS | Public Complaints Portal</header>
+
+<div class="container">
+  <div class="tabs">
+    <div class="tab active" id="tab-report">Submit Complaint</div>
+    <div class="tab" id="tab-track">Track Status</div>
+  </div>
+
+  <!-- Submit Complaint -->
+  <div id="reportView">
+    <form id="reportForm">
+      <label>Complaint Type</label>
+      <select id="complaint_type" required>
+        <option value="">Select</option>
+        <option>Water Quality</option>
+        <option>Waste Management</option>
+        <option>Food Safety</option>
+        <option>Noise Pollution</option>
+        <option>Occupational Health</option>
+        <option>Other</option>
+      </select>
+
+      <label>Description</label>
+      <textarea id="description" required></textarea>
+
+      <label>Pick Complaint Location</label>
+      <div id="map"></div>
+      <small id="coordsLabel" style="color:#444;"></small>
+
+      <label>Attach Evidence (photo/pdf)</label>
+      <input type="file" id="evidence" accept="image/*,application/pdf" multiple />
+
+      <label>Your Name</label>
+      <input type="text" id="reporter_name" />
+
+      <label>Contact (Phone)</label>
+      <input type="text" id="reporter_contact" required />
+
+      <label>Urgency</label>
+      <select id="urgency">
+        <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
+      </select>
+
+      <button type="submit" class="btn">Submit Complaint</button>
+    </form>
+    <div id="confirmation"></div>
+  </div>
+
+  <!-- Track Complaint -->
+  <div id="trackView" style="display:none;">
+    <form id="trackForm">
+      <label>Enter your phone number, name, or tracking code</label>
+      <input type="text" id="searchKey" required />
+      <button type="submit" class="btn">Track Complaints</button>
+    </form>
+    <div id="results"></div>
+  </div>
+</div>
+
+<script type="module">
+  import { supabase, showToast } from './main.js';
+
+  const tabReport=document.getElementById('tab-report');
+  const tabTrack=document.getElementById('tab-track');
+  const reportView=document.getElementById('reportView');
+  const trackView=document.getElementById('trackView');
+  const reportForm=document.getElementById('reportForm');
+  const trackForm=document.getElementById('trackForm');
+  const results=document.getElementById('results');
+  const evidenceInput=document.getElementById('evidence');
+  const coordsLabel=document.getElementById('coordsLabel');
+  const confirmation=document.getElementById('confirmation');
+  let coords=null, marker=null;
+
+  // Tabs
+  tabReport.onclick=()=>{tabReport.classList.add('active');tabTrack.classList.remove('active');reportView.style.display='block';trackView.style.display='none';confirmation.innerHTML='';};
+  tabTrack.onclick=()=>{tabTrack.classList.add('active');tabReport.classList.remove('active');trackView.style.display='block';reportView.style.display='none';};
+
+  // Map setup with reverse geocoding
+  document.addEventListener('DOMContentLoaded',()=>{
+    const map=L.map('map').setView([0.3,35.4],7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+    map.on('click',async e=>{
+      coords={lat:e.latlng.lat,lng:e.latlng.lng};
+      if(marker) map.removeLayer(marker);
+      marker=L.marker([coords.lat,coords.lng]).addTo(map);
+      coordsLabel.textContent='Fetching address...';
+      const resp=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json`);
+      const data=await resp.json();
+      const address=data.display_name||'Unnamed location';
+      coordsLabel.textContent=`${address} (Lat: ${coords.lat.toFixed(5)}, Lng: ${coords.lng.toFixed(5)})`;
+      coordsLabel.dataset.address=address;
+    });
+  });
+
+  // Generate unique tracking code
+  function generateTrackingCode(){
+    const now=new Date();
+    const year=now.getFullYear();
+    const rand=Math.floor(10000+Math.random()*90000);
+    return `CMP-${year}-${rand}`;
+  }
+
+  // Submit Complaint
+  reportForm.onsubmit=async e=>{
+    e.preventDefault();
+    if(!coords){alert('Please click on the map to pick a location');return;}
+    const address=coordsLabel.dataset.address||'';
+    const trackingCode=generateTrackingCode();
+
+    const payload={
+      complaint_type:document.getElementById('complaint_type').value,
+      description:document.getElementById('description').value,
+      location:`${address} (Lat: ${coords.lat.toFixed(5)}, Lng: ${coords.lng.toFixed(5)})`,
+      reporter_name:document.getElementById('reporter_name').value,
+      reporter_contact:document.getElementById('reporter_contact').value,
+      urgency:document.getElementById('urgency').value,
+      submission_date:new Date().toISOString().split('T')[0],
+      submission_time:new Date().toLocaleTimeString(),
+      submission_method:'Public Web',
+      resolution_status:'Pending',
+      tracking_code:trackingCode
+    };
+
+    const {data,error}=await supabase.from('complaints').insert([payload]).select('id').single();
+    if(error){alert('Error submitting complaint');console.error(error);return;}
+    const complaintId=data.id;
+
+    // Upload Evidence Files
+    const files=Array.from(evidenceInput.files);
+    if(files.length){
+      await ensureBucket();
+      for(const f of files){
+        const ext=f.name.split('.').pop();
+        const path=`${complaintId}/${Date.now()}.${ext}`;
+        const {error:upErr}=await supabase.storage.from('complaint_evidence').upload(path,f);
+        if(upErr){console.error(upErr);continue;}
+        const {data:urlData}=supabase.storage.from('complaint_evidence').getPublicUrl(path);
+        const url=urlData.publicUrl;
+        await supabase.from('complaint_docs').insert([{complaint_id:complaintId,
+          evidence_url:f.type.startsWith('image/')?url:null,
+          supporting_docs_url:f.type==='application/pdf'?url:null
+        }]);
+      }
+    }
+
+    confirmation.innerHTML = `
+  <div class="alert">
+    Complaint submitted successfully.<br>
+    <b>Your tracking code:</b> ${trackingCode}<br>
+    <a href="complaint_confirmation.html?code=${trackingCode}" target="_blank">
+      View or Print Confirmation
+    </a>
+  </div>`;
+
+    reportForm.reset();
+    coords=null;coordsLabel.textContent='';
+  };
+
+  async function ensureBucket(){
+    const {data}=await supabase.storage.listBuckets();
+    if(!data.some(b=>b.name==='complaint_evidence'))
+      await supabase.storage.createBucket('complaint_evidence',{public:true});
+  }
+
+  // Track Complaint
+  trackForm.onsubmit=async e=>{
+    e.preventDefault();
+    const key=document.getElementById('searchKey').value.trim();
+    results.innerHTML='<p style="text-align:center;color:gray;">Loading...</p>';
+    const {data,error}=await supabase
+      .from('complaints')
+      .select('tracking_code,complaint_type,location,urgency,resolution_status,submission_date,description')
+      .or(`reporter_contact.ilike.%${key}%,reporter_name.ilike.%${key}%,tracking_code.ilike.%${key}%`)
+      .order('submission_date',{ascending:false}).limit(5);
+    if(error){results.innerHTML='<p style="color:red;text-align:center;">Error loading data</p>';return;}
+    if(!data.length){results.innerHTML='<p style="text-align:center;color:gray;">No complaints found</p>';return;}
+    results.innerHTML=data.map(c=>`
+      <div class="card">
+        <b>${c.complaint_type}</b><br>
+        <small>${c.location||''} • ${c.submission_date||''}</small>
+        <p>${c.description}</p>
+        <p><b>Tracking Code:</b> ${c.tracking_code}</p>
+        <span class="tag ${c.resolution_status?.toLowerCase().replace(' ','')||'pending'}">${c.resolution_status||'Pending'}</span>
+        <br><small>Urgency: ${c.urgency||'Medium'}</small>
+      </div>`).join('');
+  };
+</script>
+</body>
+</html>

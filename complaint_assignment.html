@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complaint Assignment | EPHIS</title>
+  <script type="module" src="main.js"></script>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;padding:1rem;}
+    header{background:#1976d2;color:white;padding:1rem;display:flex;justify-content:space-between;align-items:center;}
+    form{background:white;border-radius:8px;padding:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.1);margin-top:1rem;}
+    label{font-weight:600;display:block;margin-top:0.8rem;}
+    input,textarea,select{width:100%;padding:0.6rem;border:1px solid #ccc;border-radius:6px;margin-top:0.3rem;}
+    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.6rem 1rem;background:#1976d2;color:white;width:100%;margin-top:1rem;}
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Complaint Assignment</h1>
+    <button onclick="history.back()" style="background:white;color:#1976d2;padding:0.4rem 0.8rem;border:none;border-radius:6px;">Back</button>
+  </header>
+
+  <form id="assignForm">
+    <label>Officer Name</label>
+    <input id="officer_name" required />
+
+    <label>Officer Contact</label>
+    <input id="officer_contact" />
+
+    <label>Officer Section</label>
+    <input id="officer_section" />
+
+    <label>Action Plan</label>
+    <textarea id="action_plan"></textarea>
+
+    <label>Deadline</label>
+    <input type="date" id="action_deadline" />
+
+    <label>Priority</label>
+    <select id="action_priority">
+      <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
+    </select>
+
+    <button type="submit" class="btn">Assign</button>
+  </form>
+
+  <script type="module">
+    import { supabase, showToast, requireLogin } from './main.js';
+    const params=new URLSearchParams(window.location.search);
+    const complaintId=params.get('id');
+    const form=document.getElementById('assignForm');
+    await requireLogin();
+
+    form.onsubmit=async e=>{
+      e.preventDefault();
+      const payload={
+        complaint_id:complaintId,
+        officer_name:document.getElementById('officer_name').value,
+        officer_contact:document.getElementById('officer_contact').value,
+        officer_section:document.getElementById('officer_section').value,
+        action_plan:document.getElementById('action_plan').value,
+        action_deadline:document.getElementById('action_deadline').value,
+        action_priority:document.getElementById('action_priority').value,
+        assigned_date:new Date().toISOString().split('T')[0]
+      };
+      const {error}=await supabase.from('complaint_assignments').insert([payload]);
+      if(error)showToast('Save failed','error');
+      else{showToast('Assignment saved','success');history.back();}
+    };
+  </script>
+</body>
+</html>

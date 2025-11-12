@@ -3,83 +3,133 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EPHIS Login</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>EPHIS – Elgeyo Marakwet County</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#1976d2" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    .login-header {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-    .login-header h1 {
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f6fa;
       margin: 0;
-      font-size: 1.6rem;
-      color: var(--accent);
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
-    .login-header p {
-      color: var(--text);
-      font-size: 0.9rem;
-    }
-    .error-message {
-      color: #e74c3c;
-      font-size: 0.85rem;
-      margin-top: 0.5rem;
+
+    header {
+      background: #1976d2;
+      color: white;
       text-align: center;
+      padding: 1rem;
+      font-weight: 600;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .hero {
+      max-width: 500px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      color: #1976d2;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero p {
+      font-size: 0.95rem;
+      color: #444;
+    }
+
+    .btn {
+      display: inline-block;
+      background: #2e7d32;
+      color: white;
+      padding: 0.8rem 1.2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
+
+    .info {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-top: 1.5rem;
+      padding: 1rem 1.5rem;
+      max-width: 600px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: #e3f2fd;
+      font-size: 0.85rem;
+      color: #555;
+    }
+
+    .footer-link {
+      display: block;
+      margin-top: 0.4rem;
+    }
+
+    .footer-link a {
+      color: #1976d2;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .footer-link a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
+
 <body>
-  <div class="login-container">
-    <div class="login-box">
-      <div class="login-header">
-        <h1>EPHIS</h1>
-        <p>Environmental Public Health Information System</p>
-      </div>
+  <header>
+    Environmental Public Health Information System (EPHIS)
+  </header>
 
-      <form id="loginForm">
-        <label>Email</label>
-        <input type="email" id="email" placeholder="user@domain.com" required />
-
-        <label>Password</label>
-        <input type="password" id="password" placeholder="••••••••" required />
-
-        <button type="submit">Login</button>
-        <div id="loginError" class="error-message"></div>
-      </form>
-
-      <div style="text-align:center;margin-top:1rem;">
-        <button id="themeToggle" class="export-btn">🌓 Toggle Theme</button>
-      </div>
+  <main>
+    <div class="hero">
+      <a href="complaints_public.html" class="btn">Submit or Track a Complaint</a>
     </div>
-  </div>
 
-  <script type="module">
-    import { supabase } from "./main.js";
+    <div class="info">
+      <h3>About the Platform</h3>
+      <p>
+        EPHIS is a county-wide digital platform that promotes accountability and timely response to environmental and public health concerns.
+      </p>
+      <p>
+        Residents can file complaints, upload evidence, and track resolution progress online. Complaints are automatically routed to the appropriate sub-county public health officers for investigation and follow-up.
+      </p>
+    </div>
+  </main>
 
-    const loginForm = document.getElementById("loginForm");
-    const errorBox = document.getElementById("loginError");
+  <footer>
+    © <span id="year"></span> County Health Services
+    <div class="footer-link">
+      <a href="login.html">Staff Login</a>
+    </div>
+  </footer>
 
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      errorBox.textContent = "";
-
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        errorBox.textContent = "Login failed. Please check your credentials.";
-        console.error("Login error:", error.message);
-      } else {
-        window.location.href = "dashboard.html";
-      }
-    });
-
-    // Optional: check existing session
-    const { data: session } = await supabase.auth.getSession();
-    if (session?.session) {
-      window.location.href = "dashboard.html";
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
     }
   </script>
 </body>

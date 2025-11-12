@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complaint Updates | EPHIS</title>
+  <script type="module" src="main.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; background:#f5f6fa; margin:0; padding:1rem; }
+    header { background:#1976d2; color:#fff; padding:1rem; display:flex; justify-content:space-between; align-items:center; }
+    form, .card { background:white; border-radius:8px; padding:1rem; box-shadow:0 1px 4px rgba(0,0,0,0.1); margin-top:1rem; }
+    label { font-weight:600; margin-top:0.8rem; display:block; }
+    input, textarea { width:100%; padding:0.6rem; border:1px solid #ccc; border-radius:6px; margin-top:0.3rem; }
+    .btn { border:none; border-radius:6px; cursor:pointer; font-weight:600; padding:0.6rem 1rem; background:#1976d2; color:white; width:100%; margin-top:1rem; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Complaint Updates</h1>
+    <button onclick="history.back()" style="background:white;color:#1976d2;padding:0.4rem 0.8rem;border:none;border-radius:6px;">Back</button>
+  </header>
+
+  <form id="updateForm">
+    <label>Status Log</label>
+    <input type="text" id="status_log" required />
+
+    <label>Update Notes</label>
+    <textarea id="update_notes" rows="3"></textarea>
+
+    <label>Officer Name</label>
+    <input type="text" id="officer_name" />
+
+    <button type="submit" class="btn">Save Update</button>
+  </form>
+
+  <div id="updates"></div>
+
+  <script type="module">
+    import { supabase, showToast, requireLogin } from './main.js';
+    const params = new URLSearchParams(window.location.search);
+    const complaintId = params.get('id');
+    const form = document.getElementById('updateForm');
+    const list = document.getElementById('updates');
+
+    await requireLogin();
+    loadUpdates();
+
+    async function loadUpdates() {
+      const { data, error } = await supabase.from('complaint_updates')
+        .select('*').eq('complaint_id', complaintId).order('update_time',{ascending:false}).limit(5);
+      if (error) return console.error(error);
+      list.innerHTML = data.length
+        ? data.map(u=>`<div class="card"><b>${u.status_log}</b><p>${u.update_notes||''}</p><small>${u.officer_name||''} • ${new Date(u.update_time).toLocaleString()}</small></div>`).join('')
+        : '<p style="text-align:center;color:gray;">No updates yet.</p>';
+    }
+
+    form.onsubmit = async e => {
+      e.preventDefault();
+      const payload = {
+        complaint_id: complaintId,
+        status_log: document.getElementById('status_log').value,
+        update_notes: document.getElementById('update_notes').value,
+        officer_name: document.getElementById('officer_name').value,
+        update_time: new Date().toISOString()
+      };
+      const { error } = await supabase.from('complaint_updates').insert([payload]);
+      if (error) showToast('Save failed','error');
+      else { showToast('Update saved','success'); form.reset(); loadUpdates(); }
+    };
+  </script>
+</body>
+</html>

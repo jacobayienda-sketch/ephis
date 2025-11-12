@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complaint Status | EPHIS</title>
+  <script type="module" src="main.js"></script>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;color:#222;padding:1rem;}
+    header{background:#1976d2;color:white;text-align:center;padding:1rem;font-weight:600;border-radius:8px;}
+    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);max-width:520px;margin:1rem auto;padding:1rem;}
+    h2{color:#1976d2;margin-bottom:0.4rem;}
+    h3{margin-top:1rem;color:#333;}
+    p{margin:0.3rem 0;}
+    .tag{display:inline-block;padding:0.3rem 0.6rem;border-radius:5px;font-size:0.85rem;font-weight:600;text-transform:capitalize;}
+    .tag.pending{background:#fff3cd;color:#856404;}
+    .tag.resolved{background:#d4edda;color:#155724;}
+    .tag.inprogress{background:#cce5ff;color:#004085;}
+    .doc-link{display:block;margin-top:0.3rem;font-size:0.9rem;color:#1976d2;text-decoration:none;}
+  </style>
+</head>
+
+<body>
+  <header>Complaint Status</header>
+  <div id="details" class="card"><p>Loading complaint details...</p></div>
+
+  <script type="module">
+    import { supabase } from './main.js';
+    const params=new URLSearchParams(window.location.search);
+    const code=params.get('code');
+    const details=document.getElementById('details');
+
+    async function loadStatus(){
+      if(!code){
+        details.innerHTML='<p style="color:red;">Missing tracking code.</p>';
+        return;
+      }
+
+      // Main complaint record
+      const { data:complaint, error:cErr }=await supabase
+        .from('complaints')
+        .select('id,tracking_code,complaint_type,description,location,urgency,resolution_status,submission_date')
+        .eq('tracking_code',code).single();
+      if(cErr||!complaint){details.innerHTML='<p style="color:red;">Complaint not found.</p>';return;}
+
+      // Updates, resolution, and documents
+      const [updatesRes,resolutionRes,docsRes]=await Promise.all([
+        supabase.from('complaint_updates').select('status_log,update_notes,officer_name,update_time').eq('complaint_id',complaint.id).order('update_time',{ascending:false}).limit(5),
+        supabase.from('complaint_resolution').select('resolution_status,resolution_date,resolution_description,verification_officer,verified_by_supervisor').eq('complaint_id',complaint.id).limit(1),
+        supabase.from('complaint_docs').select('evidence_url,supporting_docs_url,resolution_report_url,investigation_report_url').eq('complaint_id',complaint.id)
+      ]);
+
+      const updates=updatesRes.data||[];
+      const resolution=resolutionRes.data?.[0];
+      const docs=docsRes.data||[];
+
+      details.innerHTML=`
+        <h2>${complaint.complaint_type}</h2>
+        <p><b>Tracking Code:</b> ${complaint.tracking_code}</p>
+        <p><b>Date Submitted:</b> ${complaint.submission_date||'-'}</p>
+        <p><b>Location:</b> ${complaint.location||'-'}</p>
+        <p><b>Urgency:</b> ${complaint.urgency||'-'}</p>
+        <p><b>Status:</b> <span class="tag ${complaint.resolution_status.toLowerCase().replace(' ','')}">${complaint.resolution_status}</span></p>
+        <p><b>Description:</b><br>${complaint.description||'-'}</p>
+
+        <h3>Recent Updates</h3>
+        ${updates.length?updates.map(u=>`
+          <p><b>${u.status_log}</b><br>${u.update_notes||''}<br>
+          <small>${u.officer_name||'Officer'} • ${new Date(u.update_time).toLocaleString()}</small></p>`).join(''):'<p>No updates available.</p>'}
+
+        ${resolution?`
+          <h3>Resolution</h3>
+          <p><b>Status:</b> ${resolution.resolution_status||'-'}<br>
+          <b>Date:</b> ${resolution.resolution_date||'-'}<br>
+          <b>Description:</b> ${resolution.resolution_description||'-'}<br>
+          <b>Verified by:</b> ${resolution.verification_officer||'N/A'} (${resolution.verified_by_supervisor?'Supervisor Verified':'Not Verified'})</p>`:''}
+
+        ${docs.length?`
+          <h3>Evidence & Reports</h3>
+          ${docs.map(d=>
+            `${d.evidence_url?`<a href="${d.evidence_url}" target="_blank" class="doc-link">Evidence Photo</a>`:''}
+             ${d.investigation_report_url?`<a href="${d.investigation_report_url}" target="_blank" class="doc-link">Investigation Report</a>`:''}
+             ${d.resolution_report_url?`<a href="${d.resolution_report_url}" target="_blank" class="doc-link">Resolution Report</a>`:''}
+             ${d.supporting_docs_url?`<a href="${d.supporting_docs_url}" target="_blank" class="doc-link">Supporting Document</a>`:''}`
+          ).join('')}`:''}
+      `;
+    }
+
+    loadStatus();
+  </script>
+</body>
+</html>
