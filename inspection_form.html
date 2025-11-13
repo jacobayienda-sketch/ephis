@@ -3,147 +3,286 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inspection Form | EPHIS</title>
+  <title>EPHIS | Inspection Form | County of Elgeyo Marakwet</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
     body {
       font-family: system-ui, sans-serif;
-      background: #f5f6fa;
       margin: 0;
+      background: #f5f6fa;
       color: #222;
     }
+
     header {
       background: #1976d2;
       color: white;
-      padding: 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 0.8rem 1rem;
       flex-wrap: wrap;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    header h1 { margin: 0; font-size: 1.1rem; }
-    main { padding: 1rem; max-width: 700px; margin: auto; }
-    form {
-      background: white; padding: 1rem; border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-    label {
-      display: block; font-weight: 600; margin-top: 0.8rem;
-    }
-    input, select, textarea {
-      width: 100%; padding: 0.6rem; border: 1px solid #ccc;
-      border-radius: 6px; margin-top: 0.3rem; font-size: 0.95rem;
-    }
-    .actions {
-      display: flex; justify-content: space-between; flex-wrap: wrap;
-      gap: 0.6rem; margin-top: 1.5rem;
-    }
+
+    header h1 { font-size: 1.1rem; margin: 0; }
+
     .btn {
-      border: none; border-radius: 6px; cursor: pointer;
-      font-weight: 600; padding: 0.6rem 1rem;
+      border: none; border-radius: 6px; cursor: pointer; font-weight: 600; padding: 0.5rem 1rem;
     }
-    .btn-primary { background: #1976d2; color: #fff; }
-    .btn-danger { background: #c62828; color: #fff; }
-    .btn-secondary { background: #eee; color: #333; }
+    .btn-primary { background: #1976d2; color: white; }
+    .btn-secondary { background: #2e7d32; color: white; }
+    .btn-light { background: white; color: #1976d2; border: 1px solid #1976d2; }
+    .btn:hover { opacity: 0.9; }
+
+    main {
+      max-width: 900px;
+      margin: 1rem auto;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    form { display: grid; gap: 1rem; }
+    label { font-weight: 600; display: block; margin-bottom: 0.3rem; }
+    input, select, textarea {
+      width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #ccc; font-size: 0.95rem;
+    }
+
+    footer {
+      text-align: center; font-size: 0.8rem; color: #555;
+      padding: 0.8rem; background: #e3f2fd; margin-top: 1rem; border-top: 1px solid #ddd;
+    }
+
+    .toast {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: #1976d2; color: white; padding: 0.8rem 1rem; border-radius: 6px;
+      font-size: 0.9rem; opacity: 0; transition: opacity 0.3s ease; z-index: 1000;
+    }
+    .toast.show { opacity: 1; }
+
+    .file-link {
+      display: inline-block; margin-top: 0.3rem;
+      color: #1976d2; text-decoration: none; font-weight: 600;
+    }
   </style>
 </head>
 
 <body>
   <header>
-    <h1 id="form-title">New Inspection</h1>
-    <button class="btn btn-secondary" onclick="window.location.href='inspections.html'">← Back to List</button>
+    <h1>EPHIS – Inspection Entry</h1>
+    <div>
+      <button class="btn btn-light" onclick="window.location.href='inspections.html'">Back</button>
+      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+    </div>
   </header>
 
   <main>
-    <form id="inspection-form">
-      <label for="inspection_date">Inspection Date</label>
-      <input type="date" id="inspection_date" name="inspection_date" required />
+    <form id="inspectionForm">
+      <h2 id="formTitle">New Inspection</h2>
 
-      <label for="inspection_type">Inspection Type</label>
-      <input type="text" id="inspection_type" name="inspection_type" required />
+      <div>
+        <label for="inspection_type">Inspection Type</label>
+        <select id="inspection_type" required>
+          <option value="">Select Type</option>
+          <option>Routine</option>
+          <option>Follow-up</option>
+          <option>Complaint-based</option>
+          <option>Environmental Audit</option>
+        </select>
+      </div>
 
-      <label for="inspector_details">Inspector Details</label>
-      <input type="text" id="inspector_details" name="inspector_details" required />
+      <div>
+        <label for="scheduled_date">Scheduled Date</label>
+        <input type="date" id="scheduled_date" required />
+      </div>
 
-      <label for="risk_rating">Risk Rating</label>
-      <select name="risk_rating" id="risk_rating">
-        <option value="">Select</option>
-        <option>Low</option>
-        <option>Medium</option>
-        <option>High</option>
-      </select>
+      <div>
+        <label for="scheduled_time">Scheduled Time</label>
+        <input type="time" id="scheduled_time" />
+      </div>
 
-      <label for="inspection_outcome">Outcome</label>
-      <select name="inspection_outcome" id="inspection_outcome">
-        <option value="">Select</option>
-        <option>Pass</option>
-        <option>Conditional Pass</option>
-        <option>Fail</option>
-      </select>
+      <div>
+        <label for="inspector_details">Inspector Details</label>
+        <input type="text" id="inspector_details" placeholder="Name / Team / Section" />
+      </div>
 
-      <div class="actions">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
-        <button type="button" class="btn btn-danger" id="delete-btn">Delete</button>
+      <div>
+        <label for="reason">Reason / Purpose</label>
+        <textarea id="reason" rows="2"></textarea>
+      </div>
+
+      <div>
+        <label for="priority">Priority Level</label>
+        <select id="priority">
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+          <option>Critical</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="business_type">Business Type</label>
+        <input type="text" id="business_type" placeholder="e.g., Food, Health, Waste" />
+      </div>
+
+      <div>
+        <label for="geo_location">Geo-location</label>
+        <input type="text" id="geo_location" placeholder="Coordinates or description" />
+      </div>
+
+      <div>
+        <label for="assigned_team">Assigned Team</label>
+        <input type="text" id="assigned_team" placeholder="Team or Unit" />
+      </div>
+
+      <div>
+        <label for="notification_status">Notification Status</label>
+        <select id="notification_status">
+          <option>Pending</option>
+          <option>Sent</option>
+          <option>Delivered</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="notification_date">Notification Date</label>
+        <input type="date" id="notification_date" />
+      </div>
+
+      <div>
+        <label for="inspection_date">Actual Inspection Date</label>
+        <input type="date" id="inspection_date" />
+      </div>
+
+      <div>
+        <label for="file">Attach Checklist / Report</label>
+        <input type="file" id="file" accept="application/pdf,image/*" />
+        <div id="fileInfo" style="font-size:0.85rem;color:#555;"></div>
+      </div>
+
+      <div style="text-align:right;">
+        <button type="submit" class="btn btn-primary">Save Inspection</button>
       </div>
     </form>
   </main>
 
-  <script type="module">
-    import { supabase, showToast, getFormData, populateForm, insertRecord, updateRecord, deleteRecord, fetchById, requireLogin } from "./main.js";
+  <footer>
+    County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span>
+  </footer>
 
-    const form = document.getElementById("inspection-form");
-    const cancelBtn = document.getElementById("cancel-btn");
-    const deleteBtn = document.getElementById("delete-btn");
-    const title = document.getElementById("form-title");
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { supabase } from "./main.js";
+
+    const toast = document.getElementById("toast");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const form = document.getElementById("inspectionForm");
+    const fileInfo = document.getElementById("fileInfo");
     const params = new URLSearchParams(window.location.search);
     const inspectionId = params.get("id");
+    let uploadedFileUrl = "";
 
-    await requireLogin();
+    function showToast(msg, type="info") {
+      toast.textContent = msg;
+      toast.style.background = type === "error" ? "#c62828" : "#1976d2";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
 
-    cancelBtn.onclick = () => window.location.href = "inspections.html";
-    if (!inspectionId) deleteBtn.style.display = "none";
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) window.location.href = "login.html";
+    }
+    checkSession();
 
-    if (inspectionId) {
-      try {
-        const record = await fetchById("inspections", inspectionId);
-        populateForm(form, record);
-        title.textContent = "Edit Inspection";
-      } catch (err) {
-        showToast("Error loading record: " + err.message, "error");
+    async function ensureBucket() {
+      const { data } = await supabase.storage.listBuckets();
+      if (!data.some(b => b.name === "inspection_docs")) {
+        await supabase.storage.createBucket("inspection_docs", { public: true });
       }
     }
 
-    form.onsubmit = async (e) => {
+    async function loadInspection() {
+      if (!inspectionId) return;
+      document.getElementById("formTitle").textContent = "Edit Inspection";
+
+      const { data, error } = await supabase.from("inspections").select("*").eq("id", inspectionId).single();
+      if (error || !data) return showToast("Failed to load record", "error");
+
+      for (const key in data) {
+        const field = document.getElementById(key);
+        if (field && data[key]) field.value = data[key];
+      }
+
+      const { data: docs } = await supabase.from("inspection_docs").select("checklist_template_url").eq("inspection_id", inspectionId).single();
+      if (docs?.checklist_template_url) {
+        uploadedFileUrl = docs.checklist_template_url;
+        fileInfo.innerHTML = `<a href="${uploadedFileUrl}" target="_blank" class="file-link">View Uploaded File</a>`;
+      }
+    }
+
+    loadInspection();
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const payload = getFormData(form);
-      try {
-        const { data: userData } = await supabase.auth.getUser();
-        payload.created_by = userData?.user?.id || null;
 
-        if (inspectionId) {
-          await updateRecord("inspections", inspectionId, payload);
-          showToast("Inspection updated", "success");
-        } else {
-          await insertRecord("inspections", payload);
-          showToast("Inspection added", "success");
-        }
-        window.location.href = "inspections.html";
-      } catch (err) {
-        showToast("Save failed: " + err.message, "error");
-      }
-    };
+      const payload = {
+        inspection_type: document.getElementById("inspection_type").value,
+        scheduled_date: document.getElementById("scheduled_date").value,
+        scheduled_time: document.getElementById("scheduled_time").value,
+        inspector_details: document.getElementById("inspector_details").value,
+        reason: document.getElementById("reason").value,
+        priority: document.getElementById("priority").value,
+        business_type: document.getElementById("business_type").value,
+        geo_location: document.getElementById("geo_location").value,
+        assigned_team: document.getElementById("assigned_team").value,
+        notification_status: document.getElementById("notification_status").value,
+        notification_date: document.getElementById("notification_date").value,
+        inspection_date: document.getElementById("inspection_date").value
+      };
 
-    deleteBtn.onclick = async () => {
-      if (!confirm("Delete this inspection?")) return;
-      try {
-        await deleteRecord("inspections", inspectionId);
-        showToast("Inspection deleted", "success");
-        window.location.href = "inspections.html";
-      } catch (err) {
-        showToast("Delete failed: " + err.message, "error");
+      const file = document.getElementById("file").files[0];
+      if (file) {
+        await ensureBucket();
+        const ext = file.name.split(".").pop();
+        const path = `${inspectionId || Date.now()}.${ext}`;
+        const { error: uploadErr } = await supabase.storage.from("inspection_docs").upload(path, file, { upsert: true });
+        if (uploadErr) return showToast("Upload failed", "error");
+
+        const { data: publicUrl } = supabase.storage.from("inspection_docs").getPublicUrl(path);
+        uploadedFileUrl = publicUrl.publicUrl;
+
+        const docPayload = { inspection_id: inspectionId, checklist_template_url: uploadedFileUrl };
+        await supabase.from("inspection_docs").upsert(docPayload, { onConflict: "inspection_id" });
       }
-    };
+
+      let result;
+      if (inspectionId) {
+        result = await supabase.from("inspections").update(payload).eq("id", inspectionId);
+      } else {
+        result = await supabase.from("inspections").insert([payload]);
+      }
+
+      if (result.error) {
+        console.error(result.error);
+        showToast("Error saving inspection", "error");
+      } else {
+        showToast("Inspection saved successfully");
+        setTimeout(() => (window.location.href = "inspections.html"), 1000);
+      }
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      showToast("Logging out...");
+      setTimeout(() => (window.location.href = "login.html"), 800);
+    });
+
+    document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </body>
 </html>

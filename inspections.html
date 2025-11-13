@@ -3,154 +3,320 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inspections | EPHIS</title>
+  <title>EPHIS | Inspections</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#1976d2" />
   <style>
     body {
       font-family: system-ui, sans-serif;
       background: #f5f6fa;
       margin: 0;
       color: #222;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
+
     header {
       background: #1976d2;
       color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 1rem;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      font-size: 1rem;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary { background: #1976d2; color: white; }
+    .btn-secondary { background: #2e7d32; color: white; }
+    .btn-light { background: white; color: #1976d2; border: 1px solid #1976d2; }
+
+    main {
+      flex: 1;
       padding: 1rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .toolbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
+      margin-bottom: 1rem;
     }
-    header h1 { margin: 0; font-size: 1.1rem; }
-    main { padding: 1rem; max-width: 1000px; margin: auto; }
-    .btn {
-      border: none; border-radius: 6px; cursor: pointer; font-weight: 600; padding: 0.6rem 1rem;
-    }
-    .btn-primary { background: #1976d2; color: #fff; }
-    .btn-danger { background: #c62828; color: #fff; }
-    .btn-secondary { background: #eee; color: #333; }
-    .toolbar {
-      display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;
-    }
+
     .toolbar input {
-      flex: 1; min-width: 200px; padding: 0.6rem;
-      border: 1px solid #ccc; border-radius: 6px;
+      padding: 0.6rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 220px;
     }
-    table {
-      width: 100%; border-collapse: collapse; background: #fff;
-      border-radius: 8px; overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      transition: 0.2s ease;
     }
-    th, td {
-      padding: 10px; border-bottom: 1px solid #eee; text-align: left;
+
+    .card:hover { transform: scale(1.01); }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      color: #1976d2;
     }
-    th { background: #f1f1f1; font-weight: 600; }
-    tr:hover { background: #f9f9f9; }
+
+    .card-body { margin-top: 0.5rem; font-size: 0.9rem; color: #444; }
+
+    .badge {
+      border-radius: 5px;
+      padding: 0.2rem 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .badge.High { background: #ffcdd2; color: #c62828; }
+    .badge.Medium { background: #fff9c4; color: #f57f17; }
+    .badge.Low { background: #c8e6c9; color: #2e7d32; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.6rem;
+    }
+
+    .actions a {
+      text-decoration: none;
+      color: white;
+      background: #1976d2;
+      border-radius: 6px;
+      padding: 0.4rem 0.7rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .expand {
+      background: #f9f9f9;
+      margin-top: 0.6rem;
+      border-left: 3px solid #1976d2;
+      border-radius: 6px;
+      padding: 0.6rem;
+      display: none;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .pagination button {
+      border: none;
+      background: #1976d2;
+      color: white;
+      border-radius: 5px;
+      padding: 0.4rem 0.8rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    footer {
+      text-align: center;
+      background: #e3f2fd;
+      color: #555;
+      padding: 0.6rem;
+      font-size: 0.8rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1976d2;
+      color: white;
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .toast.show { opacity: 1; }
+
     @media (max-width: 600px) {
-      table, thead, tbody, th, td, tr { display: block; }
-      tr { margin-bottom: 1rem; background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
-      th { display: none; }
-      td { display: flex; justify-content: space-between; padding: 8px 12px; }
-      td::before { content: attr(data-label); font-weight: 600; color: #555; }
+      .toolbar { flex-direction: column; gap: 0.5rem; align-items: stretch; }
+      .toolbar input { width: 100%; }
     }
   </style>
 </head>
 
-<body data-module="inspections">
+<body>
   <header>
-    <h1>Inspection Management</h1>
-    <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+    <h1>EPHIS – Inspections</h1>
+    <div>
+      <button class="btn btn-light" onclick="window.location.href='dashboard.html'">Dashboard</button>
+      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+    </div>
   </header>
 
   <main>
     <div class="toolbar">
-      <button id="add-btn" class="btn btn-primary">+ New Inspection</button>
-      <input type="search" id="search" placeholder="Search inspections..." />
+      <input type="text" id="searchInput" placeholder="Search by type or team..." />
+      <button class="btn btn-primary" id="newBtn">+ New Inspection</button>
     </div>
-    <div id="table"></div>
+
+    <div id="cardsContainer"></div>
+
+    <div class="pagination">
+      <button id="prevPage">Previous</button>
+      <button id="nextPage">Next</button>
+    </div>
   </main>
 
+  <footer>
+    County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
   <script type="module">
-    import { supabase, showToast, fetchAll, deleteRecord, requireLogin } from "./main.js";
+    import { supabase } from "./main.js";
 
-    const addBtn = document.getElementById("add-btn");
-    const searchInput = document.getElementById("search");
-    const tableDiv = document.getElementById("table");
+    const cardsContainer = document.getElementById("cardsContainer");
+    const searchInput = document.getElementById("searchInput");
+    const toast = document.getElementById("toast");
+    const prevPage = document.getElementById("prevPage");
+    const nextPage = document.getElementById("nextPage");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const newBtn = document.getElementById("newBtn");
 
-    await requireLogin();
+    let page = 0;
+    const limit = 10;
+    let total = 0;
 
-    async function loadInspections() {
-      try {
-        const data = await fetchAll("inspections", "id, inspection_date, inspection_type, inspector_details, risk_rating, inspection_outcome");
-        renderTable(data);
-      } catch (err) {
-        showToast("Error loading inspections: " + err.message, "error");
-      }
+    function showToast(msg, type="info") {
+      toast.textContent = msg;
+      toast.style.background = type === "error" ? "#c62828" : "#1976d2";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
     }
 
-    function renderTable(rows) {
-      if (!rows.length) {
-        tableDiv.innerHTML = "<p style='text-align:center;margin-top:2rem;'>No inspections found.</p>";
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) window.location.href = "login.html";
+    }
+    checkSession();
+
+    async function loadInspections() {
+      cardsContainer.innerHTML = "<p style='text-align:center;color:gray;'>Loading...</p>";
+
+      let query = supabase
+        .from("inspections")
+        .select("id, inspection_type, scheduled_date, inspector_details, assigned_team, business_type, priority, inspection_date, notification_status", { count: "exact" })
+        .order("created_at", { ascending: false })
+        .range(page * limit, page * limit + limit - 1);
+
+      const term = searchInput.value.trim();
+      if (term) query = query.or(`inspection_type.ilike.%${term}%,assigned_team.ilike.%${term}%`);
+
+      const { data, count, error } = await query;
+
+      if (error) {
+        console.error(error);
+        showToast("Failed to load inspections", "error");
         return;
       }
 
-      const html = `
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Inspector</th>
-              <th>Risk</th>
-              <th>Outcome</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.map(r => `
-              <tr>
-                <td data-label="Date">${r.inspection_date || "-"}</td>
-                <td data-label="Type">${r.inspection_type || "-"}</td>
-                <td data-label="Inspector">${r.inspector_details || "-"}</td>
-                <td data-label="Risk">${r.risk_rating || "-"}</td>
-                <td data-label="Outcome">${r.inspection_outcome || "-"}</td>
-                <td data-label="Actions">
-                  <button class="btn btn-primary" onclick="window.location.href='inspection_form.html?id=${r.id}'">Edit</button>
-                  <button class="btn btn-danger" data-id="${r.id}">Delete</button>
-                </td>
-              </tr>`).join("")}
-          </tbody>
-        </table>`;
-      tableDiv.innerHTML = html;
-
-      document.querySelectorAll(".btn-danger").forEach((b) =>
-        b.addEventListener("click", () => handleDelete(b.dataset.id))
-      );
+      total = count;
+      renderCards(data);
     }
 
-    async function handleDelete(id) {
-      if (!confirm("Delete this inspection?")) return;
-      try {
-        await deleteRecord("inspections", id);
-        showToast("Inspection deleted", "success");
-        loadInspections();
-      } catch (err) {
-        showToast("Delete failed: " + err.message, "error");
+    function renderCards(data) {
+      if (!data.length) {
+        cardsContainer.innerHTML = "<p style='text-align:center;color:gray;'>No records found</p>";
+        return;
       }
+
+      cardsContainer.innerHTML = data.map(i => `
+        <div class="card">
+          <div class="card-header">
+            <span>${i.inspection_type || "Inspection"}</span>
+            <span class="badge ${i.priority || "Low"}">${i.priority || "Low"}</span>
+          </div>
+          <div class="card-body">
+            <p><strong>Scheduled:</strong> ${i.scheduled_date || "-"} | <strong>Team:</strong> ${i.assigned_team || "-"} </p>
+            <p><strong>Inspector:</strong> ${i.inspector_details || "-"} | <strong>Business:</strong> ${i.business_type || "-"}</p>
+            <p><strong>Status:</strong> ${i.notification_status || "Pending"} | <strong>Date:</strong> ${i.inspection_date || "-"}</p>
+          </div>
+          <div class="actions">
+            <a href="inspection_form.html?id=${i.id}">Edit</a>
+            <a href="inspection_outcomes.html?id=${i.id}">Outcome</a>
+            <a href="inspection_reinspections.html?id=${i.id}">Re-Inspection</a>
+            <a href="inspection_actions.html?id=${i.id}">Actions</a>
+            <a href="inspection_docs.html?id=${i.id}">Docs</a>
+            <a href="#" onclick="toggleExpand('${i.id}')">Details</a>
+          </div>
+          <div class="expand" id="expand-${i.id}">
+            <p><strong>Notification Status:</strong> ${i.notification_status || "Pending"}</p>
+            <p><strong>Priority:</strong> ${i.priority || "-"}</p>
+            <p><strong>Team Assigned:</strong> ${i.assigned_team || "-"}</p>
+            <p><strong>Inspector:</strong> ${i.inspector_details || "-"}</p>
+          </div>
+        </div>
+      `).join("");
+
+      prevPage.disabled = page === 0;
+      nextPage.disabled = (page + 1) * limit >= total;
     }
 
-    searchInput.addEventListener("input", (e) => {
-      const term = e.target.value.toLowerCase();
-      document.querySelectorAll("tbody tr").forEach((r) => {
-        r.style.display = r.innerText.toLowerCase().includes(term) ? "" : "none";
-      });
+    window.toggleExpand = (id) => {
+      const el = document.getElementById("expand-" + id);
+      el.style.display = el.style.display === "block" ? "none" : "block";
+    };
+
+    prevPage.addEventListener("click", () => { if (page > 0) { page--; loadInspections(); } });
+    nextPage.addEventListener("click", () => { if ((page + 1) * limit < total) { page++; loadInspections(); } });
+    searchInput.addEventListener("input", () => { page = 0; loadInspections(); });
+    newBtn.addEventListener("click", () => window.location.href = "inspection_form.html");
+
+    logoutBtn.addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      showToast("Logging out...");
+      setTimeout(() => (window.location.href = "login.html"), 800);
     });
 
-    addBtn.addEventListener("click", () => {
-      window.location.href = "inspection_form.html";
-    });
-
+    document.getElementById("year").textContent = new Date().getFullYear();
     loadInspections();
   </script>
 </body>

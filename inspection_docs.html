@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EPHIS | Premise Documents</title>
+  <title>EPHIS | Inspection Documents</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
@@ -14,7 +14,7 @@
     .btn-primary{background:#1976d2;color:white;}
     .btn-secondary{background:#2e7d32;color:white;}
     .btn-light{background:white;color:#1976d2;border:1px solid #1976d2;}
-    main{flex:1;padding:1rem;max-width:900px;margin:0 auto;}
+    main{flex:1;padding:1rem;max-width:950px;margin:0 auto;}
     .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
     .form-card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
     form label{font-weight:600;display:block;margin-top:0.5rem;}
@@ -32,9 +32,9 @@
 
 <body>
   <header>
-    <h1>EPHIS – Premise Documents</h1>
+    <h1>EPHIS – Inspection Documents</h1>
     <div>
-      <button class="btn btn-light" onclick="window.location.href='premises_management.html'">Back</button>
+      <button class="btn btn-light" onclick="window.location.href='inspections.html'">Back</button>
       <button class="btn btn-secondary" id="logoutBtn">Logout</button>
     </div>
   </header>
@@ -49,12 +49,11 @@
         <label>Document Type</label>
         <select id="doc_type" required>
           <option value="">Select</option>
-          <option value="registration_form_url">Registration Form</option>
-          <option value="license_doc_url">License Document</option>
+          <option value="checklist_template_url">Checklist Template</option>
           <option value="inspection_report_url">Inspection Report</option>
-          <option value="compliance_action_url">Compliance Report</option>
-          <option value="photos_url">Premise Photos</option>
-          <option value="supporting_docs_url">Supporting Documents</option>
+          <option value="compliance_notice_url">Compliance Notice</option>
+          <option value="evidence_files_url">Evidence File</option>
+          <option value="support_docs_url">Supporting Document</option>
         </select>
 
         <label>Select File</label>
@@ -79,15 +78,15 @@
   <script type="module">
     import { supabase } from "./main.js";
 
-    const params=new URLSearchParams(window.location.search);
-    const premiseId=params.get("id");
-    const toast=document.getElementById("toast");
-    const logoutBtn=document.getElementById("logoutBtn");
-    const toggleFormBtn=document.getElementById("toggleFormBtn");
-    const cancelBtn=document.getElementById("cancelBtn");
-    const formContainer=document.getElementById("formContainer");
-    const form=document.getElementById("docForm");
-    const cardsContainer=document.getElementById("cardsContainer");
+    const params = new URLSearchParams(window.location.search);
+    const inspectionId = params.get("id");
+    const toast = document.getElementById("toast");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const toggleFormBtn = document.getElementById("toggleFormBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const formContainer = document.getElementById("formContainer");
+    const form = document.getElementById("docForm");
+    const cardsContainer = document.getElementById("cardsContainer");
 
     function showToast(msg,type="info"){
       toast.textContent=msg;
@@ -108,14 +107,14 @@
 
     async function ensureBucket(){
       const {data}=await supabase.storage.listBuckets();
-      if(!data.some(b=>b.name==="premises_docs")){
-        await supabase.storage.createBucket("premises_docs",{public:true});
+      if(!data.some(b=>b.name==="inspection_docs")){
+        await supabase.storage.createBucket("inspection_docs",{public:true});
       }
     }
 
     async function loadDocs(){
       cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading...</p>";
-      const {data,error}=await supabase.from("premises_documents").select("*").eq("premises_id",premiseId).single();
+      const {data,error}=await supabase.from("inspection_docs").select("*").eq("inspection_id",inspectionId).single();
       if(error&&error.code!=="PGRST116"){console.error(error);showToast("Failed to load docs","error");return;}
       const docs=data||{};
       const entries=Object.entries(docs).filter(([k,v])=>k.endsWith("_url")&&v);
@@ -137,7 +136,7 @@
     window.deleteDoc=async(column)=>{
       if(!confirm("Delete this file link?"))return;
       const update={[column]:null};
-      const {error}=await supabase.from("premises_documents").update(update).eq("premises_id",premiseId);
+      const {error}=await supabase.from("inspection_docs").update(update).eq("inspection_id",inspectionId);
       if(error)return showToast("Delete failed","error");
       showToast("File removed");loadDocs();
     };
@@ -148,12 +147,12 @@
       const column=document.getElementById("doc_type").value;
       if(!file)return showToast("Select a file first","error");
       await ensureBucket();
-      const path=`${premiseId}/${Date.now()}_${file.name}`;
-      const{error:uploadErr}=await supabase.storage.from("premises_docs").upload(path,file,{upsert:true});
+      const path=`${inspectionId}/${Date.now()}_${file.name}`;
+      const{error:uploadErr}=await supabase.storage.from("inspection_docs").upload(path,file,{upsert:true});
       if(uploadErr)return showToast("Upload failed","error");
-      const {data:urlData}=supabase.storage.from("premises_docs").getPublicUrl(path);
-      const update={premises_id:premiseId,[column]:urlData.publicUrl};
-      await supabase.from("premises_documents").upsert(update,{onConflict:"premises_id"});
+      const {data:urlData}=supabase.storage.from("inspection_docs").getPublicUrl(path);
+      const update={inspection_id:inspectionId,[column]:urlData.publicUrl};
+      await supabase.from("inspection_docs").upsert(update,{onConflict:"inspection_id"});
       showToast("File uploaded successfully");
       form.reset();toggleForm(false);loadDocs();
     });

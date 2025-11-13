@@ -3,172 +3,172 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Premises Contacts | EPHIS</title>
+  <title>EPHIS | Premise Contacts</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    body { font-family: system-ui, sans-serif; background: #f5f6fa; margin: 0; color: #222; }
-    header { background: #1976d2; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-    header h1 { margin: 0; font-size: 1.1rem; }
-    .btn { border: none; border-radius: 6px; cursor: pointer; font-weight: 600; padding: 0.6rem 1rem; }
-    .btn-primary { background: #1976d2; color: #fff; }
-    .btn-danger { background: #c62828; color: #fff; }
-    .btn-secondary { background: #eee; color: #333; }
-    main { padding: 1rem; max-width: 900px; margin: auto; }
-    .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
-    .toolbar input { flex: 1; min-width: 200px; padding: 0.6rem; border: 1px solid #ccc; border-radius: 6px; }
-    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-    th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
-    th { background: #f1f1f1; font-weight: 600; }
-    tr:hover { background: #f9f9f9; }
-    form { background: #fff; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.05); display: none; }
-    form input { width: 100%; padding: 0.6rem; margin: 0.4rem 0; border: 1px solid #ccc; border-radius: 6px; }
-    @media (max-width: 600px) {
-      table, thead, tbody, th, td, tr { display: block; }
-      tr { margin-bottom: 1rem; background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
-      th { display: none; }
-      td { display: flex; justify-content: space-between; padding: 8px 12px; }
-      td::before { content: attr(data-label); font-weight: 600; color: #555; }
-    }
+    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;color:#222;display:flex;flex-direction:column;min-height:100vh;}
+    header{background:#1976d2;color:white;display:flex;justify-content:space-between;align-items:center;padding:0.8rem 1rem;flex-wrap:wrap;}
+    header h1{font-size:1rem;margin:0;font-weight:600;}
+    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.5rem 1rem;font-size:0.9rem;}
+    .btn-primary{background:#1976d2;color:white;}
+    .btn-secondary{background:#2e7d32;color:white;}
+    .btn-light{background:white;color:#1976d2;border:1px solid #1976d2;}
+    main{flex:1;padding:1rem;max-width:900px;margin:0 auto;}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
+    .toolbar input{padding:0.6rem;border:1px solid #ccc;border-radius:6px;width:220px;}
+    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
+    .card-header{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:#1976d2;}
+    .form-card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
+    form label{font-weight:600;display:block;margin-top:0.5rem;}
+    form input,form textarea{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
+    .pagination{display:flex;justify-content:center;gap:0.5rem;margin-top:1rem;}
+    .pagination button{border:none;background:#1976d2;color:white;border-radius:5px;padding:0.4rem 0.8rem;cursor:pointer;font-weight:600;}
+    footer{text-align:center;background:#e3f2fd;color:#555;padding:0.6rem;font-size:0.8rem;}
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1976d2;color:white;padding:0.8rem 1rem;border-radius:6px;opacity:0;transition:opacity 0.3s ease;}
+    .toast.show{opacity:1;}
+    @media(max-width:600px){.toolbar{flex-direction:column;gap:0.5rem;align-items:stretch;}.toolbar input{width:100%;}}
   </style>
 </head>
 
-<body data-module="premises_contacts">
+<body>
   <header>
-    <h1>Premises Contacts</h1>
+    <h1>EPHIS – Premise Contacts</h1>
     <div>
-      <button class="btn btn-secondary" id="back-premises">← Back to Premises</button>
-      <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'">🏠 Dashboard</button>
+      <button class="btn btn-light" onclick="window.location.href='premises_management.html'">Back</button>
+      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
     </div>
   </header>
 
   <main>
-    <h2 id="premises-name">Loading premises...</h2>
-
     <div class="toolbar">
-      <button id="add-btn" class="btn btn-primary">+ Add Contact</button>
-      <input type="search" id="search" placeholder="Search contacts..." />
+      <input type="text" id="searchInput" placeholder="Search contact or officer..." />
+      <button class="btn btn-primary" id="addBtn">+ Add Contact</button>
     </div>
 
-    <form id="contact-form">
-      <h3 id="form-title">Add New Contact</h3>
-      <input type="hidden" id="contact-id" />
-      <label>Primary Contact</label><input id="primary_contact" placeholder="Main contact name or phone" />
-      <label>Secondary Contact</label><input id="secondary_contact" placeholder="Alternate contact name or phone" />
-      <label>Public Health Officer</label><input id="public_health_officer" placeholder="Officer name" />
-      <label>Subcounty Office Contact</label><input id="subcounty_office_contact" placeholder="Office phone or email" />
-      <div>
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" id="cancel-btn" class="btn btn-secondary">Cancel</button>
-      </div>
-    </form>
+    <div id="formContainer" style="display:none;" class="form-card">
+      <form id="contactForm">
+        <label>Primary Contact</label>
+        <input type="text" id="primary_contact" placeholder="Name or phone" required />
 
-    <div id="table"></div>
+        <label>Secondary Contact</label>
+        <input type="text" id="secondary_contact" placeholder="Optional" />
+
+        <label>Public Health Officer</label>
+        <input type="text" id="public_health_officer" placeholder="Officer in charge" />
+
+        <label>Subcounty Office Contact</label>
+        <input type="text" id="subcounty_office_contact" placeholder="Office phone or email" />
+
+        <div style="text-align:right;margin-top:0.6rem;">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="cardsContainer"></div>
+
+    <div class="pagination">
+      <button id="prevPage">Previous</button>
+      <button id="nextPage">Next</button>
+    </div>
   </main>
 
+  <footer>
+    County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
   <script type="module">
-    import { supabase, insertRecord, updateRecord, deleteRecord, showToast, requireLogin } from "./main.js";
-    await requireLogin();
+    import { supabase } from "./main.js";
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const premisesId = urlParams.get("id");
-    const addBtn = document.getElementById("add-btn");
-    const form = document.getElementById("contact-form");
-    const cancelBtn = document.getElementById("cancel-btn");
-    const tableDiv = document.getElementById("table");
-    const searchInput = document.getElementById("search");
-    const backPremises = document.getElementById("back-premises");
-    const premisesName = document.getElementById("premises-name");
-    let editingId = null;
+    const params=new URLSearchParams(window.location.search);
+    const premiseId=params.get("id");
+    const toast=document.getElementById("toast");
+    const logoutBtn=document.getElementById("logoutBtn");
+    const addBtn=document.getElementById("addBtn");
+    const cancelBtn=document.getElementById("cancelBtn");
+    const formContainer=document.getElementById("formContainer");
+    const form=document.getElementById("contactForm");
+    const searchInput=document.getElementById("searchInput");
+    const cardsContainer=document.getElementById("cardsContainer");
+    const prevPage=document.getElementById("prevPage");
+    const nextPage=document.getElementById("nextPage");
 
-    async function loadPremisesName() {
-      const { data } = await supabase.from("premises").select("name").eq("id", premisesId).single();
-      premisesName.textContent = data ? data.name : "Premises not found";
+    let page=0;const limit=10;let total=0;
+
+    function showToast(msg,type="info"){
+      toast.textContent=msg;
+      toast.style.background=type==="error"?"#c62828":"#1976d2";
+      toast.classList.add("show");
+      setTimeout(()=>toast.classList.remove("show"),3000);
     }
 
-    async function loadContacts() {
-      const { data, error } = await supabase.from("premises_contacts")
-        .select("*")
-        .eq("premises_id", premisesId)
-        .order("created_at", { ascending: false });
-      if (error) showToast("Error loading contacts: " + error.message, "error");
-      else renderTable(data);
+    async function checkSession(){
+      const {data}=await supabase.auth.getSession();
+      if(!data.session)window.location.href="login.html";
+    }
+    checkSession();
+
+    function toggleForm(show){formContainer.style.display=show?"block":"none";}
+    addBtn.addEventListener("click",()=>toggleForm(true));
+    cancelBtn.addEventListener("click",()=>toggleForm(false));
+
+    async function loadContacts(){
+      cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading...</p>";
+
+      let query=supabase.from("premises_contacts").select("*",{count:"exact"}).eq("premises_id",premiseId).order("created_at",{ascending:false}).range(page*limit,page*limit+limit-1);
+      const term=searchInput.value.trim();
+      if(term)query=query.or(`primary_contact.ilike.%${term}%,public_health_officer.ilike.%${term}%`);
+      const{data,count,error}=await query;
+      if(error){console.error(error);showToast("Failed to load contacts","error");return;}
+      total=count;renderCards(data);
     }
 
-    function renderTable(rows) {
-      if (!rows.length) {
-        tableDiv.innerHTML = "<p style='text-align:center;margin-top:2rem;'>No contacts found.</p>";
-        return;
-      }
-      const html = `
-        <table>
-          <thead><tr><th>Primary</th><th>Secondary</th><th>Public Health Officer</th><th>Subcounty Office Contact</th><th>Actions</th></tr></thead>
-          <tbody>
-            ${rows.map(r => `
-              <tr>
-                <td data-label="Primary">${r.primary_contact || "-"}</td>
-                <td data-label="Secondary">${r.secondary_contact || "-"}</td>
-                <td data-label="Officer">${r.public_health_officer || "-"}</td>
-                <td data-label="Office Contact">${r.subcounty_office_contact || "-"}</td>
-                <td data-label="Actions">
-                  <button class="btn btn-primary" data-edit="${r.id}">Edit</button>
-                  <button class="btn btn-danger" data-del="${r.id}">Delete</button>
-                </td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>`;
-      tableDiv.innerHTML = html;
-      document.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", () => editContact(b.dataset.edit)));
-      document.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => removeContact(b.dataset.del)));
+    function renderCards(data){
+      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No contacts found</p>";return;}
+      cardsContainer.innerHTML=data.map(c=>`
+        <div class="card">
+          <div class="card-header">
+            <span>${c.primary_contact||"Primary Contact"}</span>
+          </div>
+          <p><strong>Secondary:</strong> ${c.secondary_contact||"-"}</p>
+          <p><strong>Public Health Officer:</strong> ${c.public_health_officer||"-"}</p>
+          <p><strong>Subcounty Office:</strong> ${c.subcounty_office_contact||"-"}</p>
+        </div>
+      `).join("");
+      prevPage.disabled=page===0;
+      nextPage.disabled=(page+1)*limit>=total;
     }
 
-    addBtn.onclick = () => { form.reset(); form.style.display = "block"; editingId = null; };
-    cancelBtn.onclick = () => { form.style.display = "none"; };
-
-    form.onsubmit = async (e) => {
+    form.addEventListener("submit",async e=>{
       e.preventDefault();
-      const data = {
-        premises_id: premisesId,
-        primary_contact: primary_contact.value,
-        secondary_contact: secondary_contact.value,
-        public_health_officer: public_health_officer.value,
-        subcounty_office_contact: subcounty_office_contact.value
+      const payload={
+        premises_id:premiseId,
+        primary_contact:document.getElementById("primary_contact").value.trim(),
+        secondary_contact:document.getElementById("secondary_contact").value.trim()||null,
+        public_health_officer:document.getElementById("public_health_officer").value.trim()||null,
+        subcounty_office_contact:document.getElementById("subcounty_office_contact").value.trim()||null
       };
-      try {
-        if (editingId) await updateRecord("premises_contacts", editingId, data);
-        else await insertRecord("premises_contacts", data);
-        showToast("Contact saved successfully", "success");
-        form.style.display = "none";
-        loadContacts();
-      } catch (err) {
-        showToast("Save failed: " + err.message, "error");
-      }
-    };
-
-    async function editContact(id) {
-      const { data, error } = await supabase.from("premises_contacts").select("*").eq("id", id).single();
-      if (error) return showToast("Error loading record: " + error.message, "error");
-      Object.keys(data).forEach(k => { if (form[k]) form[k].value = data[k] || ""; });
-      form.style.display = "block"; editingId = id;
-    }
-
-    async function removeContact(id) {
-      if (!confirm("Delete this contact record?")) return;
-      await deleteRecord("premises_contacts", id);
-      showToast("Contact deleted", "success");
-      loadContacts();
-    }
-
-    searchInput.addEventListener("input", e => {
-      const term = e.target.value.toLowerCase();
-      document.querySelectorAll("tbody tr").forEach(r => {
-        r.style.display = r.innerText.toLowerCase().includes(term) ? "" : "none";
-      });
+      const{error}=await supabase.from("premises_contacts").insert([payload]);
+      if(error){console.error(error);showToast("Save failed","error");return;}
+      showToast("Contact added successfully");
+      form.reset();toggleForm(false);loadContacts();
     });
 
-    backPremises.onclick = () => window.location.href = "premises_management.html";
+    searchInput.addEventListener("input",()=>{page=0;loadContacts();});
+    nextPage.addEventListener("click",()=>{page++;loadContacts();});
+    prevPage.addEventListener("click",()=>{if(page>0){page--;loadContacts();}});
 
-    loadPremisesName();
+    logoutBtn.addEventListener("click",async()=>{
+      await supabase.auth.signOut();
+      showToast("Logging out...");
+      setTimeout(()=>window.location.href="login.html",800);
+    });
+
+    document.getElementById("year").textContent=new Date().getFullYear();
     loadContacts();
   </script>
 </body>

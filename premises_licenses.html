@@ -3,210 +3,199 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Premises Licenses | EPHIS</title>
+  <title>EPHIS | Premise Licenses</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    body { font-family: system-ui, sans-serif; background: #f5f6fa; margin: 0; color: #222; }
-    header { background: #1976d2; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-    header h1 { margin: 0; font-size: 1.1rem; }
-    .btn { border: none; border-radius: 6px; cursor: pointer; font-weight: 600; padding: 0.6rem 1rem; }
-    .btn-primary { background: #1976d2; color: #fff; }
-    .btn-danger { background: #c62828; color: #fff; }
-    .btn-secondary { background: #eee; color: #333; }
-    main { padding: 1rem; max-width: 1000px; margin: auto; }
-    .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
-    .toolbar input { flex: 1; min-width: 200px; padding: 0.6rem; border: 1px solid #ccc; border-radius: 6px; }
-    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-    th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
-    th { background: #f1f1f1; font-weight: 600; }
-    tr:hover { background: #f9f9f9; }
-    form { background: #fff; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.05); display: none; }
-    form input, form select, form textarea { width: 100%; padding: 0.6rem; margin: 0.4rem 0; border: 1px solid #ccc; border-radius: 6px; }
-    .status-active { color: green; font-weight: 600; }
-    .status-expiring { color: #e68a00; font-weight: 600; }
-    .status-expired { color: red; font-weight: 600; }
-    @media (max-width: 600px) {
-      table, thead, tbody, th, td, tr { display: block; }
-      tr { margin-bottom: 1rem; background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
-      th { display: none; }
-      td { display: flex; justify-content: space-between; padding: 8px 12px; }
-      td::before { content: attr(data-label); font-weight: 600; color: #555; }
-    }
+    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;color:#222;display:flex;flex-direction:column;min-height:100vh;}
+    header{background:#1976d2;color:white;display:flex;justify-content:space-between;align-items:center;padding:0.8rem 1rem;flex-wrap:wrap;}
+    header h1{font-size:1rem;margin:0;font-weight:600;}
+    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.5rem 1rem;font-size:0.9rem;}
+    .btn-primary{background:#1976d2;color:white;}
+    .btn-secondary{background:#2e7d32;color:white;}
+    .btn-light{background:white;color:#1976d2;border:1px solid #1976d2;}
+    main{flex:1;padding:1rem;max-width:900px;margin:0 auto;}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
+    .toolbar input{padding:0.6rem;border:1px solid #ccc;border-radius:6px;width:220px;}
+    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
+    .card-header{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:#1976d2;}
+    .badge{border-radius:5px;padding:0.2rem 0.5rem;font-size:0.8rem;font-weight:600;}
+    .badge.Valid{background:#c8e6c9;color:#2e7d32;}
+    .badge.Expired{background:#ffcdd2;color:#c62828;}
+    .badge.Pending{background:#fff9c4;color:#f57f17;}
+    .form-card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
+    form label{font-weight:600;display:block;margin-top:0.5rem;}
+    form input,form select,form textarea{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
+    .pagination{display:flex;justify-content:center;gap:0.5rem;margin-top:1rem;}
+    .pagination button{border:none;background:#1976d2;color:white;border-radius:5px;padding:0.4rem 0.8rem;cursor:pointer;font-weight:600;}
+    footer{text-align:center;background:#e3f2fd;color:#555;padding:0.6rem;font-size:0.8rem;}
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1976d2;color:white;padding:0.8rem 1rem;border-radius:6px;opacity:0;transition:opacity 0.3s ease;}
+    .toast.show{opacity:1;}
+    @media(max-width:600px){.toolbar{flex-direction:column;gap:0.5rem;align-items:stretch;}.toolbar input{width:100%;}}
   </style>
 </head>
 
-<body data-module="premises_licenses">
+<body>
   <header>
-    <h1>Premises Licenses</h1>
+    <h1>EPHIS – Premise Licenses</h1>
     <div>
-      <button class="btn btn-secondary" id="back-premises">← Back to Premises</button>
-      <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'">🏠 Dashboard</button>
+      <button class="btn btn-light" onclick="window.location.href='premises_management.html'">Back</button>
+      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
     </div>
   </header>
 
   <main>
-    <h2 id="premises-name">Loading premises...</h2>
-
     <div class="toolbar">
-      <button id="add-btn" class="btn btn-primary">+ Add License</button>
-      <input type="search" id="search" placeholder="Search licenses..." />
+      <input type="text" id="searchInput" placeholder="Search license number or status..." />
+      <button class="btn btn-primary" id="addBtn">+ Add License</button>
     </div>
 
-    <form id="license-form">
-      <h3 id="form-title">Add New License</h3>
-      <input type="hidden" id="license-id" />
-      <label>Registration Number</label><input id="registration_number" />
-      <label>Registration Date</label><input id="registration_date" type="date" />
-      <label>License Number</label><input id="license_number" />
-      <label>License Expiry</label><input id="license_expiry" type="date" />
-      <label>License Type</label><input id="license_type" />
-      <label>Status</label>
-      <select id="license_status">
-        <option value="">Select status</option>
-        <option value="Active">Active</option>
-        <option value="Expired">Expired</option>
-        <option value="Pending Renewal">Pending Renewal</option>
-      </select>
-      <label>Renewal History</label><textarea id="renewal_history"></textarea>
-      <label>Licensing Officer</label><input id="licensing_officer" />
-      <label>Licensing Fee (KES)</label><input id="licensing_fee" type="number" step="0.01" />
-      <label>Payment Method</label>
-      <select id="payment_method">
-        <option value="">Select method</option>
-        <option value="MPESA">MPESA</option>
-        <option value="Bank">Bank</option>
-        <option value="Cash">Cash</option>
-      </select>
-      <div>
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" id="cancel-btn" class="btn btn-secondary">Cancel</button>
-      </div>
-    </form>
+    <div id="formContainer" style="display:none;" class="form-card">
+      <form id="licenseForm">
+        <label>License Number</label>
+        <input type="text" id="license_number" required />
 
-    <div id="table"></div>
+        <label>License Type</label>
+        <input type="text" id="license_type" placeholder="e.g., Business Permit" />
+
+        <label>License Expiry Date</label>
+        <input type="date" id="license_expiry" />
+
+        <label>License Status</label>
+        <select id="license_status">
+          <option value="">Select</option>
+          <option>Valid</option>
+          <option>Expired</option>
+          <option>Pending</option>
+        </select>
+
+        <label>Registration Number</label>
+        <input type="text" id="registration_number" />
+
+        <label>Registration Date</label>
+        <input type="date" id="registration_date" />
+
+        <label>Licensing Officer</label>
+        <input type="text" id="licensing_officer" />
+
+        <label>Licensing Fee (KES)</label>
+        <input type="number" step="0.01" id="licensing_fee" />
+
+        <label>Payment Method</label>
+        <input type="text" id="payment_method" placeholder="e.g., Cash, MPESA" />
+
+        <div style="text-align:right;margin-top:0.6rem;">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="cardsContainer"></div>
+
+    <div class="pagination">
+      <button id="prevPage">Previous</button>
+      <button id="nextPage">Next</button>
+    </div>
   </main>
 
+  <footer>
+    County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
   <script type="module">
-    import { supabase, insertRecord, updateRecord, deleteRecord, showToast, requireLogin } from "./main.js";
-    await requireLogin();
+    import { supabase } from "./main.js";
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const premisesId = urlParams.get("id");
-    const addBtn = document.getElementById("add-btn");
-    const form = document.getElementById("license-form");
-    const cancelBtn = document.getElementById("cancel-btn");
-    const tableDiv = document.getElementById("table");
-    const searchInput = document.getElementById("search");
-    const backPremises = document.getElementById("back-premises");
-    const premisesName = document.getElementById("premises-name");
-    let editingId = null;
+    const params=new URLSearchParams(window.location.search);
+    const premiseId=params.get("id");
+    const toast=document.getElementById("toast");
+    const logoutBtn=document.getElementById("logoutBtn");
+    const addBtn=document.getElementById("addBtn");
+    const cancelBtn=document.getElementById("cancelBtn");
+    const formContainer=document.getElementById("formContainer");
+    const form=document.getElementById("licenseForm");
+    const searchInput=document.getElementById("searchInput");
+    const cardsContainer=document.getElementById("cardsContainer");
+    const prevPage=document.getElementById("prevPage");
+    const nextPage=document.getElementById("nextPage");
 
-    async function loadPremisesName() {
-      const { data } = await supabase.from("premises").select("name").eq("id", premisesId).single();
-      premisesName.textContent = data ? data.name : "Premises not found";
+    let page=0;const limit=10;let total=0;
+
+    function showToast(msg,type="info"){
+      toast.textContent=msg;
+      toast.style.background=type==="error"?"#c62828":"#1976d2";
+      toast.classList.add("show");
+      setTimeout(()=>toast.classList.remove("show"),3000);
     }
 
-    async function loadLicenses() {
-      const { data, error } = await supabase.from("premises_licenses")
-        .select("*")
-        .eq("premises_id", premisesId)
-        .order("license_expiry", { ascending: false });
-      if (error) showToast("Error loading licenses: " + error.message, "error");
-      else renderTable(data);
+    async function checkSession(){
+      const {data}=await supabase.auth.getSession();
+      if(!data.session)window.location.href="login.html";
+    }
+    checkSession();
+
+    function toggleForm(show){formContainer.style.display=show?"block":"none";}
+    addBtn.addEventListener("click",()=>toggleForm(true));
+    cancelBtn.addEventListener("click",()=>toggleForm(false));
+
+    async function loadLicenses(){
+      cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading...</p>";
+      let query=supabase.from("premises_licenses").select("*",{count:"exact"}).eq("premises_id",premiseId).order("license_expiry",{ascending:false}).range(page*limit,page*limit+limit-1);
+      const term=searchInput.value.trim();
+      if(term)query=query.or(`license_number.ilike.%${term}%,license_status.ilike.%${term}%`);
+      const{data,count,error}=await query;
+      if(error){console.error(error);showToast("Failed to load licenses","error");return;}
+      total=count;renderCards(data);
     }
 
-    function getStatusClass(expiryDate) {
-      if (!expiryDate) return "status-expired";
-      const now = new Date();
-      const exp = new Date(expiryDate);
-      const diffDays = (exp - now) / (1000 * 60 * 60 * 24);
-      if (diffDays < 0) return "status-expired";
-      if (diffDays <= 30) return "status-expiring";
-      return "status-active";
+    function renderCards(data){
+      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No licenses found</p>";return;}
+      cardsContainer.innerHTML=data.map(l=>`
+        <div class="card">
+          <div class="card-header">
+            <span>${l.license_number||"License"}</span>
+            <span class="badge ${l.license_status||"Pending"}">${l.license_status||"Pending"}</span>
+          </div>
+          <p><strong>Type:</strong> ${l.license_type||"-"} | <strong>Expiry:</strong> ${l.license_expiry||"-"}</p>
+          <p><strong>Officer:</strong> ${l.licensing_officer||"-"} | <strong>Fee:</strong> ${l.licensing_fee?`KES ${l.licensing_fee.toLocaleString()}`:"-"}</p>
+          <p><strong>Method:</strong> ${l.payment_method||"-"}</p>
+        </div>
+      `).join("");
+      prevPage.disabled=page===0;
+      nextPage.disabled=(page+1)*limit>=total;
     }
 
-    function renderTable(rows) {
-      if (!rows.length) {
-        tableDiv.innerHTML = "<p style='text-align:center;margin-top:2rem;'>No licenses found.</p>";
-        return;
-      }
-      const html = `
-        <table>
-          <thead><tr><th>License Number</th><th>Type</th><th>Expiry</th><th>Status</th><th>Fee</th><th>Payment</th><th>Actions</th></tr></thead>
-          <tbody>
-            ${rows.map(r => `
-              <tr>
-                <td data-label="License No.">${r.license_number || "-"}</td>
-                <td data-label="Type">${r.license_type || "-"}</td>
-                <td data-label="Expiry">${r.license_expiry || "-"}</td>
-                <td data-label="Status"><span class="${getStatusClass(r.license_expiry)}">${r.license_status || "-"}</span></td>
-                <td data-label="Fee">${r.licensing_fee ? "KES " + r.licensing_fee.toLocaleString() : "-"}</td>
-                <td data-label="Payment">${r.payment_method || "-"}</td>
-                <td data-label="Actions">
-                  <button class="btn btn-primary" data-edit="${r.id}">Edit</button>
-                  <button class="btn btn-danger" data-del="${r.id}">Delete</button>
-                </td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>`;
-      tableDiv.innerHTML = html;
-      document.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", () => editLicense(b.dataset.edit)));
-      document.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => removeLicense(b.dataset.del)));
-    }
-
-    addBtn.onclick = () => { form.reset(); form.style.display = "block"; editingId = null; };
-    cancelBtn.onclick = () => { form.style.display = "none"; };
-
-    form.onsubmit = async (e) => {
+    form.addEventListener("submit",async e=>{
       e.preventDefault();
-      const data = {
-        premises_id: premisesId,
-        registration_number: registration_number.value,
-        registration_date: registration_date.value,
-        license_number: license_number.value,
-        license_expiry: license_expiry.value,
-        license_type: license_type.value,
-        license_status: license_status.value,
-        renewal_history: renewal_history.value,
-        licensing_officer: licensing_officer.value,
-        licensing_fee: licensing_fee.value,
-        payment_method: payment_method.value
+      const payload={
+        premises_id:premiseId,
+        license_number:document.getElementById("license_number").value.trim(),
+        license_type:document.getElementById("license_type").value.trim(),
+        license_expiry:document.getElementById("license_expiry").value||null,
+        license_status:document.getElementById("license_status").value||null,
+        registration_number:document.getElementById("registration_number").value.trim()||null,
+        registration_date:document.getElementById("registration_date").value||null,
+        licensing_officer:document.getElementById("licensing_officer").value.trim()||null,
+        licensing_fee:parseFloat(document.getElementById("licensing_fee").value)||null,
+        payment_method:document.getElementById("payment_method").value.trim()||null
       };
-      try {
-        if (editingId) await updateRecord("premises_licenses", editingId, data);
-        else await insertRecord("premises_licenses", data);
-        showToast("License saved successfully", "success");
-        form.style.display = "none";
-        loadLicenses();
-      } catch (err) {
-        showToast("Error saving: " + err.message, "error");
-      }
-    };
-
-    async function editLicense(id) {
-      const { data, error } = await supabase.from("premises_licenses").select("*").eq("id", id).single();
-      if (error) return showToast("Error loading record: " + error.message, "error");
-      Object.keys(data).forEach(k => { if (form[k]) form[k].value = data[k] || ""; });
-      form.style.display = "block"; editingId = id;
-    }
-
-    async function removeLicense(id) {
-      if (!confirm("Delete this license record?")) return;
-      await deleteRecord("premises_licenses", id);
-      showToast("License deleted", "success");
-      loadLicenses();
-    }
-
-    searchInput.addEventListener("input", e => {
-      const term = e.target.value.toLowerCase();
-      document.querySelectorAll("tbody tr").forEach(r => {
-        r.style.display = r.innerText.toLowerCase().includes(term) ? "" : "none";
-      });
+      const{error}=await supabase.from("premises_licenses").insert([payload]);
+      if(error){console.error(error);showToast("Save failed","error");return;}
+      showToast("License added successfully");
+      form.reset();toggleForm(false);loadLicenses();
     });
 
-    backPremises.onclick = () => window.location.href = "premises_management.html";
-    loadPremisesName();
+    searchInput.addEventListener("input",()=>{page=0;loadLicenses();});
+    nextPage.addEventListener("click",()=>{page++;loadLicenses();});
+    prevPage.addEventListener("click",()=>{if(page>0){page--;loadLicenses();}});
+    logoutBtn.addEventListener("click",async()=>{
+      await supabase.auth.signOut();
+      showToast("Logging out...");
+      setTimeout(()=>window.location.href="login.html",800);
+    });
+    document.getElementById("year").textContent=new Date().getFullYear();
     loadLicenses();
   </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EPHIS | Premise Compliance</title>
+  <title>EPHIS | Re-Inspections</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
@@ -17,12 +17,14 @@
     main{flex:1;padding:1rem;max-width:900px;margin:0 auto;}
     .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
     .toolbar input{padding:0.6rem;border:1px solid #ccc;border-radius:6px;width:220px;}
-    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
+    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;transition:0.2s ease;}
+    .card:hover{transform:scale(1.01);}
     .card-header{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:#1976d2;}
     .badge{border-radius:5px;padding:0.2rem 0.5rem;font-size:0.8rem;font-weight:600;}
-    .badge.Compliant{background:#c8e6c9;color:#2e7d32;}
-    .badge.NonCompliant{background:#ffcdd2;color:#c62828;}
-    .badge.Pending{background:#fff9c4;color:#f57f17;}
+    .badge.compliant{background:#c8e6c9;color:#2e7d32;}
+    .badge.partial{background:#fff9c4;color:#f57f17;}
+    .badge.non{background:#ffcdd2;color:#c62828;}
+    .expand{background:#f9f9f9;margin-top:0.6rem;border-left:3px solid #1976d2;border-radius:6px;padding:0.6rem;display:none;}
     .form-card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
     form label{font-weight:600;display:block;margin-top:0.5rem;}
     form input,form select,form textarea{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
@@ -37,59 +39,39 @@
 
 <body>
   <header>
-    <h1>EPHIS – Premise Compliance</h1>
+    <h1>EPHIS – Re-Inspections</h1>
     <div>
-      <button class="btn btn-light" onclick="window.location.href='premises_management.html'">Back</button>
+      <button class="btn btn-light" onclick="window.location.href='inspections.html'">Back</button>
       <button class="btn btn-secondary" id="logoutBtn">Logout</button>
     </div>
   </header>
 
   <main>
     <div class="toolbar">
-      <input type="text" id="searchInput" placeholder="Search by action or officer..." />
-      <button class="btn btn-primary" id="addBtn">+ Add Action</button>
+      <input type="text" id="searchInput" placeholder="Search by compliance..." />
+      <button class="btn btn-primary" id="addBtn">+ Add Re-Inspection</button>
     </div>
 
     <div id="formContainer" style="display:none;" class="form-card">
-      <form id="complianceForm">
-        <label>Action Type</label>
-        <select id="action_type" required>
+      <form id="reinspectionForm">
+        <label>Re-Inspection Date</label>
+        <input type="date" id="reinspection_date" required />
+
+        <label>Findings</label>
+        <textarea id="findings" rows="2"></textarea>
+
+        <label>Compliance Level</label>
+        <select id="compliance_level" required>
           <option value="">Select</option>
-          <option>Warning Notice</option>
-          <option>Closure Notice</option>
-          <option>Fine</option>
-          <option>Re-Inspection</option>
-          <option>Court Action</option>
+          <option>Fully Compliant</option>
+          <option>Partially Compliant</option>
+          <option>Non-Compliant</option>
         </select>
 
-        <label>Action Details</label>
-        <textarea id="action_details" rows="2"></textarea>
+        <label><input type="checkbox" id="corrective_verified" /> Corrective Actions Verified</label>
 
-        <label>Date of Action</label>
-        <input type="date" id="date_of_action" />
-
-        <label>Responsible Officer</label>
-        <input type="text" id="responsible_officer" />
-
-        <label>Fine Amount (KES)</label>
-        <input type="number" step="0.01" id="fine_amount" />
-
-        <label>Payment Reference</label>
-        <input type="text" id="payment_reference" />
-
-        <label>Compliance Status</label>
-        <select id="compliance_status">
-          <option value="">Select</option>
-          <option>Compliant</option>
-          <option>NonCompliant</option>
-          <option>Pending</option>
-        </select>
-
-        <label>Reinspection Date</label>
-        <input type="date" id="reinspection_date" />
-
-        <label>Comments</label>
-        <textarea id="comments" rows="2"></textarea>
+        <label>Verification Officer</label>
+        <input type="text" id="verification_officer" />
 
         <div style="text-align:right;margin-top:0.6rem;">
           <button type="submit" class="btn btn-primary">Save</button>
@@ -115,18 +97,18 @@
   <script type="module">
     import { supabase } from "./main.js";
 
-    const params=new URLSearchParams(window.location.search);
-    const premiseId=params.get("id");
+    const params = new URLSearchParams(window.location.search);
+    const inspectionId = params.get("id");
     const toast=document.getElementById("toast");
     const logoutBtn=document.getElementById("logoutBtn");
     const addBtn=document.getElementById("addBtn");
     const cancelBtn=document.getElementById("cancelBtn");
     const formContainer=document.getElementById("formContainer");
-    const form=document.getElementById("complianceForm");
+    const form=document.getElementById("reinspectionForm");
     const searchInput=document.getElementById("searchInput");
-    const cardsContainer=document.getElementById("cardsContainer");
     const prevPage=document.getElementById("prevPage");
     const nextPage=document.getElementById("nextPage");
+    const cardsContainer=document.getElementById("cardsContainer");
 
     let page=0;const limit=10;let total=0;
 
@@ -147,64 +129,72 @@
     addBtn.addEventListener("click",()=>toggleForm(true));
     cancelBtn.addEventListener("click",()=>toggleForm(false));
 
-    async function loadCompliance(){
+    async function loadReinspections(){
       cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading...</p>";
-      let query=supabase.from("premises_compliance_actions").select("*",{count:"exact"}).eq("premises_id",premiseId).order("date_of_action",{ascending:false}).range(page*limit,page*limit+limit-1);
+      let query=supabase.from("inspection_reinspections").select("*",{count:"exact"}).eq("inspection_id",inspectionId).order("reinspection_date",{ascending:false}).range(page*limit,page*limit+limit-1);
       const term=searchInput.value.trim();
-      if(term)query=query.or(`action_type.ilike.%${term}%,responsible_officer.ilike.%${term}%`);
+      if(term)query=query.ilike("compliance_level",`%${term}%`);
       const{data,count,error}=await query;
-      if(error){console.error(error);showToast("Failed to load compliance records","error");return;}
+      if(error){console.error(error);showToast("Failed to load records","error");return;}
       total=count;renderCards(data);
     }
 
     function renderCards(data){
-      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No actions found</p>";return;}
-      cardsContainer.innerHTML=data.map(a=>`
+      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No re-inspections found</p>";return;}
+      cardsContainer.innerHTML=data.map(r=>`
         <div class="card">
           <div class="card-header">
-            <span>${a.action_type||"Action"}</span>
-            <span class="badge ${a.compliance_status||"Pending"}">${a.compliance_status||"Pending"}</span>
+            <span>${r.reinspection_date||"Re-Inspection"}</span>
+            <span class="badge ${r.compliance_level?.includes("Fully")?"compliant":r.compliance_level?.includes("Partial")?"partial":"non"}">${r.compliance_level||"N/A"}</span>
           </div>
-          <p><strong>Date:</strong> ${a.date_of_action||"-"} | <strong>Officer:</strong> ${a.responsible_officer||"-"}</p>
-          <p><strong>Fine:</strong> ${a.fine_amount?`KES ${a.fine_amount.toLocaleString()}`:"-"} | <strong>Reference:</strong> ${a.payment_reference||"-"}</p>
-          <p><strong>Reinspection:</strong> ${a.reinspection_date||"-"}</p>
-          <p><strong>Details:</strong> ${a.action_details||"-"}</p>
+          <div class="card-body">
+            <p><strong>Findings:</strong> ${r.findings||"-"}</p>
+            <p><strong>Verified:</strong> ${r.corrective_verified?"Yes":"No"} | <strong>Officer:</strong> ${r.verification_officer||"-"}</p>
+            <div style="margin-top:0.4rem;">
+              <a href="#" style="color:#1976d2;font-weight:600;font-size:0.85rem;" onclick="toggleExpand('${r.id}')">Toggle Details</a>
+            </div>
+            <div class="expand" id="exp-${r.id}">
+              <p><strong>Notes:</strong> ${r.findings||"-"}</p>
+            </div>
+          </div>
         </div>
       `).join("");
       prevPage.disabled=page===0;
       nextPage.disabled=(page+1)*limit>=total;
     }
 
+    window.toggleExpand=(id)=>{
+      const el=document.getElementById("exp-"+id);
+      el.style.display=el.style.display==="block"?"none":"block";
+    };
+
     form.addEventListener("submit",async e=>{
       e.preventDefault();
       const payload={
-        premises_id:premiseId,
-        action_type:document.getElementById("action_type").value,
-        action_details:document.getElementById("action_details").value,
-        date_of_action:document.getElementById("date_of_action").value||null,
-        responsible_officer:document.getElementById("responsible_officer").value,
-        fine_amount:parseFloat(document.getElementById("fine_amount").value)||null,
-        payment_reference:document.getElementById("payment_reference").value,
-        compliance_status:document.getElementById("compliance_status").value,
-        reinspection_date:document.getElementById("reinspection_date").value||null,
-        comments:document.getElementById("comments").value
+        inspection_id:inspectionId,
+        reinspection_date:document.getElementById("reinspection_date").value,
+        findings:document.getElementById("findings").value,
+        compliance_level:document.getElementById("compliance_level").value,
+        corrective_verified:document.getElementById("corrective_verified").checked,
+        verification_officer:document.getElementById("verification_officer").value
       };
-      const{error}=await supabase.from("premises_compliance_actions").insert([payload]);
+      const{error}=await supabase.from("inspection_reinspections").insert([payload]);
       if(error){console.error(error);showToast("Save failed","error");return;}
-      showToast("Compliance action recorded");
-      form.reset();toggleForm(false);loadCompliance();
+      showToast("Re-inspection added");
+      form.reset();toggleForm(false);loadReinspections();
     });
 
-    searchInput.addEventListener("input",()=>{page=0;loadCompliance();});
-    nextPage.addEventListener("click",()=>{page++;loadCompliance();});
-    prevPage.addEventListener("click",()=>{if(page>0){page--;loadCompliance();}});
     logoutBtn.addEventListener("click",async()=>{
       await supabase.auth.signOut();
       showToast("Logging out...");
       setTimeout(()=>window.location.href="login.html",800);
     });
+
+    searchInput.addEventListener("input",()=>{page=0;loadReinspections();});
+    nextPage.addEventListener("click",()=>{page++;loadReinspections();});
+    prevPage.addEventListener("click",()=>{if(page>0){page--;loadReinspections();}});
     document.getElementById("year").textContent=new Date().getFullYear();
-    loadCompliance();
+    loadReinspections();
   </script>
 </body>
 </html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EPHIS | Inspection Outcomes</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="main.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f5f6fa; margin: 0; color: #222; display:flex;flex-direction:column;min-height:100vh;}
+    header {background:#1976d2;color:white;display:flex;justify-content:space-between;align-items:center;padding:0.8rem 1rem;flex-wrap:wrap;}
+    header h1{font-size:1rem;margin:0;font-weight:600;}
+    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.5rem 1rem;font-size:0.9rem;}
+    .btn-primary{background:#1976d2;color:white;}
+    .btn-secondary{background:#2e7d32;color:white;}
+    .btn-light{background:white;color:#1976d2;border:1px solid #1976d2;}
+    main{flex:1;padding:1rem;max-width:900px;margin:0 auto;}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
+    .toolbar input{padding:0.6rem;border:1px solid #ccc;border-radius:6px;width:220px;}
+    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;transition:0.2s ease;}
+    .card:hover{transform:scale(1.01);}
+    .card-header{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:#1976d2;}
+    .badge{border-radius:5px;padding:0.2rem 0.5rem;font-size:0.8rem;font-weight:600;}
+    .badge.follow{background:#fff9c4;color:#f57f17;}
+    .badge.compliant{background:#c8e6c9;color:#2e7d32;}
+    .badge.non{background:#ffcdd2;color:#c62828;}
+    .expand{background:#f9f9f9;margin-top:0.6rem;border-left:3px solid #1976d2;border-radius:6px;padding:0.6rem;display:none;}
+    .form-card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
+    form label{font-weight:600;display:block;margin-top:0.5rem;}
+    form input,form select,form textarea{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
+    .pagination{display:flex;justify-content:center;gap:0.5rem;margin-top:1rem;}
+    .pagination button{border:none;background:#1976d2;color:white;border-radius:5px;padding:0.4rem 0.8rem;cursor:pointer;font-weight:600;}
+    footer{text-align:center;background:#e3f2fd;color:#555;padding:0.6rem;font-size:0.8rem;}
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1976d2;color:white;padding:0.8rem 1rem;border-radius:6px;opacity:0;transition:opacity 0.3s ease;}
+    .toast.show{opacity:1;}
+    @media(max-width:600px){.toolbar{flex-direction:column;gap:0.5rem;align-items:stretch;}.toolbar input{width:100%;}}
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>EPHIS – Inspection Outcomes</h1>
+    <div>
+      <button class="btn btn-light" onclick="window.location.href='inspections.html'">Back</button>
+      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <input type="text" id="searchInput" placeholder="Search outcome type..." />
+      <button class="btn btn-primary" id="addBtn">+ Add Outcome</button>
+    </div>
+
+    <div id="formContainer" style="display:none;" class="form-card">
+      <form id="outcomeForm">
+        <label>Outcome Type</label>
+        <select id="outcome_type" required>
+          <option value="">Select</option>
+          <option>Compliant</option>
+          <option>Non-Compliant</option>
+          <option>Partially Compliant</option>
+          <option>Requires Follow-up</option>
+        </select>
+
+        <label>Report Summary</label>
+        <textarea id="report_summary" rows="2"></textarea>
+
+        <label>Inspection Score (%)</label>
+        <input type="number" id="inspection_score" min="0" max="100" />
+
+        <label>Follow-up Required</label>
+        <select id="followup_required"><option value="false">No</option><option value="true">Yes</option></select>
+
+        <label>Follow-up Date</label>
+        <input type="date" id="followup_date" />
+
+        <label>Follow-up Officer</label>
+        <input type="text" id="followup_officer" />
+
+        <div style="text-align:right;margin-top:0.6rem;">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="cardsContainer"></div>
+
+    <div class="pagination">
+      <button id="prevPage">Previous</button>
+      <button id="nextPage">Next</button>
+    </div>
+  </main>
+
+  <footer>
+    County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { supabase } from "./main.js";
+
+    const params = new URLSearchParams(window.location.search);
+    const inspectionId = params.get("id");
+    const toast = document.getElementById("toast");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const addBtn = document.getElementById("addBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const formContainer = document.getElementById("formContainer");
+    const form = document.getElementById("outcomeForm");
+    const searchInput = document.getElementById("searchInput");
+    const prevPage = document.getElementById("prevPage");
+    const nextPage = document.getElementById("nextPage");
+    const cardsContainer = document.getElementById("cardsContainer");
+
+    let page = 0;
+    const limit = 10;
+    let total = 0;
+
+    function showToast(msg,type="info"){
+      toast.textContent=msg;
+      toast.style.background=type==="error"?"#c62828":"#1976d2";
+      toast.classList.add("show");
+      setTimeout(()=>toast.classList.remove("show"),3000);
+    }
+
+    async function checkSession(){
+      const { data }=await supabase.auth.getSession();
+      if(!data.session) window.location.href="login.html";
+    }
+    checkSession();
+
+    function toggleForm(show){ formContainer.style.display=show?"block":"none"; }
+
+    addBtn.addEventListener("click",()=>toggleForm(true));
+    cancelBtn.addEventListener("click",()=>toggleForm(false));
+
+    async function loadOutcomes(){
+      cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading...</p>";
+      let query=supabase.from("inspection_outcomes").select("*",{count:"exact"}).eq("inspection_id",inspectionId).order("inspection_id",{ascending:false}).range(page*limit,page*limit+limit-1);
+      const term=searchInput.value.trim();
+      if(term) query=query.ilike("outcome_type",`%${term}%`);
+      const{data,count,error}=await query;
+      if(error){console.error(error);showToast("Failed to load outcomes","error");return;}
+      total=count;
+      renderCards(data);
+    }
+
+    function renderCards(data){
+      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No outcomes found</p>";return;}
+      cardsContainer.innerHTML=data.map(o=>`
+        <div class="card">
+          <div class="card-header">
+            <span>${o.outcome_type||"Outcome"}</span>
+            <span class="badge ${o.outcome_type?.includes("Compliant")?"compliant":o.outcome_type?.includes("Non")?"non":"follow"}">${o.outcome_type}</span>
+          </div>
+          <div class="card-body">
+            <p><strong>Score:</strong> ${o.inspection_score||"-"}%</p>
+            <p><strong>Follow-up Required:</strong> ${o.followup_required?"Yes":"No"}</p>
+            <p><strong>Officer:</strong> ${o.followup_officer||"-"}</p>
+            <p><strong>Follow-up Date:</strong> ${o.followup_date||"-"}</p>
+            <div class="expand" id="exp-${o.id}">
+              <p><strong>Summary:</strong> ${o.report_summary||"-"}</p>
+            </div>
+            <div style="margin-top:0.4rem;">
+              <a href="#" style="color:#1976d2;font-weight:600;font-size:0.85rem;" onclick="toggleExpand('${o.id}')">Toggle Details</a>
+            </div>
+          </div>
+        </div>
+      `).join("");
+      prevPage.disabled=page===0;
+      nextPage.disabled=(page+1)*limit>=total;
+    }
+
+    window.toggleExpand=(id)=>{
+      const el=document.getElementById("exp-"+id);
+      el.style.display=el.style.display==="block"?"none":"block";
+    };
+
+    form.addEventListener("submit",async e=>{
+      e.preventDefault();
+      const payload={
+        inspection_id:inspectionId,
+        outcome_type:document.getElementById("outcome_type").value,
+        report_summary:document.getElementById("report_summary").value,
+        inspection_score:parseFloat(document.getElementById("inspection_score").value)||null,
+        followup_required:document.getElementById("followup_required").value==="true",
+        followup_date:document.getElementById("followup_date").value||null,
+        followup_officer:document.getElementById("followup_officer").value||null
+      };
+      const{error}=await supabase.from("inspection_outcomes").insert([payload]);
+      if(error){console.error(error);showToast("Save failed","error");return;}
+      showToast("Outcome added");
+      form.reset();toggleForm(false);loadOutcomes();
+    });
+
+    logoutBtn.addEventListener("click",async()=>{
+      await supabase.auth.signOut();
+      showToast("Logging out...");
+      setTimeout(()=>window.location.href="login.html",800);
+    });
+
+    searchInput.addEventListener("input",()=>{page=0;loadOutcomes();});
+    nextPage.addEventListener("click",()=>{page++;loadOutcomes();});
+    prevPage.addEventListener("click",()=>{if(page>0){page--;loadOutcomes();}});
+    document.getElementById("year").textContent=new Date().getFullYear();
+    loadOutcomes();
+  </script>
+</body>
+</html>

@@ -3,222 +3,207 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Premises Inspections | EPHIS</title>
+  <title>EPHIS | Premise Inspections</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    body { font-family: system-ui, sans-serif; background: #f5f6fa; margin: 0; color: #222; }
-    header { background: #1976d2; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-    header h1 { margin: 0; font-size: 1.1rem; }
-    .btn { border: none; border-radius: 6px; cursor: pointer; font-weight: 600; padding: 0.6rem 1rem; }
-    .btn-primary { background: #1976d2; color: #fff; }
-    .btn-secondary { background: #eee; color: #333; }
-    .btn-danger { background: #c62828; color: #fff; }
-    main { padding: 1rem; max-width: 1000px; margin: auto; }
-    .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
-    .toolbar input { flex: 1; min-width: 200px; padding: 0.6rem; border: 1px solid #ccc; border-radius: 6px; }
-    form { background: #fff; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
-    form input, form select, form textarea { width: 100%; padding: 0.5rem; margin: 0.4rem 0; border: 1px solid #ccc; border-radius: 6px; }
-    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-    th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
-    th { background: #f1f1f1; font-weight: 600; }
-    tr:hover { background: #f9f9f9; }
-    .risk-high { color: #c62828; font-weight: 600; }
-    .risk-medium { color: #f9a825; font-weight: 600; }
-    .risk-low { color: #2e7d32; font-weight: 600; }
-    #premises-name { font-weight: 700; font-size: 1.2rem; color: #1976d2; margin-bottom: 0.5rem; }
-    @media (max-width: 600px) {
-      table, thead, tbody, th, td, tr { display: block; }
-      tr { margin-bottom: 1rem; background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
-      th { display: none; }
-      td { display: flex; justify-content: space-between; padding: 8px 12px; }
-      td::before { content: attr(data-label); font-weight: 600; color: #555; }
-    }
+    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;color:#222;display:flex;flex-direction:column;min-height:100vh;}
+    header{background:#1976d2;color:white;display:flex;justify-content:space-between;align-items:center;padding:0.8rem 1rem;flex-wrap:wrap;}
+    header h1{font-size:1rem;margin:0;font-weight:600;}
+    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.5rem 1rem;font-size:0.9rem;}
+    .btn-primary{background:#1976d2;color:white;}
+    .btn-secondary{background:#2e7d32;color:white;}
+    .btn-light{background:white;color:#1976d2;border:1px solid #1976d2;}
+    main{flex:1;padding:1rem;max-width:900px;margin:0 auto;}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
+    .toolbar input{padding:0.6rem;border:1px solid #ccc;border-radius:6px;width:220px;}
+    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
+    .card-header{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:#1976d2;}
+    .badge{border-radius:5px;padding:0.2rem 0.5rem;font-size:0.8rem;font-weight:600;}
+    .badge.Low{background:#c8e6c9;color:#2e7d32;}
+    .badge.Medium{background:#fff9c4;color:#f57f17;}
+    .badge.High{background:#ffcdd2;color:#c62828;}
+    .form-card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
+    form label{font-weight:600;display:block;margin-top:0.5rem;}
+    form input,form select,form textarea{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
+    .pagination{display:flex;justify-content:center;gap:0.5rem;margin-top:1rem;}
+    .pagination button{border:none;background:#1976d2;color:white;border-radius:5px;padding:0.4rem 0.8rem;cursor:pointer;font-weight:600;}
+    footer{text-align:center;background:#e3f2fd;color:#555;padding:0.6rem;font-size:0.8rem;}
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1976d2;color:white;padding:0.8rem 1rem;border-radius:6px;opacity:0;transition:opacity 0.3s ease;}
+    .toast.show{opacity:1;}
+    @media(max-width:600px){.toolbar{flex-direction:column;gap:0.5rem;align-items:stretch;}.toolbar input{width:100%;}}
   </style>
 </head>
 
-<body data-module="premises_inspections">
+<body>
   <header>
-    <h1>Premises Inspections</h1>
-    <button class="btn btn-secondary" onclick="window.location.href='premises_management.html'">← Back to Premises</button>
+    <h1>EPHIS – Premise Inspections</h1>
+    <div>
+      <button class="btn btn-light" onclick="window.location.href='premises_management.html'">Back</button>
+      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+    </div>
   </header>
 
   <main>
-    <div id="premises-name">Loading premises...</div>
-
     <div class="toolbar">
-      <button id="add-btn" class="btn btn-primary">+ New Inspection</button>
-      <input type="search" id="search" placeholder="Search inspections..." />
+      <input type="text" id="searchInput" placeholder="Search by type or officer..." />
+      <button class="btn btn-primary" id="addBtn">+ Add Inspection</button>
     </div>
 
-    <form id="inspection-form" style="display:none;">
-      <h3 id="form-title">Add Inspection</h3>
-      <input type="hidden" id="inspection-id" />
-      <label>Inspection Type</label>
-      <select id="inspection_type">
-        <option value="Routine">Routine</option>
-        <option value="Follow-up">Follow-up</option>
-        <option value="Complaint-based">Complaint-based</option>
-        <option value="Special">Special</option>
-      </select>
-      <label>Findings</label><textarea id="findings"></textarea>
-      <label>Non-Compliance</label><textarea id="non_compliance"></textarea>
-      <label>Risk Rating</label>
-      <select id="risk_rating">
-        <option value="High">High</option>
-        <option value="Medium">Medium</option>
-        <option value="Low">Low</option>
-      </select>
-      <label>Outcome</label>
-      <select id="outcome">
-        <option value="Pass">Pass</option>
-        <option value="Conditional Pass">Conditional Pass</option>
-        <option value="Fail">Fail</option>
-      </select>
-      <label>Follow-up Actions</label><textarea id="followup_actions"></textarea>
-      <label>Follow-up Date</label><input id="followup_date" type="date" />
-      <label>Evidence URL</label><input id="evidence_url" type="url" />
-      <label>Recommendation</label><textarea id="recommendation"></textarea>
-      <div>
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" id="cancel-btn" class="btn btn-secondary">Cancel</button>
-      </div>
-    </form>
+    <div id="formContainer" style="display:none;" class="form-card">
+      <form id="inspectionForm">
+        <label>Inspection Date</label>
+        <input type="date" id="date" required />
 
-    <div id="table"></div>
-    <div style="text-align:center;margin-top:1rem;">
-      <button id="load-more" class="btn btn-secondary">Load More</button>
+        <label>Inspection Type</label>
+        <select id="inspection_type" required>
+          <option value="">Select</option>
+          <option>Routine</option>
+          <option>Follow-up</option>
+          <option>Complaint-Based</option>
+          <option>Licensing</option>
+        </select>
+
+        <label>Inspector Details</label>
+        <input type="text" id="inspector_details" placeholder="Officer name or team" />
+
+        <label>Findings</label>
+        <textarea id="findings" rows="2"></textarea>
+
+        <label>Risk Rating</label>
+        <select id="risk_rating">
+          <option value="">Select</option>
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+
+        <label>Outcome</label>
+        <select id="outcome">
+          <option value="">Select</option>
+          <option>Compliant</option>
+          <option>Non-Compliant</option>
+          <option>Partially Compliant</option>
+        </select>
+
+        <label>Follow-up Date</label>
+        <input type="date" id="followup_date" />
+
+        <label>Recommendation</label>
+        <textarea id="recommendation" rows="2"></textarea>
+
+        <div style="text-align:right;margin-top:0.6rem;">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="cardsContainer"></div>
+
+    <div class="pagination">
+      <button id="prevPage">Previous</button>
+      <button id="nextPage">Next</button>
     </div>
   </main>
 
+  <footer>
+    County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
   <script type="module">
-    import { supabase, fetchAll, insertRecord, updateRecord, deleteRecord, showToast, requireLogin } from "./main.js";
-    await requireLogin();
+    import { supabase } from "./main.js";
 
-    const params = new URLSearchParams(window.location.search);
-    const premisesId = params.get("id");
-    const premisesNameDiv = document.getElementById("premises-name");
-    const form = document.getElementById("inspection-form");
-    const addBtn = document.getElementById("add-btn");
-    const cancelBtn = document.getElementById("cancel-btn");
-    const tableDiv = document.getElementById("table");
-    const searchInput = document.getElementById("search");
-    const loadMoreBtn = document.getElementById("load-more");
+    const params=new URLSearchParams(window.location.search);
+    const premiseId=params.get("id");
+    const toast=document.getElementById("toast");
+    const logoutBtn=document.getElementById("logoutBtn");
+    const addBtn=document.getElementById("addBtn");
+    const cancelBtn=document.getElementById("cancelBtn");
+    const formContainer=document.getElementById("formContainer");
+    const form=document.getElementById("inspectionForm");
+    const searchInput=document.getElementById("searchInput");
+    const cardsContainer=document.getElementById("cardsContainer");
+    const prevPage=document.getElementById("prevPage");
+    const nextPage=document.getElementById("nextPage");
 
-    let editingId = null, offset = 0, limit = 10, allLoaded = false;
+    let page=0;const limit=10;let total=0;
 
-    async function fetchPremisesName() {
-      const { data } = await supabase.from("premises").select("name").eq("id", premisesId).single();
-      premisesNameDiv.textContent = data ? "Premises: " + data.name : "Premises not found";
+    function showToast(msg,type="info"){
+      toast.textContent=msg;
+      toast.style.background=type==="error"?"#c62828":"#1976d2";
+      toast.classList.add("show");
+      setTimeout(()=>toast.classList.remove("show"),3000);
     }
 
-    async function loadInspections(reset = false) {
-      if (reset) { offset = 0; allLoaded = false; tableDiv.innerHTML = ""; }
-      if (allLoaded) return;
+    async function checkSession(){
+      const {data}=await supabase.auth.getSession();
+      if(!data.session)window.location.href="login.html";
+    }
+    checkSession();
 
-      const { data, error } = await supabase
-        .from("premises_inspections")
-        .select("*")
-        .eq("premises_id", premisesId)
-        .order("date", { ascending: false })
-        .range(offset, offset + limit - 1);
+    function toggleForm(show){formContainer.style.display=show?"block":"none";}
+    addBtn.addEventListener("click",()=>toggleForm(true));
+    cancelBtn.addEventListener("click",()=>toggleForm(false));
 
-      if (error) return showToast("Error loading inspections: " + error.message, "error");
-      if (!data.length) { allLoaded = true; return; }
-
-      offset += data.length;
-      renderTable(data, reset);
+    async function loadInspections(){
+      cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading...</p>";
+      let query=supabase.from("premises_inspections").select("*",{count:"exact"}).eq("premises_id",premiseId).order("date",{ascending:false}).range(page*limit,page*limit+limit-1);
+      const term=searchInput.value.trim();
+      if(term)query=query.or(`inspection_type.ilike.%${term}%,inspector_details.ilike.%${term}%`);
+      const{data,count,error}=await query;
+      if(error){console.error(error);showToast("Failed to load inspections","error");return;}
+      total=count;renderCards(data);
     }
 
-    function renderTable(rows, reset) {
-      if (!rows.length && reset) {
-        tableDiv.innerHTML = "<p style='text-align:center;margin-top:2rem;'>No inspections found.</p>";
-        return;
-      }
-
-      const tbody = rows.map(r => `
-        <tr>
-          <td data-label="Date">${r.date || "-"}</td>
-          <td data-label="Type">${r.inspection_type || "-"}</td>
-          <td data-label="Risk"><span class="risk-${r.risk_rating?.toLowerCase()}">${r.risk_rating || "-"}</span></td>
-          <td data-label="Outcome">${r.outcome || "-"}</td>
-          <td data-label="Follow-up">${r.followup_date || "-"}</td>
-          <td data-label="Action">
-            <button class="btn btn-primary" data-edit="${r.id}">Edit</button>
-            <button class="btn btn-danger" data-del="${r.id}">Delete</button>
-          </td>
-        </tr>`).join("");
-
-      const tableExists = tableDiv.querySelector("table");
-      if (tableExists && !reset) tableDiv.querySelector("tbody").insertAdjacentHTML("beforeend", tbody);
-      else tableDiv.innerHTML = `
-        <table>
-          <thead>
-            <tr><th>Date</th><th>Type</th><th>Risk</th><th>Outcome</th><th>Follow-up Date</th><th>Action</th></tr>
-          </thead>
-          <tbody>${tbody}</tbody>
-        </table>
-      `;
-
-      document.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", () => editInspection(b.dataset.edit)));
-      document.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => removeInspection(b.dataset.del)));
+    function renderCards(data){
+      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No inspections found</p>";return;}
+      cardsContainer.innerHTML=data.map(i=>`
+        <div class="card">
+          <div class="card-header">
+            <span>${i.inspection_type||"Inspection"}</span>
+            <span class="badge ${i.risk_rating||"Low"}">${i.risk_rating||"Low"}</span>
+          </div>
+          <p><strong>Date:</strong> ${i.date||"-"} | <strong>Officer:</strong> ${i.inspector_details||"-"}</p>
+          <p><strong>Outcome:</strong> ${i.outcome||"-"} | <strong>Follow-up:</strong> ${i.followup_date||"-"}</p>
+          <p><strong>Findings:</strong> ${i.findings||"-"}</p>
+        </div>
+      `).join("");
+      prevPage.disabled=page===0;
+      nextPage.disabled=(page+1)*limit>=total;
     }
 
-    form.onsubmit = async (e) => {
+    form.addEventListener("submit",async e=>{
       e.preventDefault();
-      const dateNow = new Date().toISOString().split("T")[0];
-      const followup = followup_date.value || new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0];
-
-      const data = {
-        premises_id: premisesId,
-        date: dateNow,
-        inspection_type: inspection_type.value,
-        findings: findings.value,
-        non_compliance: non_compliance.value,
-        risk_rating: risk_rating.value,
-        outcome: outcome.value,
-        followup_actions: followup_actions.value,
-        followup_date: followup,
-        evidence_url: evidence_url.value,
-        recommendation: recommendation.value
+      const payload={
+        premises_id:premiseId,
+        date:document.getElementById("date").value,
+        inspection_type:document.getElementById("inspection_type").value,
+        inspector_details:document.getElementById("inspector_details").value,
+        findings:document.getElementById("findings").value,
+        risk_rating:document.getElementById("risk_rating").value,
+        outcome:document.getElementById("outcome").value,
+        followup_date:document.getElementById("followup_date").value||null,
+        recommendation:document.getElementById("recommendation").value
       };
-
-      try {
-        if (editingId) await updateRecord("premises_inspections", editingId, data);
-        else await insertRecord("premises_inspections", data);
-        showToast("Saved successfully", "success");
-        form.style.display = "none";
-        loadInspections(true);
-      } catch (err) {
-        showToast("Error saving: " + err.message, "error");
-      }
-    };
-
-    async function editInspection(id) {
-      const { data } = await supabase.from("premises_inspections").select("*").eq("id", id).single();
-      Object.keys(data).forEach(k => { if (form[k]) form[k].value = data[k] || ""; });
-      form.style.display = "block"; editingId = id;
-    }
-
-    async function removeInspection(id) {
-      if (!confirm("Delete this inspection?")) return;
-      await deleteRecord("premises_inspections", id);
-      showToast("Deleted successfully", "success");
-      loadInspections(true);
-    }
-
-    addBtn.onclick = () => { form.reset(); editingId = null; form.style.display = "block"; };
-    cancelBtn.onclick = () => form.style.display = "none";
-    loadMoreBtn.onclick = () => loadInspections();
-
-    searchInput.addEventListener("input", e => {
-      const term = e.target.value.toLowerCase();
-      document.querySelectorAll("tbody tr").forEach(r => {
-        r.style.display = r.innerText.toLowerCase().includes(term) ? "" : "none";
-      });
+      const{error}=await supabase.from("premises_inspections").insert([payload]);
+      if(error){console.error(error);showToast("Save failed","error");return;}
+      showToast("Inspection recorded successfully");
+      form.reset();toggleForm(false);loadInspections();
     });
 
-    fetchPremisesName();
-    loadInspections(true);
+    searchInput.addEventListener("input",()=>{page=0;loadInspections();});
+    nextPage.addEventListener("click",()=>{page++;loadInspections();});
+    prevPage.addEventListener("click",()=>{if(page>0){page--;loadInspections();}});
+    logoutBtn.addEventListener("click",async()=>{
+      await supabase.auth.signOut();
+      showToast("Logging out...");
+      setTimeout(()=>window.location.href="login.html",800);
+    });
+    document.getElementById("year").textContent=new Date().getFullYear();
+    loadInspections();
   </script>
 </body>
 </html>
