@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EPHIS | Water Quality</title>
+  <title>EPHIS | Water Lab Results</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
@@ -14,24 +14,18 @@
     .btn-primary{background:#1976d2;color:white;}
     .btn-secondary{background:#2e7d32;color:white;}
     .btn-light{background:white;color:#1976d2;border:1px solid #1976d2;}
-    main{flex:1;padding:1rem;max-width:1100px;margin:0 auto;}
+    main{flex:1;padding:1rem;max-width:1000px;margin:0 auto;}
     .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
     .toolbar input{padding:0.6rem;border:1px solid #ccc;border-radius:6px;width:250px;}
-    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;transition:0.2s ease;}
-    .card:hover{transform:scale(1.01);}
+    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
     .card-header{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:#1976d2;}
-    .badge{border-radius:5px;padding:0.2rem 0.6rem;font-size:0.8rem;font-weight:600;}
-    .badge.Safe{background:#c8e6c9;color:#2e7d32;}
-    .badge.Unsafe{background:#ffcdd2;color:#c62828;}
-    .badge.Pending{background:#fff9c4;color:#f57f17;}
-    .risk{font-weight:600;border-radius:6px;padding:0.2rem 0.5rem;}
     .actions{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.6rem;}
     .actions a{text-decoration:none;color:white;background:#1976d2;border-radius:6px;padding:0.4rem 0.7rem;font-size:0.8rem;font-weight:600;}
     .pagination{display:flex;justify-content:center;gap:0.5rem;margin-top:1rem;}
     .pagination button{border:none;background:#1976d2;color:white;border-radius:5px;padding:0.4rem 0.8rem;cursor:pointer;font-weight:600;}
     .form-card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
     form label{font-weight:600;display:block;margin-top:0.5rem;}
-    form input,form select{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
+    form input,form select,form textarea{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
     footer{text-align:center;background:#e3f2fd;color:#555;padding:0.6rem;font-size:0.8rem;}
     .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1976d2;color:white;padding:0.8rem 1rem;border-radius:6px;opacity:0;transition:opacity 0.3s ease;}
     .toast.show{opacity:1;}
@@ -41,41 +35,37 @@
 
 <body>
   <header>
-    <h1>EPHIS – Water Quality Monitoring</h1>
+    <h1>EPHIS – Water Lab Results</h1>
     <div>
-      <button class="btn btn-light" onclick="window.location.href='dashboard.html'">Dashboard</button>
+      <button class="btn btn-light" onclick="history.back()">Back</button>
       <button class="btn btn-secondary" id="logoutBtn">Logout</button>
     </div>
   </header>
 
   <main>
     <div class="toolbar">
-      <input type="text" id="searchInput" placeholder="Search water source..." />
-      <button class="btn btn-primary" id="addBtn">+ Add Source</button>
+      <input type="text" id="searchInput" placeholder="Search lab or parameter..." />
+      <button class="btn btn-primary" id="addBtn">+ Add Result</button>
     </div>
 
     <div id="formContainer" style="display:none;" class="form-card">
-      <form id="sourceForm">
-        <label>Source Name</label><input type="text" id="name" required />
-        <label>Type</label><input type="text" id="source_type" placeholder="Surface, Borehole …" />
-        <label>Category</label><input type="text" id="category" placeholder="Dam, Spring …" />
-        <label>Ownership</label>
-        <select id="ownership">
+      <form id="labForm">
+        <label>Lab Reference</label><input type="text" id="lab_ref" placeholder="LAB-2025-001" required />
+        <label>Analysis Date</label><input type="date" id="analysis_date" required />
+        <label>Lab Name</label><input type="text" id="lab_name" placeholder="Iten County Lab" />
+        <label>Parameters Tested (comma separated)</label><input type="text" id="parameters" placeholder="E. coli, pH, Turbidity" />
+        <label>Result Values (comma separated)</label><input type="text" id="result_values" placeholder="Absent,7.2,5" />
+        <label>Units</label><input type="text" id="units" placeholder="CFU,pH,NTU" />
+        <label>Classification</label>
+        <select id="classification">
           <option value="">Select</option>
-          <option>Public</option><option>Private</option>
-          <option>Community</option><option>Partnership</option>
-          <option>PPP</option><option>Cooperative</option>
+          <option>Safe</option>
+          <option>Unsafe</option>
+          <option>Pending</option>
         </select>
-        <label>Responsible Agency</label><input type="text" id="responsible_agency" />
-        <label>Registration Status</label>
-        <select id="registration_status">
-          <option value="">Select</option><option>Registered</option><option>Pending</option>
-        </select>
-        <label>Inspection Frequency</label>
-        <select id="inspection_frequency">
-          <option>Monthly</option><option>Quarterly</option>
-          <option>Biannual</option><option>Annual</option>
-        </select>
+        <label>Turnaround Days</label><input type="number" id="turnaround_days" placeholder="2" />
+        <label>QA Reference</label><input type="text" id="qa_reference" placeholder="QA-01" />
+        <label>Technician</label><input type="text" id="technician" placeholder="Officer Name" />
         <div style="text-align:right;margin-top:0.6rem;">
           <button type="submit" class="btn btn-primary">Save</button>
           <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
@@ -104,11 +94,14 @@
     const addBtn=document.getElementById("addBtn");
     const cancelBtn=document.getElementById("cancelBtn");
     const formContainer=document.getElementById("formContainer");
-    const form=document.getElementById("sourceForm");
+    const form=document.getElementById("labForm");
     const searchInput=document.getElementById("searchInput");
     const cardsContainer=document.getElementById("cardsContainer");
     const prevPage=document.getElementById("prevPage");
     const nextPage=document.getElementById("nextPage");
+
+    const urlParams=new URLSearchParams(window.location.search);
+    const sampleId=urlParams.get("sample");
 
     let page=0;const limit=10;let total=0;
 
@@ -121,35 +114,33 @@
     addBtn.addEventListener("click",()=>toggleForm(true));
     cancelBtn.addEventListener("click",()=>toggleForm(false));
 
-    async function loadSources(){
+    async function loadLabResults(){
       cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading…</p>";
-      let query=supabase.from("vw_water_quality_summary").select("*",{count:"exact"}).order("date_registered",{ascending:false}).range(page*limit,page*limit+limit-1);
+      let query=supabase.from("water_lab_results").select("*",{count:"exact"}).order("analysis_date",{ascending:false}).eq("sample_id",sampleId).range(page*limit,page*limit+limit-1);
       const term=searchInput.value.trim();
-      if(term)query=query.or(`name.ilike.%${term}%,category.ilike.%${term}%,responsible_agency.ilike.%${term}%`);
+      if(term)query=query.or(`lab_name.ilike.%${term}%,parameters::text.ilike.%${term}%`);
       const{data,count,error}=await query;
       if(error){console.error(error);showToast("Load failed","error");return;}
       total=count;renderCards(data);
     }
 
     function renderCards(data){
-      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No water sources found</p>";return;}
-      cardsContainer.innerHTML=data.map(d=>{
-        const status=d.last_classification||"Pending";
-        const badge=status==="Unsafe"?"badge Unsafe":status==="Safe"?"badge Safe":"badge Pending";
+      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No lab results found</p>";return;}
+      cardsContainer.innerHTML=data.map(r=>{
+        const badge=r.classification==="Unsafe"?"badge Unsafe":r.classification==="Safe"?"badge Safe":"badge Pending";
         return`
           <div class="card">
-            <div class="card-header"><span>${d.name}</span><span class="${badge}">${status}</span></div>
-            <p><strong>Type:</strong> ${d.source_type||"-"} | <strong>Category:</strong> ${d.category||"-"}</p>
-            <p><strong>Agency:</strong> ${d.responsible_agency||"-"} | <strong>Status:</strong> ${d.registration_status||"-"}</p>
-            <p><strong>Last Sample:</strong> ${d.last_sample_date||"–"} | <strong>Alerts:</strong> ${d.active_alerts||0}</p>
-            <div class="actions">
-              <a href="water_samples.html?id=${d.id}">Samples</a>
-              <a href="water_lab_results.html?id=${d.id}">Lab Results</a>
-              <a href="water_alerts.html?id=${d.id}">Alerts</a>
-              <a href="water_performance.html">Performance</a>
+            <div class="card-header">
+              <span>${r.lab_ref||"Result"}</span><span class="${badge}">${r.classification||"Pending"}</span>
             </div>
-          </div>`;
-      }).join("");
+            <p><strong>Lab:</strong> ${r.lab_name||"-"} | <strong>Date:</strong> ${r.analysis_date||"-"}</p>
+            <p><strong>Parameters:</strong> ${(r.parameters||[]).join(", ")}</p>
+            <p><strong>Values:</strong> ${r.result_values||"-"} | <strong>Units:</strong> ${r.units||"-"}</p>
+            <p><strong>Technician:</strong> ${r.technician||"-"} | <strong>Turnaround:</strong> ${r.turnaround_days||"-"} days</p>
+            <div class="actions">
+              <a href="water_alerts.html?sample=${r.sample_id}">Alerts</a>
+            </div>
+          </div>`;}).join("");
       prevPage.disabled=page===0;
       nextPage.disabled=(page+1)*limit>=total;
     }
@@ -157,26 +148,30 @@
     form.addEventListener("submit",async e=>{
       e.preventDefault();
       const payload={
-        name:document.getElementById("name").value.trim(),
-        source_type:document.getElementById("source_type").value.trim(),
-        category:document.getElementById("category").value.trim(),
-        ownership:document.getElementById("ownership").value||null,
-        responsible_agency:document.getElementById("responsible_agency").value.trim()||null,
-        registration_status:document.getElementById("registration_status").value||null,
-        inspection_frequency:document.getElementById("inspection_frequency").value||null
+        sample_id:sampleId,
+        lab_ref:document.getElementById("lab_ref").value.trim(),
+        analysis_date:document.getElementById("analysis_date").value,
+        lab_name:document.getElementById("lab_name").value.trim(),
+        parameters:document.getElementById("parameters").value.split(",").map(v=>v.trim()).filter(Boolean),
+        result_values:document.getElementById("result_values").value.trim(),
+        units:document.getElementById("units").value.trim(),
+        classification:document.getElementById("classification").value||"Pending",
+        turnaround_days:parseFloat(document.getElementById("turnaround_days").value)||null,
+        qa_reference:document.getElementById("qa_reference").value.trim()||null,
+        technician:document.getElementById("technician").value.trim()||null
       };
-      const{error}=await supabase.from("water_sources").insert([payload]);
+      const{error}=await supabase.from("water_lab_results").insert([payload]);
       if(error){console.error(error);showToast("Save failed","error");return;}
-      showToast("Water source added successfully");
-      form.reset();toggleForm(false);loadSources();
+      showToast("Lab result added successfully");
+      form.reset();toggleForm(false);loadLabResults();
     });
 
-    searchInput.addEventListener("input",()=>{page=0;loadSources();});
-    prevPage.addEventListener("click",()=>{if(page>0){page--;loadSources();}});
-    nextPage.addEventListener("click",()=>{if((page+1)*limit<total){page++;loadSources();}});
+    searchInput.addEventListener("input",()=>{page=0;loadLabResults();});
+    prevPage.addEventListener("click",()=>{if(page>0){page--;loadLabResults();}});
+    nextPage.addEventListener("click",()=>{if((page+1)*limit<total){page++;loadLabResults();}});
     logoutBtn.addEventListener("click",async()=>{await supabase.auth.signOut();showToast("Logging out…");setTimeout(()=>window.location.href="login.html",800);});
     document.getElementById("year").textContent=new Date().getFullYear();
-    loadSources();
+    loadLabResults();
   </script>
 </body>
 </html>

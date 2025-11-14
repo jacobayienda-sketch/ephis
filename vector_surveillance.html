@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EPHIS | Water Quality</title>
+  <title>EPHIS | Vector Surveillance</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
@@ -14,24 +14,19 @@
     .btn-primary{background:#1976d2;color:white;}
     .btn-secondary{background:#2e7d32;color:white;}
     .btn-light{background:white;color:#1976d2;border:1px solid #1976d2;}
-    main{flex:1;padding:1rem;max-width:1100px;margin:0 auto;}
+    main{flex:1;padding:1rem;max-width:1000px;margin:0 auto;}
     .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
     .toolbar input{padding:0.6rem;border:1px solid #ccc;border-radius:6px;width:250px;}
-    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;transition:0.2s ease;}
-    .card:hover{transform:scale(1.01);}
+    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
     .card-header{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:#1976d2;}
     .badge{border-radius:5px;padding:0.2rem 0.6rem;font-size:0.8rem;font-weight:600;}
-    .badge.Safe{background:#c8e6c9;color:#2e7d32;}
-    .badge.Unsafe{background:#ffcdd2;color:#c62828;}
-    .badge.Pending{background:#fff9c4;color:#f57f17;}
-    .risk{font-weight:600;border-radius:6px;padding:0.2rem 0.5rem;}
-    .actions{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.6rem;}
-    .actions a{text-decoration:none;color:white;background:#1976d2;border-radius:6px;padding:0.4rem 0.7rem;font-size:0.8rem;font-weight:600;}
+    .badge.Lab{background:#bbdefb;color:#0d47a1;}
+    .badge.Field{background:#c8e6c9;color:#2e7d32;}
     .pagination{display:flex;justify-content:center;gap:0.5rem;margin-top:1rem;}
     .pagination button{border:none;background:#1976d2;color:white;border-radius:5px;padding:0.4rem 0.8rem;cursor:pointer;font-weight:600;}
     .form-card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
     form label{font-weight:600;display:block;margin-top:0.5rem;}
-    form input,form select{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
+    form input,form select,form textarea{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
     footer{text-align:center;background:#e3f2fd;color:#555;padding:0.6rem;font-size:0.8rem;}
     .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1976d2;color:white;padding:0.8rem 1rem;border-radius:6px;opacity:0;transition:opacity 0.3s ease;}
     .toast.show{opacity:1;}
@@ -41,41 +36,33 @@
 
 <body>
   <header>
-    <h1>EPHIS – Water Quality Monitoring</h1>
+    <h1>EPHIS – Vector Surveillance Reports</h1>
     <div>
-      <button class="btn btn-light" onclick="window.location.href='dashboard.html'">Dashboard</button>
+      <button class="btn btn-light" onclick="history.back()">Back</button>
       <button class="btn btn-secondary" id="logoutBtn">Logout</button>
     </div>
   </header>
 
   <main>
     <div class="toolbar">
-      <input type="text" id="searchInput" placeholder="Search water source..." />
-      <button class="btn btn-primary" id="addBtn">+ Add Source</button>
+      <input type="text" id="searchInput" placeholder="Search vector type or officer..." />
+      <button class="btn btn-primary" id="addBtn">+ Add Surveillance Report</button>
     </div>
 
     <div id="formContainer" style="display:none;" class="form-card">
-      <form id="sourceForm">
-        <label>Source Name</label><input type="text" id="name" required />
-        <label>Type</label><input type="text" id="source_type" placeholder="Surface, Borehole …" />
-        <label>Category</label><input type="text" id="category" placeholder="Dam, Spring …" />
-        <label>Ownership</label>
-        <select id="ownership">
-          <option value="">Select</option>
-          <option>Public</option><option>Private</option>
-          <option>Community</option><option>Partnership</option>
-          <option>PPP</option><option>Cooperative</option>
+      <form id="surveillanceForm">
+        <label>Date</label><input type="date" id="date" required />
+        <label>Vector Type</label><input type="text" id="vector_type" placeholder="e.g. Mosquito, Blackfly..." />
+        <label>Method</label><input type="text" id="method" placeholder="e.g. Light trap, Larval dip, etc." />
+        <label>Density</label><input type="number" step="0.1" id="density" placeholder="Vector density per unit area" />
+        <label>Lab Analysis</label>
+        <select id="lab_analysis">
+          <option value="">Select</option><option value="true">Yes</option><option value="false">No</option>
         </select>
-        <label>Responsible Agency</label><input type="text" id="responsible_agency" />
-        <label>Registration Status</label>
-        <select id="registration_status">
-          <option value="">Select</option><option>Registered</option><option>Pending</option>
-        </select>
-        <label>Inspection Frequency</label>
-        <select id="inspection_frequency">
-          <option>Monthly</option><option>Quarterly</option>
-          <option>Biannual</option><option>Annual</option>
-        </select>
+        <label>Species Identified</label><input type="text" id="species_identified" placeholder="e.g. Anopheles, Culex..." />
+        <label>Breeding Source</label><input type="text" id="breeding_source" placeholder="e.g. Swamp, stagnant water, etc." />
+        <label>Environmental Condition</label><textarea id="environment_condition" rows="2" placeholder="e.g. High vegetation, poor drainage..."></textarea>
+        <label>Remarks</label><textarea id="remarks" rows="2"></textarea>
         <div style="text-align:right;margin-top:0.6rem;">
           <button type="submit" class="btn btn-primary">Save</button>
           <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
@@ -99,16 +86,20 @@
 
   <script type="module">
     import { supabase } from "./main.js";
+
     const toast=document.getElementById("toast");
     const logoutBtn=document.getElementById("logoutBtn");
     const addBtn=document.getElementById("addBtn");
     const cancelBtn=document.getElementById("cancelBtn");
     const formContainer=document.getElementById("formContainer");
-    const form=document.getElementById("sourceForm");
+    const form=document.getElementById("surveillanceForm");
     const searchInput=document.getElementById("searchInput");
     const cardsContainer=document.getElementById("cardsContainer");
     const prevPage=document.getElementById("prevPage");
     const nextPage=document.getElementById("nextPage");
+
+    const urlParams=new URLSearchParams(window.location.search);
+    const siteId=urlParams.get("id");
 
     let page=0;const limit=10;let total=0;
 
@@ -121,33 +112,33 @@
     addBtn.addEventListener("click",()=>toggleForm(true));
     cancelBtn.addEventListener("click",()=>toggleForm(false));
 
-    async function loadSources(){
+    async function loadReports(){
       cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading…</p>";
-      let query=supabase.from("vw_water_quality_summary").select("*",{count:"exact"}).order("date_registered",{ascending:false}).range(page*limit,page*limit+limit-1);
+      let query=supabase.from("vector_surveillance").select("*",{count:"exact"}).order("date",{ascending:false}).range(page*limit,page*limit+limit-1);
+      if(siteId)query=query.eq("site_id",siteId);
       const term=searchInput.value.trim();
-      if(term)query=query.or(`name.ilike.%${term}%,category.ilike.%${term}%,responsible_agency.ilike.%${term}%`);
+      if(term)query=query.or(`vector_type.ilike.%${term}%,species_identified.ilike.%${term}%`);
       const{data,count,error}=await query;
       if(error){console.error(error);showToast("Load failed","error");return;}
       total=count;renderCards(data);
     }
 
     function renderCards(data){
-      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No water sources found</p>";return;}
-      cardsContainer.innerHTML=data.map(d=>{
-        const status=d.last_classification||"Pending";
-        const badge=status==="Unsafe"?"badge Unsafe":status==="Safe"?"badge Safe":"badge Pending";
+      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No surveillance reports found</p>";return;}
+      cardsContainer.innerHTML=data.map(r=>{
+        const badge=r.lab_analysis?"badge Lab":"badge Field";
+        const badgeText=r.lab_analysis?"Lab":"Field";
         return`
           <div class="card">
-            <div class="card-header"><span>${d.name}</span><span class="${badge}">${status}</span></div>
-            <p><strong>Type:</strong> ${d.source_type||"-"} | <strong>Category:</strong> ${d.category||"-"}</p>
-            <p><strong>Agency:</strong> ${d.responsible_agency||"-"} | <strong>Status:</strong> ${d.registration_status||"-"}</p>
-            <p><strong>Last Sample:</strong> ${d.last_sample_date||"–"} | <strong>Alerts:</strong> ${d.active_alerts||0}</p>
-            <div class="actions">
-              <a href="water_samples.html?id=${d.id}">Samples</a>
-              <a href="water_lab_results.html?id=${d.id}">Lab Results</a>
-              <a href="water_alerts.html?id=${d.id}">Alerts</a>
-              <a href="water_performance.html">Performance</a>
+            <div class="card-header">
+              <span>${r.vector_type||"Vector"}</span>
+              <span class="${badge}">${badgeText}</span>
             </div>
+            <p><strong>Date:</strong> ${r.date||"-"} | <strong>Method:</strong> ${r.method||"-"}</p>
+            <p><strong>Density:</strong> ${r.density||"-"} | <strong>Species:</strong> ${r.species_identified||"-"}</p>
+            <p><strong>Breeding Source:</strong> ${r.breeding_source||"-"}</p>
+            <p><strong>Environment:</strong> ${r.environment_condition||"-"}</p>
+            <p><strong>Remarks:</strong> ${r.remarks||"-"}</p>
           </div>`;
       }).join("");
       prevPage.disabled=page===0;
@@ -157,26 +148,29 @@
     form.addEventListener("submit",async e=>{
       e.preventDefault();
       const payload={
-        name:document.getElementById("name").value.trim(),
-        source_type:document.getElementById("source_type").value.trim(),
-        category:document.getElementById("category").value.trim(),
-        ownership:document.getElementById("ownership").value||null,
-        responsible_agency:document.getElementById("responsible_agency").value.trim()||null,
-        registration_status:document.getElementById("registration_status").value||null,
-        inspection_frequency:document.getElementById("inspection_frequency").value||null
+        site_id:siteId,
+        date:document.getElementById("date").value,
+        vector_type:document.getElementById("vector_type").value.trim()||null,
+        method:document.getElementById("method").value.trim()||null,
+        density:parseFloat(document.getElementById("density").value)||null,
+        lab_analysis:document.getElementById("lab_analysis").value==="true",
+        species_identified:document.getElementById("species_identified").value.trim()||null,
+        breeding_source:document.getElementById("breeding_source").value.trim()||null,
+        environment_condition:document.getElementById("environment_condition").value.trim()||null,
+        remarks:document.getElementById("remarks").value.trim()||null
       };
-      const{error}=await supabase.from("water_sources").insert([payload]);
+      const{error}=await supabase.from("vector_surveillance").insert([payload]);
       if(error){console.error(error);showToast("Save failed","error");return;}
-      showToast("Water source added successfully");
-      form.reset();toggleForm(false);loadSources();
+      showToast("Surveillance report added successfully");
+      form.reset();toggleForm(false);loadReports();
     });
 
-    searchInput.addEventListener("input",()=>{page=0;loadSources();});
-    prevPage.addEventListener("click",()=>{if(page>0){page--;loadSources();}});
-    nextPage.addEventListener("click",()=>{if((page+1)*limit<total){page++;loadSources();}});
+    searchInput.addEventListener("input",()=>{page=0;loadReports();});
+    prevPage.addEventListener("click",()=>{if(page>0){page--;loadReports();}});
+    nextPage.addEventListener("click",()=>{if((page+1)*limit<total){page++;loadReports();}});
     logoutBtn.addEventListener("click",async()=>{await supabase.auth.signOut();showToast("Logging out…");setTimeout(()=>window.location.href="login.html",800);});
     document.getElementById("year").textContent=new Date().getFullYear();
-    loadSources();
+    loadReports();
   </script>
 </body>
 </html>

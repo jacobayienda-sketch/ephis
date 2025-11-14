@@ -3,162 +3,173 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Food Premises Form | EPHIS</title>
+  <title>EPHIS | Food Premise Form</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    body {
-      font-family: system-ui, sans-serif;
-      background: #f5f6fa;
-      margin: 0;
-      color: #222;
-    }
-    header {
-      background: #1976d2;
-      color: white;
-      padding: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    header h1 { margin: 0; font-size: 1.1rem; }
-    main { padding: 1rem; max-width: 700px; margin: auto; }
-    form {
-      background: white;
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-    label {
-      display: block;
-      font-weight: 600;
-      margin-top: 0.8rem;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 0.6rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-top: 0.3rem;
-      font-size: 0.95rem;
-    }
-    .actions {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      margin-top: 1.5rem;
-    }
-    .btn {
-      border: none; border-radius: 6px;
-      cursor: pointer; font-weight: 600;
-      padding: 0.6rem 1rem;
-    }
-    .btn-primary { background: #1976d2; color: #fff; }
-    .btn-danger { background: #c62828; color: #fff; }
-    .btn-secondary { background: #eee; color: #333; }
+    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;color:#222;display:flex;flex-direction:column;min-height:100vh;}
+    header{background:#1976d2;color:white;display:flex;justify-content:space-between;align-items:center;padding:0.8rem 1rem;flex-wrap:wrap;}
+    header h1{font-size:1rem;margin:0;font-weight:600;}
+    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.5rem 1rem;font-size:0.9rem;}
+    .btn-primary{background:#1976d2;color:white;}
+    .btn-secondary{background:#2e7d32;color:white;}
+    .btn-light{background:white;color:#1976d2;border:1px solid #1976d2;}
+    main{flex:1;padding:1rem;max-width:700px;margin:0 auto;}
+    form{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;}
+    form label{font-weight:600;display:block;margin-top:0.6rem;}
+    form input,form select,form textarea{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
+    .form-actions{text-align:right;margin-top:1rem;}
+    footer{text-align:center;background:#e3f2fd;color:#555;padding:0.6rem;font-size:0.8rem;}
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1976d2;color:white;padding:0.8rem 1rem;border-radius:6px;opacity:0;transition:opacity 0.3s ease;}
+    .toast.show{opacity:1;}
+    @media(max-width:600px){form{padding:0.8rem;}}
   </style>
 </head>
 
 <body>
   <header>
-    <h1 id="form-title">New Food Premises</h1>
-    <button class="btn btn-secondary" onclick="window.location.href='food_control.html'">← Back to List</button>
+    <h1>EPHIS – Food Premise Form</h1>
+    <div>
+      <button class="btn btn-light" onclick="window.location.href='food_control.html'">Back</button>
+      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+    </div>
   </header>
 
   <main>
-    <form id="food-form">
-      <label for="premises_name">Premises Name</label>
-      <input type="text" id="premises_name" name="premises_name" required />
+    <form id="foodForm">
+      <label>Premise Name</label>
+      <input type="text" id="name" required />
 
-      <label for="premises_type">Premises Type</label>
-      <input type="text" id="premises_type" name="premises_type" required />
+      <label>Type</label>
+      <input type="text" id="type" placeholder="e.g., Hotel, Butchery, Bakery" />
 
-      <label for="license_type">License Type</label>
-      <select name="license_type" id="license_type">
+      <label>Category</label>
+      <input type="text" id="category" placeholder="e.g., Food Processing, Retail, Restaurant" />
+
+      <label>Ownership Type</label>
+      <select id="ownership">
         <option value="">Select</option>
-        <option>Annual</option>
-        <option>Temporary</option>
-        <option>Provisional</option>
+        <option>Public</option>
+        <option>Private</option>
+        <option>Community</option>
       </select>
 
-      <label for="inspection_date">Inspection Date</label>
-      <input type="date" id="inspection_date" name="inspection_date" />
+      <label>Owner Details</label>
+      <textarea id="owner_details" rows="2" placeholder="Name, ID, or Contact Info"></textarea>
 
-      <label for="hygiene_score">Hygiene Score (%)</label>
-      <input type="number" id="hygiene_score" name="hygiene_score" min="0" max="100" />
+      <label>Responsible Agency</label>
+      <input type="text" id="responsible_agency" placeholder="e.g., MOH, County Health Department" />
 
-      <label for="risk_category">Risk Category</label>
-      <select name="risk_category" id="risk_category">
+      <label>Registration Status</label>
+      <select id="registration_status">
         <option value="">Select</option>
-        <option>Low</option>
-        <option>Medium</option>
-        <option>High</option>
+        <option>Registered</option>
+        <option>Pending</option>
+        <option>Suspended</option>
+        <option>Closed</option>
       </select>
 
-      <div class="actions">
+      <label>Date Registered</label>
+      <input type="date" id="date_registered" />
+
+      <label>Address</label>
+      <input type="text" id="address" placeholder="Physical address or description" />
+
+      <label>Operating Hours</label>
+      <input type="text" id="operating_hours" placeholder="e.g., 8:00 AM - 6:00 PM" />
+
+      <label>Latitude</label>
+      <input type="number" step="0.000001" id="latitude" placeholder="Optional" />
+
+      <label>Longitude</label>
+      <input type="number" step="0.000001" id="longitude" placeholder="Optional" />
+
+      <div class="form-actions">
         <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
-        <button type="button" class="btn btn-danger" id="delete-btn">Delete</button>
       </div>
     </form>
   </main>
 
+  <footer>
+    County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
   <script type="module">
-    import { supabase, showToast, getFormData, populateForm, insertRecord, updateRecord, deleteRecord, fetchById, requireLogin } from "./main.js";
+    import { supabase } from "./main.js";
 
-    const form = document.getElementById("food-form");
-    const cancelBtn = document.getElementById("cancel-btn");
-    const deleteBtn = document.getElementById("delete-btn");
-    const title = document.getElementById("form-title");
-    const params = new URLSearchParams(window.location.search);
-    const recordId = params.get("id");
+    const toast=document.getElementById("toast");
+    const logoutBtn=document.getElementById("logoutBtn");
+    const form=document.getElementById("foodForm");
+    const params=new URLSearchParams(window.location.search);
+    const foodId=params.get("id");
 
-    await requireLogin();
+    function showToast(msg,type="info"){
+      toast.textContent=msg;
+      toast.style.background=type==="error"?"#c62828":"#1976d2";
+      toast.classList.add("show");
+      setTimeout(()=>toast.classList.remove("show"),3000);
+    }
 
-    cancelBtn.onclick = () => window.location.href = "food_control.html";
-    if (!recordId) deleteBtn.style.display = "none";
+    async function checkSession(){
+      const {data}=await supabase.auth.getSession();
+      if(!data.session)window.location.href="login.html";
+    }
+    checkSession();
 
-    if (recordId) {
-      try {
-        const record = await fetchById("food_control", recordId);
-        populateForm(form, record);
-        title.textContent = "Edit Food Premises";
-      } catch (err) {
-        showToast("Error loading record: " + err.message, "error");
+    async function loadFoodPremise(){
+      if(!foodId)return;
+      const {data,error}=await supabase.from("food_premises").select("*").eq("id",foodId).single();
+      if(error){console.error(error);return;}
+      for(const key in data){
+        const el=document.getElementById(key);
+        if(el)el.value=data[key]||"";
       }
     }
 
-    form.onsubmit = async (e) => {
+    form.addEventListener("submit",async e=>{
       e.preventDefault();
-      const payload = getFormData(form);
-      try {
-        const { data: userData } = await supabase.auth.getUser();
-        payload.created_by = userData?.user?.id || null;
+      const payload={
+        name:document.getElementById("name").value.trim(),
+        type:document.getElementById("type").value.trim(),
+        category:document.getElementById("category").value.trim(),
+        ownership:document.getElementById("ownership").value||null,
+        owner_details:document.getElementById("owner_details").value.trim()||null,
+        responsible_agency:document.getElementById("responsible_agency").value.trim()||null,
+        registration_status:document.getElementById("registration_status").value||null,
+        date_registered:document.getElementById("date_registered").value||null,
+        address:document.getElementById("address").value.trim(),
+        operating_hours:document.getElementById("operating_hours").value.trim()||null,
+        latitude:parseFloat(document.getElementById("latitude").value)||null,
+        longitude:parseFloat(document.getElementById("longitude").value)||null
+      };
 
-        if (recordId) {
-          await updateRecord("food_control", recordId, payload);
-          showToast("Record updated", "success");
-        } else {
-          await insertRecord("food_control", payload);
-          showToast("Record added", "success");
-        }
-        window.location.href = "food_control.html";
-      } catch (err) {
-        showToast("Save failed: " + err.message, "error");
+      let error;
+      if(foodId){
+        ({error}=await supabase.from("food_premises").update(payload).eq("id",foodId));
+      }else{
+        ({error}=await supabase.from("food_premises").insert([payload]));
       }
-    };
 
-    deleteBtn.onclick = async () => {
-      if (!confirm("Delete this record?")) return;
-      try {
-        await deleteRecord("food_control", recordId);
-        showToast("Record deleted", "success");
-        window.location.href = "food_control.html";
-      } catch (err) {
-        showToast("Delete failed: " + err.message, "error");
+      if(error){
+        console.error(error);
+        showToast("Save failed","error");
+        return;
       }
-    };
+
+      showToast("Food premise saved successfully");
+      setTimeout(()=>window.location.href="food_control.html",1000);
+    });
+
+    logoutBtn.addEventListener("click",async()=>{
+      await supabase.auth.signOut();
+      showToast("Logging out...");
+      setTimeout(()=>window.location.href="login.html",800);
+    });
+
+    document.getElementById("year").textContent=new Date().getFullYear();
+    loadFoodPremise();
   </script>
 </body>
 </html>

@@ -3,122 +3,174 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vector and Vermin Control | EPHIS</title>
+  <title>EPHIS | Vector Control</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    body { font-family: system-ui, sans-serif; background:#f5f6fa; margin:0; color:#222; }
-    header {
-      background:#1976d2; color:#fff; padding:1rem;
-      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;
-    }
-    header h1{margin:0;font-size:1.1rem;}
-    main{padding:1rem;max-width:1000px;margin:auto;}
-    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.6rem 1rem;}
-    .btn-primary{background:#1976d2;color:#fff;}
-    .btn-danger{background:#c62828;color:#fff;}
-    .btn-secondary{background:#eee;color:#333;}
-    .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;}
-    .toolbar input{flex:1;min-width:200px;padding:0.6rem;border:1px solid #ccc;border-radius:6px;}
-    table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.05);}
-    th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;}
-    th{background:#f1f1f1;font-weight:600;}
-    tr:hover{background:#f9f9f9;}
-    @media(max-width:600px){
-      table,thead,tbody,th,td,tr{display:block;}
-      tr{margin-bottom:1rem;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
-      th{display:none;}
-      td{display:flex;justify-content:space-between;padding:8px 12px;}
-      td::before{content:attr(data-label);font-weight:600;color:#555;}
-    }
+    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;color:#222;display:flex;flex-direction:column;min-height:100vh;}
+    header{background:#1976d2;color:white;display:flex;justify-content:space-between;align-items:center;padding:0.8rem 1rem;flex-wrap:wrap;}
+    header h1{font-size:1rem;margin:0;font-weight:600;}
+    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.5rem 1rem;font-size:0.9rem;}
+    .btn-primary{background:#1976d2;color:white;}
+    .btn-secondary{background:#2e7d32;color:white;}
+    .btn-light{background:white;color:#1976d2;border:1px solid #1976d2;}
+    main{flex:1;padding:1rem;max-width:1100px;margin:0 auto;}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
+    .toolbar input{padding:0.6rem;border:1px solid #ccc;border-radius:6px;width:250px;}
+    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;transition:0.2s;}
+    .card:hover{transform:scale(1.01);}
+    .card-header{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:#1976d2;}
+    .badge{border-radius:5px;padding:0.2rem 0.6rem;font-size:0.8rem;font-weight:600;}
+    .badge.High{background:#ffcdd2;color:#c62828;}
+    .badge.Moderate{background:#fff9c4;color:#f57f17;}
+    .badge.Low{background:#c8e6c9;color:#2e7d32;}
+    .actions{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.6rem;}
+    .actions a{text-decoration:none;color:white;background:#1976d2;border-radius:6px;padding:0.4rem 0.7rem;font-size:0.8rem;font-weight:600;}
+    .pagination{display:flex;justify-content:center;gap:0.5rem;margin-top:1rem;}
+    .pagination button{border:none;background:#1976d2;color:white;border-radius:5px;padding:0.4rem 0.8rem;cursor:pointer;font-weight:600;}
+    .form-card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
+    form label{font-weight:600;display:block;margin-top:0.5rem;}
+    form input,form select{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
+    footer{text-align:center;background:#e3f2fd;color:#555;padding:0.6rem;font-size:0.8rem;}
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1976d2;color:white;padding:0.8rem 1rem;border-radius:6px;opacity:0;transition:opacity 0.3s ease;}
+    .toast.show{opacity:1;}
+    @media(max-width:600px){.toolbar{flex-direction:column;gap:0.5rem;align-items:stretch;}.toolbar input{width:100%;}}
   </style>
 </head>
 
-<body data-module="vector_control">
+<body>
   <header>
-    <h1>Vector and Vermin Control</h1>
-    <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+    <h1>EPHIS – Vector Control</h1>
+    <div>
+      <button class="btn btn-light" onclick="window.location.href='dashboard.html'">Dashboard</button>
+      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+    </div>
   </header>
 
   <main>
     <div class="toolbar">
-      <button id="add-btn" class="btn btn-primary">+ New Record</button>
-      <input type="search" id="search" placeholder="Search locations..." />
+      <input type="text" id="searchInput" placeholder="Search site or officer..." />
+      <button class="btn btn-primary" id="addBtn">+ Add Site</button>
     </div>
-    <div id="table"></div>
+
+    <div id="formContainer" style="display:none;" class="form-card">
+      <form id="siteForm">
+        <label>Site Name</label><input type="text" id="site_name" required />
+        <label>Site Type</label><input type="text" id="site_type" placeholder="Swamp, Stream, Drainage, etc." />
+        <label>Address</label><input type="text" id="address" />
+        <label>Latitude</label><input type="number" step="0.000001" id="latitude" />
+        <label>Longitude</label><input type="number" step="0.000001" id="longitude" />
+        <label>Reporting Agency</label><input type="text" id="reporting_agency" placeholder="e.g. County PH Dept" />
+        <label>Responsible Officer</label><input type="text" id="responsible_officer" />
+        <label>Risk Level</label>
+        <select id="risk_level">
+          <option value="">Select</option>
+          <option>Low</option><option>Moderate</option><option>High</option>
+        </select>
+        <div style="text-align:right;margin-top:0.6rem;">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="cardsContainer"></div>
+
+    <div class="pagination">
+      <button id="prevPage">Previous</button>
+      <button id="nextPage">Next</button>
+    </div>
   </main>
 
+  <footer>
+    County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
   <script type="module">
-    import { supabase, showToast, fetchAll, deleteRecord, requireLogin } from "./main.js";
+    import { supabase } from "./main.js";
 
-    const addBtn=document.getElementById("add-btn");
-    const search=document.getElementById("search");
-    const tableDiv=document.getElementById("table");
+    const toast=document.getElementById("toast");
+    const logoutBtn=document.getElementById("logoutBtn");
+    const addBtn=document.getElementById("addBtn");
+    const cancelBtn=document.getElementById("cancelBtn");
+    const formContainer=document.getElementById("formContainer");
+    const form=document.getElementById("siteForm");
+    const searchInput=document.getElementById("searchInput");
+    const cardsContainer=document.getElementById("cardsContainer");
+    const prevPage=document.getElementById("prevPage");
+    const nextPage=document.getElementById("nextPage");
 
-    await requireLogin();
+    let page=0;const limit=10;let total=0;
 
-    async function loadData(){
-      try{
-        const data=await fetchAll("vector_control","id, location_name, vector_type, risk_level, intervention_date, intervention_type, responsible_officer");
-        render(data);
-      }catch(err){showToast("Error loading data: "+err.message,"error");}
+    function showToast(msg,type="info"){toast.textContent=msg;toast.style.background=type==="error"?"#c62828":"#1976d2";toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
+
+    async function checkSession(){const {data}=await supabase.auth.getSession();if(!data.session)window.location.href="login.html";}
+    checkSession();
+
+    function toggleForm(show){formContainer.style.display=show?"block":"none";}
+    addBtn.addEventListener("click",()=>toggleForm(true));
+    cancelBtn.addEventListener("click",()=>toggleForm(false));
+
+    async function loadSites(){
+      cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading…</p>";
+      let query=supabase.from("vector_sites").select("*",{count:"exact"}).order("date_registered",{ascending:false}).range(page*limit,page*limit+limit-1);
+      const term=searchInput.value.trim();
+      if(term)query=query.or(`site_name.ilike.%${term}%,responsible_officer.ilike.%${term}%`);
+      const{data,count,error}=await query;
+      if(error){console.error(error);showToast("Load failed","error");return;}
+      total=count;renderCards(data);
     }
 
-    function render(rows){
-      if(!rows.length){
-        tableDiv.innerHTML="<p style='text-align:center;margin-top:2rem;'>No records found.</p>";
-        return;
-      }
-      const html=`
-      <table>
-        <thead>
-          <tr>
-            <th>Location</th>
-            <th>Vector Type</th>
-            <th>Risk Level</th>
-            <th>Intervention Date</th>
-            <th>Intervention</th>
-            <th>Officer</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.map(r=>`
-            <tr>
-              <td data-label="Location">${r.location_name||"-"}</td>
-              <td data-label="Vector">${r.vector_type||"-"}</td>
-              <td data-label="Risk">${r.risk_level||"-"}</td>
-              <td data-label="Date">${r.intervention_date||"-"}</td>
-              <td data-label="Intervention">${r.intervention_type||"-"}</td>
-              <td data-label="Officer">${r.responsible_officer||"-"}</td>
-              <td data-label="Actions">
-                <button class="btn btn-primary" onclick="window.location.href='vector_control_form.html?id=${r.id}'">Edit</button>
-                <button class="btn btn-danger" data-id="${r.id}">Delete</button>
-              </td>
-            </tr>`).join("")}
-        </tbody>
-      </table>`;
-      tableDiv.innerHTML=html;
-      document.querySelectorAll(".btn-danger").forEach(b=>b.addEventListener("click",()=>handleDelete(b.dataset.id)));
+    function renderCards(data){
+      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No vector sites found</p>";return;}
+      cardsContainer.innerHTML=data.map(d=>{
+        const badge=d.risk_level||"Low";
+        return`
+          <div class="card">
+            <div class="card-header">
+              <span>${d.site_name||"Unnamed Site"}</span>
+              <span class="badge ${badge}">${d.risk_level||"N/A"}</span>
+            </div>
+            <p><strong>Type:</strong> ${d.site_type||"-"} | <strong>Agency:</strong> ${d.reporting_agency||"-"}</p>
+            <p><strong>Officer:</strong> ${d.responsible_officer||"-"} | <strong>Registered:</strong> ${d.date_registered||"-"}</p>
+            <div class="actions">
+              <a href="vector_surveillance.html?id=${d.id}">Surveillance</a>
+              <a href="vector_interventions.html?id=${d.id}">Interventions</a>
+              <a href="vector_performance.html">Performance</a>
+            </div>
+          </div>`;
+      }).join("");
+      prevPage.disabled=page===0;
+      nextPage.disabled=(page+1)*limit>=total;
     }
 
-    async function handleDelete(id){
-      if(!confirm("Delete this record?"))return;
-      try{
-        await deleteRecord("vector_control",id);
-        showToast("Record deleted","success");
-        loadData();
-      }catch(err){showToast("Delete failed: "+err.message,"error");}
-    }
-
-    search.addEventListener("input",e=>{
-      const term=e.target.value.toLowerCase();
-      document.querySelectorAll("tbody tr").forEach(r=>{
-        r.style.display=r.innerText.toLowerCase().includes(term)?"":"none";
-      });
+    form.addEventListener("submit",async e=>{
+      e.preventDefault();
+      const payload={
+        site_name:document.getElementById("site_name").value.trim(),
+        site_type:document.getElementById("site_type").value.trim()||null,
+        address:document.getElementById("address").value.trim()||null,
+        latitude:parseFloat(document.getElementById("latitude").value)||null,
+        longitude:parseFloat(document.getElementById("longitude").value)||null,
+        reporting_agency:document.getElementById("reporting_agency").value.trim()||null,
+        responsible_officer:document.getElementById("responsible_officer").value.trim()||null,
+        risk_level:document.getElementById("risk_level").value||null,
+        date_registered:new Date()
+      };
+      const{error}=await supabase.from("vector_sites").insert([payload]);
+      if(error){console.error(error);showToast("Save failed","error");return;}
+      showToast("Vector site added successfully");
+      form.reset();toggleForm(false);loadSites();
     });
 
-    addBtn.addEventListener("click",()=>window.location.href="vector_control_form.html");
-    loadData();
+    searchInput.addEventListener("input",()=>{page=0;loadSites();});
+    prevPage.addEventListener("click",()=>{if(page>0){page--;loadSites();}});
+    nextPage.addEventListener("click",()=>{if((page+1)*limit<total){page++;loadSites();}});
+    logoutBtn.addEventListener("click",async()=>{await supabase.auth.signOut();showToast("Logging out…");setTimeout(()=>window.location.href="login.html",800);});
+    document.getElementById("year").textContent=new Date().getFullYear();
+    loadSites();
   </script>
 </body>
 </html>

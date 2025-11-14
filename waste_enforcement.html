@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EPHIS | Water Quality</title>
+  <title>EPHIS | Waste Enforcement</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
@@ -14,24 +14,20 @@
     .btn-primary{background:#1976d2;color:white;}
     .btn-secondary{background:#2e7d32;color:white;}
     .btn-light{background:white;color:#1976d2;border:1px solid #1976d2;}
-    main{flex:1;padding:1rem;max-width:1100px;margin:0 auto;}
+    main{flex:1;padding:1rem;max-width:1000px;margin:0 auto;}
     .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
     .toolbar input{padding:0.6rem;border:1px solid #ccc;border-radius:6px;width:250px;}
-    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;transition:0.2s ease;}
-    .card:hover{transform:scale(1.01);}
+    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
     .card-header{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:#1976d2;}
     .badge{border-radius:5px;padding:0.2rem 0.6rem;font-size:0.8rem;font-weight:600;}
-    .badge.Safe{background:#c8e6c9;color:#2e7d32;}
-    .badge.Unsafe{background:#ffcdd2;color:#c62828;}
-    .badge.Pending{background:#fff9c4;color:#f57f17;}
-    .risk{font-weight:600;border-radius:6px;padding:0.2rem 0.5rem;}
-    .actions{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.6rem;}
-    .actions a{text-decoration:none;color:white;background:#1976d2;border-radius:6px;padding:0.4rem 0.7rem;font-size:0.8rem;font-weight:600;}
+    .badge.Paid{background:#c8e6c9;color:#2e7d32;}
+    .badge.Unpaid{background:#ffcdd2;color:#c62828;}
+    .badge.Partially{background:#fff9c4;color:#f57f17;}
     .pagination{display:flex;justify-content:center;gap:0.5rem;margin-top:1rem;}
     .pagination button{border:none;background:#1976d2;color:white;border-radius:5px;padding:0.4rem 0.8rem;cursor:pointer;font-weight:600;}
     .form-card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
     form label{font-weight:600;display:block;margin-top:0.5rem;}
-    form input,form select{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
+    form input,form select,form textarea{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
     footer{text-align:center;background:#e3f2fd;color:#555;padding:0.6rem;font-size:0.8rem;}
     .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1976d2;color:white;padding:0.8rem 1rem;border-radius:6px;opacity:0;transition:opacity 0.3s ease;}
     .toast.show{opacity:1;}
@@ -41,41 +37,34 @@
 
 <body>
   <header>
-    <h1>EPHIS – Water Quality Monitoring</h1>
+    <h1>EPHIS – Waste Enforcement Actions</h1>
     <div>
-      <button class="btn btn-light" onclick="window.location.href='dashboard.html'">Dashboard</button>
+      <button class="btn btn-light" onclick="history.back()">Back</button>
       <button class="btn btn-secondary" id="logoutBtn">Logout</button>
     </div>
   </header>
 
   <main>
     <div class="toolbar">
-      <input type="text" id="searchInput" placeholder="Search water source..." />
-      <button class="btn btn-primary" id="addBtn">+ Add Source</button>
+      <input type="text" id="searchInput" placeholder="Search violation or agency..." />
+      <button class="btn btn-primary" id="addBtn">+ Add Enforcement</button>
     </div>
 
     <div id="formContainer" style="display:none;" class="form-card">
-      <form id="sourceForm">
-        <label>Source Name</label><input type="text" id="name" required />
-        <label>Type</label><input type="text" id="source_type" placeholder="Surface, Borehole …" />
-        <label>Category</label><input type="text" id="category" placeholder="Dam, Spring …" />
-        <label>Ownership</label>
-        <select id="ownership">
+      <form id="enforcementForm">
+        <label>Violation Type</label><input type="text" id="violation_type" placeholder="Illegal dumping, open burning..." required />
+        <label>Detection Date</label><input type="date" id="detection_date" required />
+        <label>Enforcement Action</label><input type="text" id="enforcement_action" placeholder="Fine issued, warning..." />
+        <label>Fine Amount (Ksh)</label><input type="number" step="1" id="fine_amount" />
+        <label>Payment Status</label>
+        <select id="payment_status">
           <option value="">Select</option>
-          <option>Public</option><option>Private</option>
-          <option>Community</option><option>Partnership</option>
-          <option>PPP</option><option>Cooperative</option>
+          <option>Paid</option><option>Partially Paid</option><option>Unpaid</option><option>Waived</option>
         </select>
-        <label>Responsible Agency</label><input type="text" id="responsible_agency" />
-        <label>Registration Status</label>
-        <select id="registration_status">
-          <option value="">Select</option><option>Registered</option><option>Pending</option>
-        </select>
-        <label>Inspection Frequency</label>
-        <select id="inspection_frequency">
-          <option>Monthly</option><option>Quarterly</option>
-          <option>Biannual</option><option>Annual</option>
-        </select>
+        <label>Coordination Agency</label><input type="text" id="coordination_agency" placeholder="Public Health, NEMA..." />
+        <label>Follow-up Date</label><input type="date" id="followup_date" />
+        <label>Follow-up Outcome</label><input type="text" id="followup_outcome" placeholder="Resolved, Ongoing..." />
+        <label>Remarks</label><textarea id="remarks" rows="2" placeholder="Notes or comments"></textarea>
         <div style="text-align:right;margin-top:0.6rem;">
           <button type="submit" class="btn btn-primary">Save</button>
           <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
@@ -99,12 +88,13 @@
 
   <script type="module">
     import { supabase } from "./main.js";
+
     const toast=document.getElementById("toast");
     const logoutBtn=document.getElementById("logoutBtn");
     const addBtn=document.getElementById("addBtn");
     const cancelBtn=document.getElementById("cancelBtn");
     const formContainer=document.getElementById("formContainer");
-    const form=document.getElementById("sourceForm");
+    const form=document.getElementById("enforcementForm");
     const searchInput=document.getElementById("searchInput");
     const cardsContainer=document.getElementById("cardsContainer");
     const prevPage=document.getElementById("prevPage");
@@ -121,35 +111,31 @@
     addBtn.addEventListener("click",()=>toggleForm(true));
     cancelBtn.addEventListener("click",()=>toggleForm(false));
 
-    async function loadSources(){
+    async function loadEnforcements(){
       cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading…</p>";
-      let query=supabase.from("vw_water_quality_summary").select("*",{count:"exact"}).order("date_registered",{ascending:false}).range(page*limit,page*limit+limit-1);
+      let query=supabase.from("waste_enforcement").select("*",{count:"exact"}).order("detection_date",{ascending:false}).range(page*limit,page*limit+limit-1);
       const term=searchInput.value.trim();
-      if(term)query=query.or(`name.ilike.%${term}%,category.ilike.%${term}%,responsible_agency.ilike.%${term}%`);
+      if(term)query=query.or(`violation_type.ilike.%${term}%,coordination_agency.ilike.%${term}%`);
       const{data,count,error}=await query;
       if(error){console.error(error);showToast("Load failed","error");return;}
       total=count;renderCards(data);
     }
 
     function renderCards(data){
-      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No water sources found</p>";return;}
-      cardsContainer.innerHTML=data.map(d=>{
-        const status=d.last_classification||"Pending";
-        const badge=status==="Unsafe"?"badge Unsafe":status==="Safe"?"badge Safe":"badge Pending";
+      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No enforcement records found</p>";return;}
+      cardsContainer.innerHTML=data.map(e=>{
+        const badgeClass=e.payment_status==="Paid"?"badge Paid":e.payment_status==="Partially Paid"?"badge Partially":"badge Unpaid";
         return`
           <div class="card">
-            <div class="card-header"><span>${d.name}</span><span class="${badge}">${status}</span></div>
-            <p><strong>Type:</strong> ${d.source_type||"-"} | <strong>Category:</strong> ${d.category||"-"}</p>
-            <p><strong>Agency:</strong> ${d.responsible_agency||"-"} | <strong>Status:</strong> ${d.registration_status||"-"}</p>
-            <p><strong>Last Sample:</strong> ${d.last_sample_date||"–"} | <strong>Alerts:</strong> ${d.active_alerts||0}</p>
-            <div class="actions">
-              <a href="water_samples.html?id=${d.id}">Samples</a>
-              <a href="water_lab_results.html?id=${d.id}">Lab Results</a>
-              <a href="water_alerts.html?id=${d.id}">Alerts</a>
-              <a href="water_performance.html">Performance</a>
+            <div class="card-header">
+              <span>${e.violation_type||"Violation"}</span>
+              <span class="${badgeClass}">${e.payment_status||"Unknown"}</span>
             </div>
-          </div>`;
-      }).join("");
+            <p><strong>Detected:</strong> ${e.detection_date||"-"} | <strong>Fine:</strong> ${e.fine_amount?("Ksh "+e.fine_amount):"–"}</p>
+            <p><strong>Action:</strong> ${e.enforcement_action||"-"} | <strong>Agency:</strong> ${e.coordination_agency||"-"}</p>
+            <p><strong>Follow-up:</strong> ${e.followup_date||"-"} | <strong>Outcome:</strong> ${e.followup_outcome||"-"}</p>
+            <p><strong>Remarks:</strong> ${e.remarks||"-"}</p>
+          </div>`;}).join("");
       prevPage.disabled=page===0;
       nextPage.disabled=(page+1)*limit>=total;
     }
@@ -157,26 +143,28 @@
     form.addEventListener("submit",async e=>{
       e.preventDefault();
       const payload={
-        name:document.getElementById("name").value.trim(),
-        source_type:document.getElementById("source_type").value.trim(),
-        category:document.getElementById("category").value.trim(),
-        ownership:document.getElementById("ownership").value||null,
-        responsible_agency:document.getElementById("responsible_agency").value.trim()||null,
-        registration_status:document.getElementById("registration_status").value||null,
-        inspection_frequency:document.getElementById("inspection_frequency").value||null
+        violation_type:document.getElementById("violation_type").value.trim(),
+        detection_date:document.getElementById("detection_date").value,
+        enforcement_action:document.getElementById("enforcement_action").value.trim()||null,
+        fine_amount:parseFloat(document.getElementById("fine_amount").value)||null,
+        payment_status:document.getElementById("payment_status").value||null,
+        coordination_agency:document.getElementById("coordination_agency").value.trim()||null,
+        followup_date:document.getElementById("followup_date").value||null,
+        followup_outcome:document.getElementById("followup_outcome").value.trim()||null,
+        remarks:document.getElementById("remarks").value.trim()||null
       };
-      const{error}=await supabase.from("water_sources").insert([payload]);
+      const{error}=await supabase.from("waste_enforcement").insert([payload]);
       if(error){console.error(error);showToast("Save failed","error");return;}
-      showToast("Water source added successfully");
-      form.reset();toggleForm(false);loadSources();
+      showToast("Enforcement record added successfully");
+      form.reset();toggleForm(false);loadEnforcements();
     });
 
-    searchInput.addEventListener("input",()=>{page=0;loadSources();});
-    prevPage.addEventListener("click",()=>{if(page>0){page--;loadSources();}});
-    nextPage.addEventListener("click",()=>{if((page+1)*limit<total){page++;loadSources();}});
+    searchInput.addEventListener("input",()=>{page=0;loadEnforcements();});
+    prevPage.addEventListener("click",()=>{if(page>0){page--;loadEnforcements();}});
+    nextPage.addEventListener("click",()=>{if((page+1)*limit<total){page++;loadEnforcements();}});
     logoutBtn.addEventListener("click",async()=>{await supabase.auth.signOut();showToast("Logging out…");setTimeout(()=>window.location.href="login.html",800);});
     document.getElementById("year").textContent=new Date().getFullYear();
-    loadSources();
+    loadEnforcements();
   </script>
 </body>
 </html>

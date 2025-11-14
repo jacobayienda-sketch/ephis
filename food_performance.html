@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EPHIS | Food Performance Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="main.js"></script>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;color:#222;display:flex;flex-direction:column;min-height:100vh;}
+    header{background:#1976d2;color:white;display:flex;justify-content:space-between;align-items:center;padding:0.8rem 1rem;flex-wrap:wrap;}
+    header h1{font-size:1rem;margin:0;font-weight:600;}
+    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.5rem 1rem;font-size:0.9rem;}
+    .btn-primary{background:#1976d2;color:white;}
+    .btn-secondary{background:#2e7d32;color:white;}
+    .btn-light{background:white;color:#1976d2;border:1px solid #1976d2;}
+    main{flex:1;padding:1rem;max-width:900px;margin:0 auto;}
+    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
+    .card h2{margin-top:0;color:#1976d2;font-size:1rem;}
+    .metric{display:flex;justify-content:space-between;align-items:center;margin:0.6rem 0;}
+    .metric span:first-child{font-weight:600;}
+    .metric-value{font-size:1.1rem;font-weight:700;}
+    .updated{text-align:right;font-size:0.8rem;color:#666;margin-top:0.5rem;}
+    .form-card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
+    form label{font-weight:600;display:block;margin-top:0.5rem;}
+    form input{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
+    footer{text-align:center;background:#e3f2fd;color:#555;padding:0.6rem;font-size:0.8rem;}
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1976d2;color:white;padding:0.8rem 1rem;border-radius:6px;opacity:0;transition:opacity 0.3s ease;}
+    .toast.show{opacity:1;}
+    @media(max-width:600px){.metric{flex-direction:column;align-items:flex-start;gap:0.2rem;}}
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>EPHIS – Food Performance Dashboard</h1>
+    <div>
+      <button class="btn btn-light" onclick="window.location.href='food_control.html'">Back</button>
+      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="metricsContainer" class="card">
+      <h2>Performance Overview</h2>
+      <div class="metric"><span>License Coverage:</span> <span class="metric-value" id="licenseCoverage">–</span></div>
+      <div class="metric"><span>Quarterly Inspections:</span> <span class="metric-value" id="inspectionsQuarterly">–</span></div>
+      <div class="metric"><span>Compliance on First Inspection:</span> <span class="metric-value" id="complianceFirst">–</span></div>
+      <div class="metric"><span>Foodborne Outbreaks:</span> <span class="metric-value" id="foodOutbreaks">–</span></div>
+      <div class="updated" id="lastUpdated"></div>
+    </div>
+
+    <div id="formContainer" class="form-card">
+      <h2>Update Performance Data</h2>
+      <form id="performanceForm">
+        <label>License Coverage (%)</label>
+        <input type="number" step="0.1" id="license_coverage" required />
+
+        <label>Quarterly Inspections (count)</label>
+        <input type="number" step="1" id="inspections_quarterly" required />
+
+        <label>Compliance on First Inspection (%)</label>
+        <input type="number" step="0.1" id="compliance_first_inspection" required />
+
+        <label>Foodborne Outbreaks (count)</label>
+        <input type="number" step="1" id="foodborne_outbreaks" required />
+
+        <div style="text-align:right;margin-top:0.6rem;">
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { supabase } from "./main.js";
+
+    const toast=document.getElementById("toast");
+    const logoutBtn=document.getElementById("logoutBtn");
+    const form=document.getElementById("performanceForm");
+
+    const licenseCoverage=document.getElementById("licenseCoverage");
+    const inspectionsQuarterly=document.getElementById("inspectionsQuarterly");
+    const complianceFirst=document.getElementById("complianceFirst");
+    const foodOutbreaks=document.getElementById("foodOutbreaks");
+    const lastUpdated=document.getElementById("lastUpdated");
+
+    function showToast(msg,type="info"){
+      toast.textContent=msg;
+      toast.style.background=type==="error"?"#c62828":"#1976d2";
+      toast.classList.add("show");
+      setTimeout(()=>toast.classList.remove("show"),3000);
+    }
+
+    async function checkSession(){
+      const {data}=await supabase.auth.getSession();
+      if(!data.session)window.location.href="login.html";
+    }
+    checkSession();
+
+    async function loadPerformance(){
+      const{data,error}=await supabase.from("food_performance").select("*").order("updated_at",{ascending:false}).limit(1).single();
+      if(error||!data){
+        showToast("No performance data found","error");
+        return;
+      }
+      licenseCoverage.textContent=data.license_coverage ? data.license_coverage+"%" : "–";
+      inspectionsQuarterly.textContent=data.inspections_quarterly ?? "–";
+      complianceFirst.textContent=data.compliance_first_inspection ? data.compliance_first_inspection+"%" : "–";
+      foodOutbreaks.textContent=data.foodborne_outbreaks ?? "–";
+      lastUpdated.textContent="Last updated: "+(data.updated_at?new Date(data.updated_at).toLocaleString():"–");
+    }
+
+    form.addEventListener("submit",async e=>{
+      e.preventDefault();
+      const payload={
+        license_coverage:parseFloat(document.getElementById("license_coverage").value)||0,
+        inspections_quarterly:parseFloat(document.getElementById("inspections_quarterly").value)||0,
+        compliance_first_inspection:parseFloat(document.getElementById("compliance_first_inspection").value)||0,
+        foodborne_outbreaks:parseFloat(document.getElementById("foodborne_outbreaks").value)||0,
+        updated_by:"System",
+        updated_at:new Date()
+      };
+      const{error}=await supabase.from("food_performance").insert([payload]);
+      if(error){console.error(error);showToast("Save failed","error");return;}
+      showToast("Performance data updated");
+      form.reset();
+      loadPerformance();
+    });
+
+    logoutBtn.addEventListener("click",async()=>{
+      await supabase.auth.signOut();
+      showToast("Logging out...");
+      setTimeout(()=>window.location.href="login.html",800);
+    });
+
+    document.getElementById("year").textContent=new Date().getFullYear();
+    loadPerformance();
+  </script>
+</body>
+</html>

@@ -3,122 +3,181 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Waste Management | EPHIS</title>
+  <title>EPHIS | Waste Management</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    body { font-family: system-ui, sans-serif; background:#f5f6fa; margin:0; color:#222; }
-    header {
-      background:#1976d2; color:#fff; padding:1rem;
-      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;
-    }
-    header h1{margin:0;font-size:1.1rem;}
-    main{padding:1rem;max-width:1000px;margin:auto;}
-    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.6rem 1rem;}
-    .btn-primary{background:#1976d2;color:#fff;}
-    .btn-danger{background:#c62828;color:#fff;}
-    .btn-secondary{background:#eee;color:#333;}
-    .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;}
-    .toolbar input{flex:1;min-width:200px;padding:0.6rem;border:1px solid #ccc;border-radius:6px;}
-    table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.05);}
-    th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;}
-    th{background:#f1f1f1;font-weight:600;}
-    tr:hover{background:#f9f9f9;}
-    @media(max-width:600px){
-      table,thead,tbody,th,td,tr{display:block;}
-      tr{margin-bottom:1rem;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
-      th{display:none;}
-      td{display:flex;justify-content:space-between;padding:8px 12px;}
-      td::before{content:attr(data-label);font-weight:600;color:#555;}
-    }
+    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;color:#222;display:flex;flex-direction:column;min-height:100vh;}
+    header{background:#1976d2;color:white;display:flex;justify-content:space-between;align-items:center;padding:0.8rem 1rem;flex-wrap:wrap;}
+    header h1{font-size:1rem;margin:0;font-weight:600;}
+    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.5rem 1rem;font-size:0.9rem;}
+    .btn-primary{background:#1976d2;color:white;}
+    .btn-secondary{background:#2e7d32;color:white;}
+    .btn-light{background:white;color:#1976d2;border:1px solid #1976d2;}
+    main{flex:1;padding:1rem;max-width:1100px;margin:0 auto;}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
+    .toolbar input{padding:0.6rem;border:1px solid #ccc;border-radius:6px;width:250px;}
+    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;transition:0.2s ease;}
+    .card:hover{transform:scale(1.01);}
+    .card-header{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:#1976d2;}
+    .badge{border-radius:5px;padding:0.2rem 0.6rem;font-size:0.8rem;font-weight:600;}
+    .badge.Operational{background:#c8e6c9;color:#2e7d32;}
+    .badge["Under Construction"]{background:#fff9c4;color:#f57f17;}
+    .badge.Inactive{background:#ffcdd2;color:#c62828;}
+    .actions{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.6rem;}
+    .actions a{text-decoration:none;color:white;background:#1976d2;border-radius:6px;padding:0.4rem 0.7rem;font-size:0.8rem;font-weight:600;}
+    .pagination{display:flex;justify-content:center;gap:0.5rem;margin-top:1rem;}
+    .pagination button{border:none;background:#1976d2;color:white;border-radius:5px;padding:0.4rem 0.8rem;cursor:pointer;font-weight:600;}
+    .form-card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
+    form label{font-weight:600;display:block;margin-top:0.5rem;}
+    form input,form select{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
+    footer{text-align:center;background:#e3f2fd;color:#555;padding:0.6rem;font-size:0.8rem;}
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1976d2;color:white;padding:0.8rem 1rem;border-radius:6px;opacity:0;transition:opacity 0.3s ease;}
+    .toast.show{opacity:1;}
+    @media(max-width:600px){.toolbar{flex-direction:column;gap:0.5rem;align-items:stretch;}.toolbar input{width:100%;}}
   </style>
 </head>
 
-<body data-module="waste_management">
+<body>
   <header>
-    <h1>Waste Management</h1>
-    <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+    <h1>EPHIS – Waste Management</h1>
+    <div>
+      <button class="btn btn-light" onclick="window.location.href='dashboard.html'">Dashboard</button>
+      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+    </div>
   </header>
 
   <main>
     <div class="toolbar">
-      <button id="add-btn" class="btn btn-primary">+ New Waste Site</button>
-      <input type="search" id="search" placeholder="Search waste sites..." />
+      <input type="text" id="searchInput" placeholder="Search waste site..." />
+      <button class="btn btn-primary" id="addBtn">+ Add Site</button>
     </div>
-    <div id="table"></div>
+
+    <div id="formContainer" style="display:none;" class="form-card">
+      <form id="siteForm">
+        <label>Site Name</label><input type="text" id="site_name" required />
+        <label>Site Type</label><input type="text" id="site_type" placeholder="Landfill, Transfer Station, Composting..." />
+        <label>Address</label><input type="text" id="address" placeholder="Location address" />
+        <label>Ownership</label>
+        <select id="ownership">
+          <option value="">Select</option>
+          <option>Public</option><option>Private</option><option>Community</option><option>PPP</option><option>Partnership</option>
+        </select>
+        <label>Managing Agency</label><input type="text" id="managing_agency" placeholder="Agency name" />
+        <label>Capacity (tons)</label><input type="number" id="site_capacity" />
+        <label>Operational Status</label>
+        <select id="operational_status">
+          <option value="">Select</option>
+          <option>Operational</option><option>Temporarily Closed</option><option>Under Construction</option><option>Inactive</option>
+        </select>
+        <label>Responsible Officer</label><input type="text" id="responsible_officer" />
+        <label>Contact Details</label><input type="text" id="contact_details" />
+        <div style="text-align:right;margin-top:0.6rem;">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="cardsContainer"></div>
+
+    <div class="pagination">
+      <button id="prevPage">Previous</button>
+      <button id="nextPage">Next</button>
+    </div>
   </main>
 
+  <footer>
+    County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
   <script type="module">
-    import { supabase, showToast, fetchAll, deleteRecord, requireLogin } from "./main.js";
+    import { supabase } from "./main.js";
+    const toast=document.getElementById("toast");
+    const logoutBtn=document.getElementById("logoutBtn");
+    const addBtn=document.getElementById("addBtn");
+    const cancelBtn=document.getElementById("cancelBtn");
+    const formContainer=document.getElementById("formContainer");
+    const form=document.getElementById("siteForm");
+    const searchInput=document.getElementById("searchInput");
+    const cardsContainer=document.getElementById("cardsContainer");
+    const prevPage=document.getElementById("prevPage");
+    const nextPage=document.getElementById("nextPage");
 
-    const addBtn=document.getElementById("add-btn");
-    const search=document.getElementById("search");
-    const tableDiv=document.getElementById("table");
+    let page=0;const limit=10;let total=0;
 
-    await requireLogin();
+    function showToast(msg,type="info"){toast.textContent=msg;toast.style.background=type==="error"?"#c62828":"#1976d2";toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
 
-    async function loadData(){
-      try{
-        const data=await fetchAll("waste_management","id, site_name, site_type, ownership_type, managing_agency, operational_status, site_capacity");
-        render(data);
-      }catch(err){showToast("Error loading data: "+err.message,"error");}
+    async function checkSession(){const {data}=await supabase.auth.getSession();if(!data.session)window.location.href="login.html";}
+    checkSession();
+
+    function toggleForm(show){formContainer.style.display=show?"block":"none";}
+    addBtn.addEventListener("click",()=>toggleForm(true));
+    cancelBtn.addEventListener("click",()=>toggleForm(false));
+
+    async function loadSites(){
+      cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading…</p>";
+      let query=supabase.from("vw_waste_summary").select("*",{count:"exact"}).order("date_registered",{ascending:false}).range(page*limit,page*limit+limit-1);
+      const term=searchInput.value.trim();
+      if(term)query=query.or(`site_name.ilike.%${term}%,managing_agency.ilike.%${term}%`);
+      const{data,count,error}=await query;
+      if(error){console.error(error);showToast("Load failed","error");return;}
+      total=count;renderCards(data);
     }
 
-    function render(rows){
-      if(!rows.length){
-        tableDiv.innerHTML="<p style='text-align:center;margin-top:2rem;'>No waste management data found.</p>";
-        return;
-      }
-      const html=`
-      <table>
-        <thead>
-          <tr>
-            <th>Site</th>
-            <th>Type</th>
-            <th>Ownership</th>
-            <th>Agency</th>
-            <th>Status</th>
-            <th>Capacity</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.map(r=>`
-            <tr>
-              <td data-label="Site">${r.site_name||"-"}</td>
-              <td data-label="Type">${r.site_type||"-"}</td>
-              <td data-label="Ownership">${r.ownership_type||"-"}</td>
-              <td data-label="Agency">${r.managing_agency||"-"}</td>
-              <td data-label="Status">${r.operational_status||"-"}</td>
-              <td data-label="Capacity">${r.site_capacity||"-"}</td>
-              <td data-label="Actions">
-                <button class="btn btn-primary" onclick="window.location.href='waste_management_form.html?id=${r.id}'">Edit</button>
-                <button class="btn btn-danger" data-id="${r.id}">Delete</button>
-              </td>
-            </tr>`).join("")}
-        </tbody>
-      </table>`;
-      tableDiv.innerHTML=html;
-      document.querySelectorAll(".btn-danger").forEach(b=>b.addEventListener("click",()=>handleDelete(b.dataset.id)));
+    function renderCards(data){
+      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No waste sites found</p>";return;}
+      cardsContainer.innerHTML=data.map(d=>{
+        const badge=d.operational_status||"Inactive";
+        return`
+          <div class="card">
+            <div class="card-header">
+              <span>${d.site_name}</span>
+              <span class="badge ${badge}">${d.operational_status||"Inactive"}</span>
+            </div>
+            <p><strong>Type:</strong> ${d.site_type||"-"} | <strong>Ownership:</strong> ${d.ownership||"-"}</p>
+            <p><strong>Agency:</strong> ${d.managing_agency||"-"} | <strong>Capacity:</strong> ${d.site_capacity||"–"} tons</p>
+            <p><strong>Last Collection:</strong> ${d.last_collection_date||"–"} | <strong>Total Volume:</strong> ${d.total_waste_volume||0} tons</p>
+            <div class="actions">
+              <a href="waste_collections.html?id=${d.id}">Collections</a>
+              <a href="waste_recycling.html?id=${d.id}">Recycling</a>
+              <a href="waste_enforcement.html?id=${d.id}">Enforcement</a>
+              <a href="waste_performance.html">Performance</a>
+            </div>
+          </div>`;
+      }).join("");
+      prevPage.disabled=page===0;
+      nextPage.disabled=(page+1)*limit>=total;
     }
 
-    async function handleDelete(id){
-      if(!confirm("Delete this record?"))return;
-      try{
-        await deleteRecord("waste_management",id);
-        showToast("Record deleted","success");
-        loadData();
-      }catch(err){showToast("Delete failed: "+err.message,"error");}
-    }
-
-    search.addEventListener("input",e=>{
-      const term=e.target.value.toLowerCase();
-      document.querySelectorAll("tbody tr").forEach(r=>{
-        r.style.display=r.innerText.toLowerCase().includes(term)?"":"none";
-      });
+    form.addEventListener("submit",async e=>{
+      e.preventDefault();
+      const payload={
+        site_name:document.getElementById("site_name").value.trim(),
+        site_type:document.getElementById("site_type").value.trim(),
+        address:document.getElementById("address").value.trim(),
+        ownership:document.getElementById("ownership").value||null,
+        managing_agency:document.getElementById("managing_agency").value.trim()||null,
+        site_capacity:parseFloat(document.getElementById("site_capacity").value)||null,
+        operational_status:document.getElementById("operational_status").value||null,
+        responsible_officer:document.getElementById("responsible_officer").value.trim()||null,
+        contact_details:document.getElementById("contact_details").value.trim()||null,
+        date_registered:new Date()
+      };
+      const{error}=await supabase.from("waste_management_sites").insert([payload]);
+      if(error){console.error(error);showToast("Save failed","error");return;}
+      showToast("Waste site added successfully");
+      form.reset();toggleForm(false);loadSites();
     });
 
-    addBtn.addEventListener("click",()=>window.location.href="waste_management_form.html");
-    loadData();
+    searchInput.addEventListener("input",()=>{page=0;loadSites();});
+    prevPage.addEventListener("click",()=>{if(page>0){page--;loadSites();}});
+    nextPage.addEventListener("click",()=>{if((page+1)*limit<total){page++;loadSites();}});
+    logoutBtn.addEventListener("click",async()=>{await supabase.auth.signOut();showToast("Logging out…");setTimeout(()=>window.location.href="login.html",800);});
+    document.getElementById("year").textContent=new Date().getFullYear();
+    loadSites();
   </script>
 </body>
 </html>
