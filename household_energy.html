@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EPHIS | Household Energy</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="main.js"></script>
+
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f5f6fa; margin: 0; }
+    header {
+      background:#1976d2; color:white; padding:0.8rem 1rem;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    header h1 { margin:0; font-size:1rem; font-weight:600; }
+    .btn { padding:0.5rem 1rem; border-radius:6px; cursor:pointer; border:none;
+      font-weight:600; }
+    .btn-primary { background:#1976d2; color:white; }
+    .btn-light { background:white; color:#1976d2; border:1px solid #1976d2; }
+    main { max-width:1000px; margin:1rem auto; padding:1rem; }
+    .card {
+      background:white; padding:1rem; border-radius:10px; margin-bottom:1rem;
+      box-shadow:0 2px 6px rgba(0,0,0,0.1); transition:0.2s ease;
+    }
+    .card:hover { transform:scale(1.01); }
+    .card-header { display:flex; justify-content:space-between; font-weight:600; color:#1976d2; }
+    .card-body { font-size:0.9rem; margin-top:0.6rem; }
+    .actions { margin-top:0.7rem; display:flex; gap:0.4rem; }
+    .actions a {
+      background:#1976d2; color:white; padding:0.4rem 0.7rem;
+      border-radius:6px; text-decoration:none; font-size:0.8rem; font-weight:600;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Household Energy Profiles</h1>
+  <button class="btn btn-light" onclick="window.location.href='air_quality.html'">Back</button>
+</header>
+
+<main>
+
+  <button class="btn btn-primary" id="newBtn">+ New Household</button>
+
+  <div id="cardsContainer"></div>
+
+</main>
+
+<script type="module">
+  import { supabase } from "./main.js";
+
+  const cardsContainer = document.getElementById("cardsContainer");
+  const newBtn = document.getElementById("newBtn");
+
+  async function loadData() {
+    const { data, error } = await supabase
+      .from("household_energy_profiles")
+      .select("*")
+      .order("created_at", { ascending:false });
+
+    cardsContainer.innerHTML = data
+      .map( h => `
+        <div class="card">
+          <div class="card-header">
+            <span>${h.household_code}</span>
+            <span>${h.fuel_primary}</span>
+          </div>
+
+          <div class="card-body">
+            <p><strong>Head:</strong> ${h.head_of_household || "-"}</p>
+            <p><strong>Location:</strong> ${h.sub_county || "-"} – ${h.ward || "-"}</p>
+            <p><strong>Stove:</strong> ${h.stove_type || "-"}</p>
+          </div>
+
+          <div class="actions">
+            <a href="household_energy_form.html?id=${h.id}">Edit</a>
+            <a href="indoor_air_readings.html?survey_id=${h.id}">Indoor Readings</a>
+          </div>
+        </div>
+      `).join("");
+  }
+
+  newBtn.addEventListener("click", () =>
+    window.location.href = "household_energy_form.html"
+  );
+
+  loadData();
+</script>
+
+</body>
+</html>

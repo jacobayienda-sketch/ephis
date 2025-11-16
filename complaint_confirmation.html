@@ -4,65 +4,436 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Complaint Confirmation | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <script type="module" src="main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <style>
-    body {
-      font-family: system-ui, sans-serif;
-      background: #f5f6fa;
+    * {
       margin: 0;
-      color: #222;
-      padding: 1rem;
+      padding: 0;
+      box-sizing: border-box;
     }
-    .card {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      max-width: 500px;
-      margin: 1rem auto;
-      padding: 1.5rem;
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      color: #0f172a;
+      padding: 2rem 1rem;
     }
+
+    /* Animated gradient background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 600px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+      z-index: -1;
+      opacity: 0.08;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
     header {
-      background: #1976d2;
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
       color: white;
       text-align: center;
-      padding: 1rem;
-      font-weight: 600;
-      border-radius: 8px;
+      padding: 2rem;
+      border-radius: 16px 16px 0 0;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
     }
-    h2 {
-      color: #1976d2;
+
+    header .icon {
+      font-size: 3rem;
       margin-bottom: 0.5rem;
     }
-    p {
-      margin: 0.3rem 0;
-      line-height: 1.4;
+
+    header h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
     }
+
+    header p {
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    .card {
+      background: white;
+      border-radius: 0 0 16px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+      padding: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .tracking-section {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 2px solid #93c5fd;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .tracking-section h2 {
+      font-size: 0.9rem;
+      color: #1e40af;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+
+    .tracking-code {
+      font-size: 1.8rem;
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      color: #1d4ed8;
+      background: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      display: inline-block;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+    }
+
+    .info-section {
+      margin-bottom: 2rem;
+    }
+
+    .info-section h3 {
+      font-size: 1.1rem;
+      color: #1f2937;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .info-item {
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .info-item label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+
+    .info-item .value {
+      color: #1f2937;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    .description-box {
+      background: #f8fafc;
+      border-left: 4px solid #2563eb;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+
+    .description-box label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .description-box .value {
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.35rem 0.9rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .status-badge.pending {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .status-badge.resolved {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .status-badge.inprogress {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .status-badge.escalated {
+      background: #fed7aa;
+      color: #ea580c;
+    }
+
+    .urgency-badge {
+      display: inline-block;
+      padding: 0.35rem 0.9rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .urgency-badge.critical {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .urgency-badge.high {
+      background: #fed7aa;
+      color: #ea580c;
+    }
+
+    .urgency-badge.medium {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .urgency-badge.low {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .divider {
+      border: none;
+      border-top: 2px solid #e5e7eb;
+      margin: 2rem 0;
+    }
+
     .qr-container {
       text-align: center;
+      padding: 2rem;
+      background: #f8fafc;
+      border-radius: 12px;
+      margin: 2rem 0;
+      border: 2px dashed #cbd5e1;
+    }
+
+    .qr-container h3 {
+      font-size: 1rem;
+      color: #475569;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .qr-container canvas {
+      border: 4px solid white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .qr-container p {
+      font-size: 0.85rem;
+      color: #64748b;
       margin-top: 1rem;
     }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
     .btn {
-      background: #1976d2;
-      color: white;
+      flex: 1;
       border: none;
-      border-radius: 6px;
-      padding: 0.7rem 1rem;
+      border-radius: 10px;
+      padding: 1rem;
       font-weight: 600;
       cursor: pointer;
-      width: 100%;
-      margin-top: 1rem;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #4b5563;
+      border: 2px solid #d1d5db;
+    }
+
+    .btn-secondary:hover {
+      background: #f9fafb;
+      border-color: #9ca3af;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: #6b7280;
+    }
+
+    .loading-spinner {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .error {
+      color: #dc2626;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .notice {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border: 1px solid #fcd34d;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .notice h4 {
+      color: #92400e;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .notice ul {
+      margin: 0;
+      padding-left: 1.5rem;
+      color: #92400e;
+      line-height: 1.8;
+    }
+
+    /* Print styles */
     @media print {
-      .btn { display: none; }
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      body::before {
+        display: none;
+      }
+
+      .btn, .actions {
+        display: none !important;
+      }
+
+      header {
+        background: #047857;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+      }
+
+      .qr-container {
+        page-break-inside: avoid;
+      }
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 640px) {
+      body {
+        padding: 1rem 0.75rem;
+      }
+
+      header {
+        padding: 1.5rem 1rem;
+        border-radius: 12px 12px 0 0;
+      }
+
+      header h1 {
+        font-size: 1.2rem;
+      }
+
+      .card {
+        padding: 1.5rem;
+      }
+
+      .tracking-code {
+        font-size: 1.3rem;
+        padding: 0.5rem 1rem;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 
 <body>
-  <header>Complaint Confirmation</header>
-  <div class="card" id="details">
-    <p>Loading complaint details...</p>
+  <div class="container">
+    <header>
+      <div class="icon">✅</div>
+      <h1>Complaint Submitted Successfully</h1>
+      <p>Your complaint has been recorded and assigned a tracking code</p>
+    </header>
+    
+    <div class="card" id="details">
+      <div class="loading">
+        <div class="loading-spinner">🔍</div>
+        <p>Loading complaint details...</p>
+      </div>
+    </div>
   </div>
   <script type="module">
     import { supabase } from './main.js';
@@ -73,45 +444,129 @@
 
     async function loadComplaint() {
       if (!code) {
-        details.innerHTML = '<p style="color:red;">No tracking code provided.</p>';
+        details.innerHTML = '<div class="error">❌ <strong>No tracking code provided.</strong><br>Please check your URL and try again.</div>';
         return;
       }
 
-      const { data, error } = await supabase
-        .from('complaints')
-        .select('tracking_code,complaint_type,description,location,urgency,reporter_name,reporter_contact,submission_date,resolution_status')
-        .eq('tracking_code', code)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from('complaints')
+          .select('tracking_code,complaint_type,description,location,urgency,reporter_name,reporter_contact,submission_date,submission_time,resolution_status')
+          .eq('tracking_code', code)
+          .single();
 
-      if (error || !data) {
-        details.innerHTML = '<p style="color:red;">Complaint not found or invalid tracking code.</p>';
-        console.error(error);
-        return;
+        if (error || !data) {
+          details.innerHTML = '<div class="error">❌ <strong>Complaint not found.</strong><br>The tracking code may be invalid or the complaint may have been removed.</div>';
+          console.error(error);
+          return;
+        }
+
+        // Format date
+        const submittedDate = data.submission_date 
+          ? new Date(data.submission_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+          : 'Not specified';
+
+        const statusClass = data.resolution_status?.toLowerCase().replace(/\s+/g, '') || 'pending';
+        const urgencyClass = data.urgency?.toLowerCase() || 'medium';
+
+        details.innerHTML = `
+          <div class="tracking-section">
+            <h2>🎫 Your Tracking Code</h2>
+            <div class="tracking-code">${data.tracking_code}</div>
+            <p style="margin-top: 1rem; color: #1e40af; font-size: 0.9rem;">
+              📝 Save this code to track your complaint status
+            </p>
+          </div>
+
+          <div class="info-section">
+            <h3>📋 Complaint Details</h3>
+            
+            <div class="info-grid">
+              <div class="info-item">
+                <label>🎫 Complaint Type</label>
+                <div class="value">${data.complaint_type || 'Not specified'}</div>
+              </div>
+              <div class="info-item">
+                <label>📅 Date Submitted</label>
+                <div class="value">${submittedDate}</div>
+              </div>
+              <div class="info-item">
+                <label>📍 Location</label>
+                <div class="value">${data.location || 'Not specified'}</div>
+              </div>
+              <div class="info-item">
+                <label>⚠️ Urgency Level</label>
+                <div class="value"><span class="urgency-badge ${urgencyClass}">${data.urgency || 'Medium'}</span></div>
+              </div>
+              ${data.submission_time ? `
+              <div class="info-item">
+                <label>🕐 Time Submitted</label>
+                <div class="value">${data.submission_time}</div>
+              </div>` : ''}
+              <div class="info-item">
+                <label>📊 Status</label>
+                <div class="value"><span class="status-badge ${statusClass}">${data.resolution_status || 'Pending'}</span></div>
+              </div>
+            </div>
+
+            ${data.description ? `
+            <div class="description-box">
+              <label>📝 Description</label>
+              <div class="value">${data.description}</div>
+            </div>` : ''}
+          </div>
+
+          <hr class="divider">
+
+          <div class="info-section">
+            <h3>👤 Reporter Information</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Reporter Name</label>
+                <div class="value">${data.reporter_name || 'Anonymous'}</div>
+              </div>
+              <div class="info-item">
+                <label>Contact</label>
+                <div class="value">${data.reporter_contact || 'Not provided'}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="qr-container">
+            <h3>📱 Track Your Complaint Online</h3>
+            <canvas id="qr"></canvas>
+            <p>Scan this QR code with your phone to check the status of your complaint anytime</p>
+          </div>
+
+          <div class="notice">
+            <h4>💡 What Happens Next?</h4>
+            <ul>
+              <li>Your complaint will be reviewed by our team</li>
+              <li>You'll receive updates via the contact information provided</li>
+              <li>Use your tracking code to monitor progress online</li>
+              <li>Expected response time: 2-5 business days</li>
+            </ul>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" onclick="window.print()">
+              🖨️ Print Confirmation
+            </button>
+            <button class="btn btn-secondary" onclick="window.location.href='complaints_public.html'">
+              ← Back to Portal
+            </button>
+          </div>
+        `;
+
+        // Generate QR linking back to tracking page
+        const trackUrl = `${window.location.origin}/complaint_status.html?code=${encodeURIComponent(data.tracking_code)}`;
+        QRCode.toCanvas(document.getElementById('qr'), trackUrl, { width: 200, margin: 2 }, err => {
+          if (err) console.error('QR generation error:', err);
+        });
+      } catch (error) {
+        console.error('Load error:', error);
+        details.innerHTML = '<div class="error">❌ <strong>Failed to load complaint details.</strong><br>Please try again later or contact support.</div>';
       }
-
-      details.innerHTML = `
-        <h2>Tracking Code: ${data.tracking_code}</h2>
-        <p><b>Type:</b> ${data.complaint_type || '-'}</p>
-        <p><b>Description:</b> ${data.description || '-'}</p>
-        <p><b>Location:</b> ${data.location || '-'}</p>
-        <p><b>Urgency:</b> ${data.urgency || '-'}</p>
-        <p><b>Status:</b> ${data.resolution_status || 'Pending'}</p>
-        <p><b>Date Submitted:</b> ${data.submission_date || '-'}</p>
-        <hr>
-        <p><b>Reporter:</b> ${data.reporter_name || 'Anonymous'}</p>
-        <p><b>Contact:</b> ${data.reporter_contact || '-'}</p>
-        <div class="qr-container">
-          <canvas id="qr"></canvas>
-          <p style="font-size:0.85rem;color:#555;">Scan this code to check status online</p>
-        </div>
-        <button class="btn" onclick="window.print()">Print Confirmation</button>
-      `;
-
-      // Generate QR linking back to tracking page
-      const trackUrl = `${window.location.origin}/complaint_status.html?code=${encodeURIComponent(data.tracking_code)}`;
-      QRCode.toCanvas(document.getElementById('qr'), trackUrl, { width: 150 }, err => {
-        if (err) console.error(err);
-      });
     }
 
     loadComplaint();

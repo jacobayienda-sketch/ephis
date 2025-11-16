@@ -4,37 +4,378 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Complaint Updates | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <script type="module" src="main.js"></script>
   <style>
-    body { font-family: system-ui, sans-serif; background:#f5f6fa; margin:0; padding:1rem; }
-    header { background:#1976d2; color:#fff; padding:1rem; display:flex; justify-content:space-between; align-items:center; }
-    form, .card { background:white; border-radius:8px; padding:1rem; box-shadow:0 1px 4px rgba(0,0,0,0.1); margin-top:1rem; }
-    label { font-weight:600; margin-top:0.8rem; display:block; }
-    input, textarea { width:100%; padding:0.6rem; border:1px solid #ccc; border-radius:6px; margin-top:0.3rem; }
-    .btn { border:none; border-radius:6px; cursor:pointer; font-weight:600; padding:0.6rem 1rem; background:#1976d2; color:white; width:100%; margin-top:1rem; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Animated gradient background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 400px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+      z-index: -1;
+      opacity: 0.05;
+    }
+
+    header {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 1.2rem 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      font-weight: bold;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      color: #0f172a;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .back-btn {
+      background: white;
+      color: #2563eb;
+      border: 2px solid #2563eb;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .back-btn:hover {
+      background: #2563eb;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      flex: 1;
+    }
+
+    form {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+      margin-bottom: 2rem;
+    }
+
+    .form-header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .form-header h2 {
+      font-size: 1.3rem;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-header p {
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: #374151;
+      font-size: 0.9rem;
+    }
+
+    label:first-of-type {
+      margin-top: 0;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: white;
+      font-family: inherit;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .btn {
+      border: none;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      font-weight: 600;
+      width: 100%;
+      padding: 1rem;
+      border-radius: 12px;
+      margin-top: 2rem;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .updates-section {
+      margin-top: 2rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .section-header h2 {
+      font-size: 1.3rem;
+      color: #1f2937;
+      font-weight: 700;
+    }
+
+    .badge {
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+      margin-bottom: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+
+    .card b {
+      color: #1f2937;
+      font-size: 1.05rem;
+      display: block;
+      margin-bottom: 0.75rem;
+    }
+
+    .card p {
+      color: #4b5563;
+      line-height: 1.6;
+      margin: 0.75rem 0;
+    }
+
+    .card small {
+      color: #6b7280;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid #f3f4f6;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #9ca3af;
+      background: white;
+      border-radius: 16px;
+      border: 2px dashed #e5e7eb;
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .loading {
+      text-align: center;
+      color: #6b7280;
+      padding: 2rem;
+      font-style: italic;
+    }
+
+    .error {
+      color: #dc2626;
+      text-align: center;
+      padding: 1rem;
+      background: #fef2f2;
+      border-radius: 8px;
+      border: 1px solid #fecaca;
+      margin: 1rem 0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      color: #64748b;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 3rem;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 640px) {
+      .container {
+        padding: 1rem 0.75rem;
+      }
+
+      header {
+        padding: 1rem;
+      }
+
+      .header-content h1 {
+        font-size: 1.1rem;
+      }
+
+      form {
+        padding: 1.5rem;
+      }
+
+      .back-btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.85rem;
+      }
+    }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>Complaint Updates</h1>
-    <button onclick="history.back()" style="background:white;color:#1976d2;padding:0.4rem 0.8rem;border:none;border-radius:6px;">Back</button>
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo">E</div>
+        <h1>Complaint Updates</h1>
+      </div>
+      <button class="back-btn" onclick="history.back()">← Back</button>
+    </div>
   </header>
 
-  <form id="updateForm">
-    <label>Status Log</label>
-    <input type="text" id="status_log" required />
+  <div class="container">
+    <form id="updateForm">
+      <div class="form-header">
+        <h2>📝 Add New Update</h2>
+        <p>Record the latest status and progress on this complaint</p>
+      </div>
+      <label>Status Log *</label>
+      <input type="text" id="status_log" placeholder="e.g., Investigation Started, Resolved, Pending Review" required />
 
-    <label>Update Notes</label>
-    <textarea id="update_notes" rows="3"></textarea>
+      <label>Update Notes</label>
+      <textarea id="update_notes" rows="4" placeholder="Add detailed notes about this update..."></textarea>
 
-    <label>Officer Name</label>
-    <input type="text" id="officer_name" />
+      <label>Officer Name</label>
+      <input type="text" id="officer_name" placeholder="Your name" />
 
-    <button type="submit" class="btn">Save Update</button>
-  </form>
+      <button type="submit" class="btn" id="submitBtn">💾 Save Update</button>
+    </form>
 
-  <div id="updates"></div>
+    <div class="updates-section">
+      <div class="section-header">
+        <h2>📋 Update History</h2>
+        <span class="badge" id="updateCount">0</span>
+      </div>
+      <div id="updates"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 EPHIS - Elgeyo Marakwet County Environmental Health System</p>
+  </footer>
 
   <script type="module">
     import { supabase, showToast, requireLogin } from './main.js';
@@ -42,31 +383,113 @@
     const complaintId = params.get('id');
     const form = document.getElementById('updateForm');
     const list = document.getElementById('updates');
+    const submitBtn = document.getElementById('submitBtn');
+    const updateCount = document.getElementById('updateCount');
 
-    await requireLogin();
-    loadUpdates();
+    // Check if complaint ID exists
+    if (!complaintId) {
+      list.innerHTML = '<div class="error">❌ No complaint ID provided. Please access this page from a valid complaint.</div>';
+      form.style.display = 'none';
+    } else {
+      await requireLogin();
+      loadUpdates();
+    }
 
     async function loadUpdates() {
-      const { data, error } = await supabase.from('complaint_updates')
-        .select('*').eq('complaint_id', complaintId).order('update_time',{ascending:false}).limit(5);
-      if (error) return console.error(error);
-      list.innerHTML = data.length
-        ? data.map(u=>`<div class="card"><b>${u.status_log}</b><p>${u.update_notes||''}</p><small>${u.officer_name||''} • ${new Date(u.update_time).toLocaleString()}</small></div>`).join('')
-        : '<p style="text-align:center;color:gray;">No updates yet.</p>';
+      list.innerHTML = '<div class="loading">📂 Loading updates...</div>';
+      
+      try {
+        const { data, error } = await supabase
+          .from('complaint_updates')
+          .select('*')
+          .eq('complaint_id', complaintId)
+          .order('update_time', {ascending: false})
+          .limit(20);
+        
+        if (error) throw error;
+        
+        updateCount.textContent = data.length;
+        
+        if (data.length === 0) {
+          list.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">📭</div>
+              <p><strong>No updates yet</strong></p>
+              <p style="margin-top: 0.5rem; font-size: 0.9rem;">Be the first to add an update to this complaint</p>
+            </div>`;
+        } else {
+          list.innerHTML = data.map(u => {
+            const date = new Date(u.update_time);
+            const formattedDate = date.toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'short', 
+              day: 'numeric' 
+            });
+            const formattedTime = date.toLocaleTimeString('en-US', { 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            });
+            
+            return `
+              <div class="card">
+                <b>🔔 ${u.status_log}</b>
+                ${u.update_notes ? `<p>${u.update_notes}</p>` : ''}
+                <small>
+                  <span>👤 ${u.officer_name || 'Anonymous'}</span>
+                  <span>•</span>
+                  <span>📅 ${formattedDate} at ${formattedTime}</span>
+                </small>
+              </div>`;
+          }).join('');
+        }
+      } catch (error) {
+        console.error('Error loading updates:', error);
+        list.innerHTML = '<div class="error">❌ Failed to load updates. Please refresh the page.</div>';
+      }
     }
 
     form.onsubmit = async e => {
       e.preventDefault();
-      const payload = {
-        complaint_id: complaintId,
-        status_log: document.getElementById('status_log').value,
-        update_notes: document.getElementById('update_notes').value,
-        officer_name: document.getElementById('officer_name').value,
-        update_time: new Date().toISOString()
-      };
-      const { error } = await supabase.from('complaint_updates').insert([payload]);
-      if (error) showToast('Save failed','error');
-      else { showToast('Update saved','success'); form.reset(); loadUpdates(); }
+      
+      const statusLog = document.getElementById('status_log').value.trim();
+      if (!statusLog) {
+        showToast('⚠️ Status log is required', 'error');
+        return;
+      }
+
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = '💾 Saving...';
+      submitBtn.disabled = true;
+
+      try {
+        const payload = {
+          complaint_id: complaintId,
+          status_log: statusLog,
+          update_notes: document.getElementById('update_notes').value.trim(),
+          officer_name: document.getElementById('officer_name').value.trim(),
+          update_time: new Date().toISOString()
+        };
+        
+        const { error } = await supabase.from('complaint_updates').insert([payload]);
+        
+        if (error) throw error;
+        
+        showToast('✅ Update saved successfully', 'success');
+        form.reset();
+        await loadUpdates();
+        
+        // Smooth scroll to updates section
+        document.querySelector('.updates-section').scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      } catch (error) {
+        console.error('Save error:', error);
+        showToast('❌ Failed to save update', 'error');
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
     };
   </script>
 </body>

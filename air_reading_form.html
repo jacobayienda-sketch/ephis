@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Air Reading Form | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="main.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      color: #0f172a;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 400px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+      z-index: -1;
+      opacity: 0.05;
+    }
+
+    header {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 1.2rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .header-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      font-weight: bold;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      color: #0f172a;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-light {
+      background: white;
+      color: #2563eb;
+      border: 1px solid #e2e8f0;
+    }
+
+    .btn-light:hover {
+      background: #f8fafc;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .form-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+    }
+
+    .form-card h2 {
+      margin-bottom: 1.5rem;
+      color: #0f172a;
+      font-size: 1.5rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .field {
+      margin-bottom: 1.2rem;
+    }
+
+    .field label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .field input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 1rem 1.5rem;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      color: white;
+      border-radius: 8px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      z-index: 1000;
+    }
+
+    .toast.show { opacity: 1; }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      margin-top: 4rem;
+      font-size: 0.9rem;
+      color: #64748b;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-content">
+    <div class="logo-section">
+      <div class="logo">E</div>
+      <h1>Air Reading</h1>
+    </div>
+    <button class="btn btn-light" onclick="history.back()">← Back</button>
+  </div>
+</header>
+
+<main>
+  <div class="form-card">
+    <h2 id="title">New Reading</h2>
+
+    <div class="form-grid">
+      <div class="field"><label>PM2.5 (µg/m³)</label><input type="number" step="0.01" id="pm25"></div>
+      <div class="field"><label>PM10 (µg/m³)</label><input type="number" step="0.01" id="pm10"></div>
+      <div class="field"><label>SO₂ (ppb)</label><input type="number" step="0.01" id="so2"></div>
+      <div class="field"><label>NO₂ (ppb)</label><input type="number" step="0.01" id="no2"></div>
+      <div class="field"><label>CO (ppm)</label><input type="number" step="0.01" id="co"></div>
+      <div class="field"><label>Ozone (ppb)</label><input type="number" step="0.01" id="o3"></div>
+      <div class="field"><label>Noise Level (dB)</label><input type="number" step="0.1" id="noise_level"></div>
+      <div class="field"><label>Humidity (%)</label><input type="number" step="0.1" id="humidity"></div>
+      <div class="field"><label>Temperature (°C)</label><input type="number" step="0.1" id="temperature"></div>
+      <div class="field"><label>Wind Speed (m/s)</label><input type="number" step="0.1" id="wind_speed"></div>
+      <div class="field"><label>Wind Direction</label><input id="wind_dir"></div>
+      <div class="field">
+        <label>Reading Time</label>
+        <input type="datetime-local" id="reading_time">
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="saveReading()">💾 Save Reading</button>
+      <button class="btn btn-light" onclick="history.back()">Cancel</button>
+    </div>
+  </div>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<footer>
+  <p>&copy; 2025 EPHIS. All rights reserved.</p>
+</footer>
+
+<script type="module">
+  import { supabase } from "./main.js";
+
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
+  const station_id = params.get("station_id");
+
+  const toast = document.getElementById("toast");
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2000);
+  }
+
+  async function loadData() {
+    if (!id) return;
+
+    document.getElementById("title").textContent = "Edit Reading";
+
+    const { data, error } = await supabase
+      .from("air_readings")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) return;
+
+    pm25.value = data.pm25;
+    pm10.value = data.pm10;
+    so2.value = data.so2;
+    no2.value = data.no2;
+    co.value = data.co;
+    o3.value = data.o3;
+    noise_level.value = data.noise_level;
+    humidity.value = data.humidity;
+    temperature.value = data.temperature;
+    wind_speed.value = data.wind_speed;
+    wind_dir.value = data.wind_direction;
+    reading_time.value = data.reading_time?.replace("Z","");
+  }
+
+  async function saveReading() {
+    const payload = {
+      station_id,
+      pm25: pm25.value,
+      pm10: pm10.value,
+      so2: so2.value,
+      no2: no2.value,
+      co: co.value,
+      o3: o3.value,
+      noise_level: noise_level.value,
+      humidity: humidity.value,
+      temperature: temperature.value,
+      wind_speed: wind_speed.value,
+      wind_direction: wind_dir.value,
+      reading_time: reading_time.value
+    };
+
+    let res;
+
+    if (id) {
+      res = await supabase.from("air_readings")
+        .update(payload).eq("id", id);
+    } else {
+      res = await supabase.from("air_readings")
+        .insert(payload);
+    }
+
+    if (res.error) {
+      showToast("Failed to save");
+      return;
+    }
+
+    showToast("Saved successfully");
+    setTimeout(() =>
+      window.location.href = "air_readings.html?station_id=" + station_id,
+    1200);
+  }
+
+  loadData();
+</script>
+
+</body>
+</html>

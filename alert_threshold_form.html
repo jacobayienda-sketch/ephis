@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alert Threshold Form | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="main.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      color: #0f172a;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 400px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+      z-index: -1;
+      opacity: 0.05;
+    }
+
+    header {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 1.2rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-content h1 { font-size: 1.3rem; font-weight: 600; color: #0f172a; }
+
+    main {
+      max-width: 700px;
+      margin: 2rem auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    main h2 { font-size: 1.5rem; margin-bottom: 1.5rem; color: #0f172a; }
+
+    .field { margin-bottom: 1rem; }
+    .field label { color: #475569; font-weight: 600; display: block; margin-bottom: 0.5rem; font-size: 0.9rem; }
+    .field input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+    .field input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+
+    .btn {
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+      font-size: 1rem;
+    }
+    .btn-primary { background: linear-gradient(135deg, #0ea5e9, #2563eb); color: white; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+    .btn-light { background: white; color: #2563eb; border: 2px solid #e2e8f0; }
+    .btn-light:hover { border-color: #2563eb; background: #f8fafc; }
+
+    .form-actions { margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end; }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      opacity: 0;
+      transition: 0.3s;
+    }
+    .toast.show { opacity: 1; }
+
+    @media (max-width: 768px) {
+      main { margin: 1rem; padding: 1.5rem; }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-content">
+    <div class="logo">E</div>
+    <h1>Alert Threshold</h1>
+  </div>
+  <button class="btn btn-light" onclick="history.back()">← Back</button>
+</header>
+
+<main>
+  <h2>🚨 Threshold Configuration</h2>
+
+  <h2 id="title">New Threshold</h2>
+
+  <div class="field"><label>Parameter</label><input id="parameter"></div>
+  <div class="field"><label>Limit Value</label><input id="limit_value"></div>
+  <div class="field"><label>Limit Source</label><input id="limit_source"></div>
+  <div class="field"><label>Alert Level</label><input id="alert_level"></div>
+
+  <button class="btn btn-primary" onclick="saveThreshold()">Save</button>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+  import { supabase } from "./main.js";
+
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
+  const toast = document.getElementById("toast");
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2000);
+  }
+
+  async function loadData() {
+    if(!id) return;
+
+    document.getElementById("title").textContent = "Edit Threshold";
+
+    const { data, error } = await supabase
+      .from("alert_thresholds")
+      .select("*").eq("id", id).single();
+
+    if(error) return;
+
+    parameter.value = data.parameter;
+    limit_value.value = data.limit_value;
+    limit_source.value = data.limit_source;
+    alert_level.value = data.alert_level;
+  }
+
+  async function saveThreshold() {
+    const payload = {
+      parameter: parameter.value,
+      limit_value: limit_value.value,
+      limit_source: limit_source.value,
+      alert_level: alert_level.value
+    };
+
+    let res;
+
+    if(id) {
+      res = await supabase.from("alert_thresholds")
+        .update(payload).eq("id", id);
+    } else {
+      res = await supabase.from("alert_thresholds")
+        .insert(payload);
+    }
+
+    if(res.error) return showToast("Failed to save");
+
+    showToast("Saved");
+
+    setTimeout(() =>
+      window.location.href = "alert_thresholds.html", 1000);
+  }
+
+  loadData();
+</script>
+
+</body>
+</html>

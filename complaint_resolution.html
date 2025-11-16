@@ -4,66 +4,534 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Complaint Resolution | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <script type="module" src="main.js"></script>
   <style>
-    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;padding:1rem;}
-    header{background:#1976d2;color:white;padding:1rem;display:flex;justify-content:space-between;align-items:center;}
-    form{background:white;border-radius:8px;padding:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.1);margin-top:1rem;}
-    label{font-weight:600;display:block;margin-top:0.8rem;}
-    input,textarea,select{width:100%;padding:0.6rem;border:1px solid #ccc;border-radius:6px;margin-top:0.3rem;}
-    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.6rem 1rem;background:#1976d2;color:white;width:100%;margin-top:1rem;}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Animated gradient background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 400px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+      z-index: -1;
+      opacity: 0.05;
+    }
+
+    header {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 1.2rem 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      font-weight: bold;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      color: #0f172a;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .back-btn {
+      background: white;
+      color: #2563eb;
+      border: 2px solid #2563eb;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .back-btn:hover {
+      background: #2563eb;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      flex: 1;
+    }
+
+    .page-intro {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border-left: 4px solid #2563eb;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      border: 1px solid #bfdbfe;
+    }
+
+    .page-intro h2 {
+      color: #1e40af;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-intro p {
+      color: #1e40af;
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    form {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+    }
+
+    .form-header {
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .form-header h2 {
+      font-size: 1.3rem;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-header p {
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #374151;
+      font-size: 0.9rem;
+    }
+
+    label .required {
+      color: #dc2626;
+      margin-left: 0.25rem;
+    }
+
+    .field-description {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+      font-weight: normal;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: white;
+      font-family: inherit;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      background-size: 1.5em 1.5em;
+      padding-right: 2.5rem;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .radio-option:hover {
+      border-color: #2563eb;
+      background: #f8fafc;
+    }
+
+    .radio-option input[type="radio"] {
+      width: auto;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .radio-option.selected {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .btn {
+      border: none;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      font-weight: 600;
+      width: 100%;
+      padding: 1rem;
+      border-radius: 12px;
+      margin-top: 2rem;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error {
+      color: #dc2626;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    .status-badge.resolved {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .status-badge.unresolved {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .status-badge.escalated {
+      background: #fed7aa;
+      color: #ea580c;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      color: #64748b;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 3rem;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 640px) {
+      .container {
+        padding: 1rem 0.75rem;
+      }
+
+      header {
+        padding: 1rem;
+      }
+
+      .header-content h1 {
+        font-size: 1.1rem;
+      }
+
+      form {
+        padding: 1.5rem;
+      }
+
+      .back-btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.85rem;
+      }
+
+      .radio-group {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+    }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>Complaint Resolution</h1>
-    <button onclick="history.back()" style="background:white;color:#1976d2;padding:0.4rem 0.8rem;border:none;border-radius:6px;">Back</button>
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo">E</div>
+        <h1>Complaint Resolution</h1>
+      </div>
+      <button class="back-btn" onclick="history.back()">← Back</button>
+    </div>
   </header>
 
-  <form id="resForm">
-    <label>Resolution Status</label>
-    <select id="resolution_status" required>
-      <option>Resolved</option>
-      <option>Unresolved</option>
-      <option>Escalated</option>
-    </select>
+  <div class="container">
+    <div class="page-intro">
+      <h2>✅ Record Final Resolution</h2>
+      <p>Complete this form to officially resolve and close the complaint. Ensure all details are accurate before submitting.</p>
+    </div>
 
-    <label>Resolution Description</label>
-    <textarea id="resolution_description" rows="3"></textarea>
+    <div id="errorMessage"></div>
 
-    <label>Verification Officer</label>
-    <input id="verification_officer" />
+    <form id="resForm">
+      <div class="form-header">
+        <h2>📋 Resolution Details</h2>
+        <p>Provide comprehensive information about how the complaint was resolved</p>
+      </div>
 
-    <label>Verified by Supervisor</label>
-    <select id="verified_by_supervisor">
-      <option value="true">Yes</option>
-      <option value="false">No</option>
-    </select>
+      <div class="form-group">
+        <label for="resolution_status">
+          Resolution Status<span class="required">*</span>
+        </label>
+        <select id="resolution_status" required>
+          <option value="">Select status...</option>
+          <option value="Resolved">✅ Resolved</option>
+          <option value="Unresolved">❌ Unresolved</option>
+          <option value="Escalated">⬆️ Escalated</option>
+        </select>
+        <div class="field-description">Choose the final status of the complaint resolution</div>
+      </div>
 
-    <button type="submit" class="btn">Save Resolution</button>
-  </form>
+      <div class="form-group">
+        <label for="resolution_description">
+          Resolution Description<span class="required">*</span>
+        </label>
+        <textarea id="resolution_description" rows="5" placeholder="Describe in detail how the complaint was addressed, what actions were taken, and the final outcome..." required></textarea>
+        <div class="field-description">Provide a comprehensive description of the resolution process and outcome</div>
+      </div>
+
+      <div class="form-group">
+        <label for="verification_officer">
+          Verification Officer<span class="required">*</span>
+        </label>
+        <input type="text" id="verification_officer" placeholder="Enter officer name" required />
+        <div class="field-description">Name of the officer who verified the resolution</div>
+      </div>
+
+      <div class="form-group">
+        <label>
+          Supervisor Verification<span class="required">*</span>
+        </label>
+        <div class="radio-group">
+          <label class="radio-option" id="supervisor-yes">
+            <input type="radio" name="verified_by_supervisor" value="true" required />
+            <span>✓ Yes, Verified by Supervisor</span>
+          </label>
+          <label class="radio-option" id="supervisor-no">
+            <input type="radio" name="verified_by_supervisor" value="false" />
+            <span>⏳ Not Yet Verified</span>
+          </label>
+        </div>
+        <div class="field-description">Indicate if the resolution has been reviewed and approved by a supervisor</div>
+      </div>
+
+      <button type="submit" class="btn" id="submitBtn">💾 Save Resolution & Close Complaint</button>
+    </form>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 EPHIS - Elgeyo Marakwet County Environmental Health System</p>
+  </footer>
 
   <script type="module">
     import { supabase, showToast, requireLogin } from './main.js';
-    const params=new URLSearchParams(window.location.search);
-    const complaintId=params.get('id');
-    const form=document.getElementById('resForm');
-    await requireLogin();
+    const params = new URLSearchParams(window.location.search);
+    const complaintId = params.get('id');
+    const form = document.getElementById('resForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorMessage = document.getElementById('errorMessage');
 
-    form.onsubmit=async e=>{
+    // Check if complaint ID exists
+    if (!complaintId) {
+      errorMessage.innerHTML = '<div class="error">❌ <strong>No complaint ID provided.</strong> Please access this page from a valid complaint.</div>';
+      form.style.display = 'none';
+    } else {
+      await requireLogin();
+    }
+
+    // Radio button styling
+    const radioOptions = document.querySelectorAll('.radio-option');
+    const radioInputs = document.querySelectorAll('input[name="verified_by_supervisor"]');
+    
+    radioInputs.forEach(input => {
+      input.addEventListener('change', () => {
+        radioOptions.forEach(option => option.classList.remove('selected'));
+        if (input.checked) {
+          input.closest('.radio-option').classList.add('selected');
+        }
+      });
+    });
+
+    // Form validation
+    function validateForm() {
+      const status = document.getElementById('resolution_status').value;
+      const description = document.getElementById('resolution_description').value.trim();
+      const officer = document.getElementById('verification_officer').value.trim();
+      const supervisorVerified = document.querySelector('input[name="verified_by_supervisor"]:checked');
+
+      if (!status) {
+        errorMessage.innerHTML = '<div class="error">⚠️ Please select a resolution status.</div>';
+        return false;
+      }
+
+      if (!description || description.length < 10) {
+        errorMessage.innerHTML = '<div class="error">⚠️ Please provide a detailed resolution description (at least 10 characters).</div>';
+        return false;
+      }
+
+      if (!officer) {
+        errorMessage.innerHTML = '<div class="error">⚠️ Please enter the verification officer name.</div>';
+        return false;
+      }
+
+      if (!supervisorVerified) {
+        errorMessage.innerHTML = '<div class="error">⚠️ Please indicate if the resolution was verified by a supervisor.</div>';
+        return false;
+      }
+
+      errorMessage.innerHTML = '';
+      return true;
+    }
+
+    form.onsubmit = async e => {
       e.preventDefault();
-      const payload={
-        complaint_id:complaintId,
-        resolution_status:document.getElementById('resolution_status').value,
-        resolution_description:document.getElementById('resolution_description').value,
-        verification_officer:document.getElementById('verification_officer').value,
-        verified_by_supervisor:document.getElementById('verified_by_supervisor').value==='true',
-        resolution_date:new Date().toISOString().split('T')[0]
-      };
-      const {error}=await supabase.from('complaint_resolution').insert([payload]);
-      if(error)showToast('Save failed','error');
-      else{showToast('Resolution saved','success');history.back();}
+
+      if (!validateForm()) {
+        return;
+      }
+
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = '💾 Saving...';
+      submitBtn.disabled = true;
+
+      try {
+        const payload = {
+          complaint_id: complaintId,
+          resolution_status: document.getElementById('resolution_status').value,
+          resolution_description: document.getElementById('resolution_description').value.trim(),
+          verification_officer: document.getElementById('verification_officer').value.trim(),
+          verified_by_supervisor: document.querySelector('input[name="verified_by_supervisor"]:checked').value === 'true',
+          resolution_date: new Date().toISOString().split('T')[0]
+        };
+
+        const { error } = await supabase.from('complaint_resolution').insert([payload]);
+
+        if (error) throw error;
+
+        // Update the complaint status
+        await supabase
+          .from('complaints')
+          .update({ resolution_status: payload.resolution_status })
+          .eq('id', complaintId);
+
+        showToast('✅ Resolution saved successfully', 'success');
+        
+        setTimeout(() => {
+          history.back();
+        }, 1000);
+      } catch (error) {
+        console.error('Save error:', error);
+        errorMessage.innerHTML = '<div class="error">❌ <strong>Failed to save resolution.</strong><br>Please try again or contact support if the problem persists.</div>';
+        showToast('❌ Failed to save resolution', 'error');
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
     };
   </script>
 </body>

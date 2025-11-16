@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Land & Building Control | EPHIS</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#2563eb" />
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+<script type="module" src="main.js"></script>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f8fafc;
+  min-height: 100vh;
+  color: #0f172a;
+  display: flex;
+  flex-direction: column;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 400px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+  z-index: -1;
+  opacity: 0.05;
+}
+
+header {
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  padding: 1.2rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  font-weight: bold;
+  color: white;
+  font-size: 1.2rem;
+}
+
+header h1 {
+  font-size: 1.4rem;
+  color: #0f172a;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.95rem;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+}
+
+.btn-light {
+  background: white;
+  color: #2563eb;
+  border: 2px solid #2563eb;
+}
+
+.btn-light:hover {
+  background: #2563eb;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.btn-secondary {
+  background: #10b981;
+  color: white;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-secondary:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+main {
+  flex: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
+}
+
+.section {
+  margin-bottom: 3rem;
+}
+
+.section h2 {
+  font-size: 1.5rem;
+  color: #0f172a;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.filter-bar select {
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.filter-bar select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.card-body {
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.8;
+}
+
+.card-body p {
+  margin-bottom: 0.5rem;
+}
+
+.card-body strong {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.status {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status.Pending { background: #fef3c7; color: #d97706; }
+.status.Approved { background: #d1fae5; color: #047857; }
+.status.Rejected { background: #fee2e2; color: #dc2626; }
+.status.Completed { background: #dbeafe; color: #2563eb; }
+
+footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  font-size: 0.9rem;
+  color: #64748b;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 3rem;
+}
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2563eb;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+}
+
+.toast.show { opacity: 1; }
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #64748b;
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1rem;
+  }
+
+  .header-content h1 {
+    font-size: 1.1rem;
+  }
+
+  main {
+    padding: 1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-content">
+    <div class="header-left">
+      <div class="logo">E</div>
+      <h1>Land & Building Control</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-light" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+      <button class="btn btn-primary" onclick="window.location.href='building_form.html'">+ New Application</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<div class="filter-bar">
+<select id="statusFilter"><option value="">All Status</option><option>Pending</option><option>Approved</option><option>Rejected</option><option>Completed</option></select>
+<select id="locationFilter"><option value="">All Locations</option></select>
+<button class="btn btn-light" id="filterBtn">Filter</button>
+</div>
+
+<section class="section">
+<h2>Building Applications</h2>
+<div id="applicationsContainer"></div>
+</section>
+
+<section class="section">
+<h2>Recent Inspections</h2>
+<div id="inspectionsContainer"></div>
+</section>
+</main>
+
+<footer>
+  <p>&copy; <span id="year"></span> EPHIS - Elgeyo Marakwet County Environmental Health System</p>
+</footer>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import { supabase } from "./main.js";
+const toast=document.getElementById("toast");
+function showToast(msg){toast.textContent=msg;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
+
+document.getElementById("year").textContent=new Date().getFullYear();
+
+async function loadApplications(filterStatus="",filterLocation=""){
+  const query=supabase.from("building_applications").select("*").order("submission_date",{ascending:false}).limit(10);
+  if(filterStatus)query.eq("status",filterStatus);
+  if(filterLocation)query.eq("location",filterLocation);
+  const{data,error}=await query;
+  if(error){console.error(error);showToast("Failed to load applications");return;}
+  const c=document.getElementById("applicationsContainer");
+  if(!data.length){
+    c.innerHTML=`
+      <div class="empty-state">
+        <div class="empty-state-icon">🏢</div>
+        <h3>No applications found</h3>
+        <p>Start by creating a new building application</p>
+      </div>
+    `;
+    return;
+  }
+  c.innerHTML=data.map(a=>`
+  <div class="card">
+  <div class="card-header">
+  <span class="card-title">${a.applicant_name}</span>
+  <span class="status ${a.status}">${a.status}</span>
+  </div>
+  <div class="card-body">
+  <p><b>Plot:</b> ${a.plot_number||'-'} | <b>Use:</b> ${a.building_use||'-'}</p>
+  <p><b>Location:</b> ${a.location||'-'}</p>
+  </div>
+  <div><a class="btn btn-secondary" href="building_inspections.html?id=${a.id}">View Inspections</a></div>
+  </div>`).join("");
+  const locations=[...new Set(data.map(a=>a.location).filter(Boolean))];
+  const locSelect=document.getElementById("locationFilter");
+  locSelect.innerHTML='<option value="">All Locations</option>'+locations.map(l=>`<option>${l}</option>`).join("");
+}
+
+async function loadInspections(){
+  const{data,error}=await supabase.from("building_inspections").select("*,application_id").order("inspection_date",{ascending:false}).limit(5);
+  if(error){console.error(error);return;}
+  const c=document.getElementById("inspectionsContainer");
+  if(!data.length){
+    c.innerHTML=`
+      <div class="empty-state">
+        <div class="empty-state-icon">🔍</div>
+        <h3>No inspections found</h3>
+        <p>Inspections will appear here once they are created</p>
+      </div>
+    `;
+    return;
+  }
+  c.innerHTML=data.map(i=>`
+  <div class="card">
+  <div class="card-header"><span class="card-title">${i.officer_name||'Officer'}</span><span>${i.inspection_date||''}</span></div>
+  <div class="card-body">
+  <p><b>Result:</b> ${i.inspection_result||'-'}</p>
+  <p>${i.remarks||''}</p>
+  </div>
+  </div>`).join("");
+}
+
+document.getElementById("filterBtn").onclick=()=>{
+  loadApplications(statusFilter.value,locationFilter.value);
+};
+loadApplications();
+loadInspections();
+</script>
+</body>
+</html>

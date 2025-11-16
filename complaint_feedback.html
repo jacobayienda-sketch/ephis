@@ -4,53 +4,594 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Complaint Feedback | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <script type="module" src="main.js"></script>
   <style>
-    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;padding:1rem;}
-    header{background:#1976d2;color:white;padding:1rem;display:flex;justify-content:space-between;align-items:center;}
-    form{background:white;border-radius:8px;padding:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.1);margin-top:1rem;}
-    label{font-weight:600;display:block;margin-top:0.8rem;}
-    select,textarea{width:100%;padding:0.6rem;border:1px solid #ccc;border-radius:6px;margin-top:0.3rem;}
-    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.6rem 1rem;background:#1976d2;color:white;width:100%;margin-top:1rem;}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Animated gradient background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 400px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+      z-index: -1;
+      opacity: 0.05;
+    }
+
+    header {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 1.2rem 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      font-weight: bold;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      color: #0f172a;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .back-btn {
+      background: white;
+      color: #2563eb;
+      border: 2px solid #2563eb;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .back-btn:hover {
+      background: #2563eb;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      flex: 1;
+    }
+
+    .page-intro {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border-left: 4px solid #f59e0b;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      border: 1px solid #fcd34d;
+    }
+
+    .page-intro h2 {
+      color: #92400e;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .page-intro p {
+      color: #92400e;
+      font-size: 0.95rem;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    form {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+    }
+
+    .form-header {
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .form-header h2 {
+      font-size: 1.3rem;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-header p {
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+
+    .form-group {
+      margin-bottom: 2rem;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.75rem;
+      color: #374151;
+      font-size: 1rem;
+    }
+
+    .field-description {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 0.5rem;
+      font-weight: normal;
+    }
+
+    /* Star Rating */
+    .rating-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .stars {
+      display: flex;
+      gap: 0.5rem;
+      font-size: 2.5rem;
+    }
+
+    .star {
+      cursor: pointer;
+      color: #d1d5db;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .star:hover,
+    .star.active {
+      color: #fbbf24;
+      transform: scale(1.1);
+    }
+
+    .rating-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 0.5rem;
+    }
+
+    .satisfaction-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+
+    .satisfaction-option {
+      padding: 1.25rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      background: white;
+    }
+
+    .satisfaction-option:hover {
+      border-color: #2563eb;
+      background: #f8fafc;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .satisfaction-option.selected {
+      border-color: #2563eb;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .satisfaction-option input[type="radio"] {
+      display: none;
+    }
+
+    .satisfaction-option .icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .satisfaction-option .label {
+      font-weight: 600;
+      color: #374151;
+      font-size: 1rem;
+    }
+
+    .satisfaction-option.selected .label {
+      color: #1e40af;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: white;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .btn {
+      border: none;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      font-weight: 600;
+      width: 100%;
+      padding: 1rem;
+      border-radius: 12px;
+      margin-top: 2rem;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error {
+      color: #dc2626;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .success-message {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      border: 2px solid #6ee7b7;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      margin: 2rem 0;
+    }
+
+    .success-message .icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .success-message h2 {
+      color: #047857;
+      margin-bottom: 0.5rem;
+    }
+
+    .success-message p {
+      color: #065f46;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      color: #64748b;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 3rem;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 640px) {
+      .container {
+        padding: 1rem 0.75rem;
+      }
+
+      header {
+        padding: 1rem;
+      }
+
+      .header-content h1 {
+        font-size: 1.1rem;
+      }
+
+      form {
+        padding: 1.5rem;
+      }
+
+      .back-btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.85rem;
+      }
+
+      .stars {
+        font-size: 2rem;
+      }
+
+      .satisfaction-options {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>Complaint Feedback</h1>
-    <button onclick="history.back()" style="background:white;color:#1976d2;padding:0.4rem 0.8rem;border:none;border-radius:6px;">Back</button>
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo">E</div>
+        <h1>Complaint Feedback</h1>
+      </div>
+      <button class="back-btn" onclick="history.back()">← Back</button>
+    </div>
   </header>
 
-  <form id="feedbackForm">
-    <label>Satisfaction Level</label>
-    <select id="satisfaction_level">
-      <option>Satisfied</option><option>Neutral</option><option>Dissatisfied</option>
-    </select>
+  <div class="container">
+    <div class="page-intro">
+      <h2>⭐ Your Feedback Matters</h2>
+      <p>Help us improve our services by sharing your experience with how your complaint was handled. Your honest feedback helps us serve you better.</p>
+    </div>
 
-    <label>Additional Comments</label>
-    <textarea id="additional_comments"></textarea>
+    <div id="errorMessage"></div>
 
-    <button type="submit" class="btn">Submit Feedback</button>
-  </form>
+    <form id="feedbackForm">
+      <div class="form-header">
+        <h2>💬 Share Your Experience</h2>
+        <p>Please rate your satisfaction and provide any additional comments</p>
+      </div>
+
+      <div class="form-group">
+        <label>How satisfied are you with the resolution?</label>
+        <div class="satisfaction-options">
+          <label class="satisfaction-option" data-value="Very Satisfied">
+            <input type="radio" name="satisfaction" value="Very Satisfied" required>
+            <span class="icon">😄</span>
+            <span class="label">Very Satisfied</span>
+          </label>
+          <label class="satisfaction-option" data-value="Satisfied">
+            <input type="radio" name="satisfaction" value="Satisfied">
+            <span class="icon">🙂</span>
+            <span class="label">Satisfied</span>
+          </label>
+          <label class="satisfaction-option" data-value="Neutral">
+            <input type="radio" name="satisfaction" value="Neutral">
+            <span class="icon">😐</span>
+            <span class="label">Neutral</span>
+          </label>
+          <label class="satisfaction-option" data-value="Dissatisfied">
+            <input type="radio" name="satisfaction" value="Dissatisfied">
+            <span class="icon">☹️</span>
+            <span class="label">Dissatisfied</span>
+          </label>
+        </div>
+        <div class="field-description">Select the option that best describes your experience</div>
+      </div>
+
+      <div class="form-group">
+        <label for="rating">Overall Rating (Optional)</label>
+        <div class="rating-container">
+          <div class="stars" id="starRating">
+            <span class="star" data-rating="1">★</span>
+            <span class="star" data-rating="2">★</span>
+            <span class="star" data-rating="3">★</span>
+            <span class="star" data-rating="4">★</span>
+            <span class="star" data-rating="5">★</span>
+          </div>
+          <div class="rating-labels">
+            <span>Poor</span>
+            <span>Excellent</span>
+          </div>
+        </div>
+        <input type="hidden" id="rating" name="rating" value="0">
+      </div>
+
+      <div class="form-group">
+        <label for="additional_comments">Additional Comments (Optional)</label>
+        <textarea id="additional_comments" placeholder="Share any additional thoughts, suggestions, or concerns about your experience..."></textarea>
+        <div class="field-description">Your detailed feedback helps us identify areas for improvement</div>
+      </div>
+
+      <button type="submit" class="btn" id="submitBtn">💾 Submit Feedback</button>
+    </form>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 EPHIS - Elgeyo Marakwet County Environmental Health System</p>
+  </footer>
 
   <script type="module">
     import { supabase, showToast, requireLogin } from './main.js';
-    const params=new URLSearchParams(window.location.search);
-    const complaintId=params.get('id');
-    const form=document.getElementById('feedbackForm');
-    await requireLogin();
+    const params = new URLSearchParams(window.location.search);
+    const complaintId = params.get('id');
+    const form = document.getElementById('feedbackForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.getElementById('rating');
+    const satisfactionOptions = document.querySelectorAll('.satisfaction-option');
 
-    form.onsubmit=async e=>{
+    // Check if complaint ID exists
+    if (!complaintId) {
+      errorMessage.innerHTML = '<div class="error">❌ <strong>No complaint ID provided.</strong> Please access this page from a valid complaint.</div>';
+      form.style.display = 'none';
+    } else {
+      await requireLogin();
+    }
+
+    // Star rating functionality
+    let selectedRating = 0;
+    
+    stars.forEach(star => {
+      star.addEventListener('click', () => {
+        selectedRating = parseInt(star.dataset.rating);
+        ratingInput.value = selectedRating;
+        updateStars(selectedRating);
+      });
+
+      star.addEventListener('mouseenter', () => {
+        const rating = parseInt(star.dataset.rating);
+        updateStars(rating);
+      });
+    });
+
+    document.getElementById('starRating').addEventListener('mouseleave', () => {
+      updateStars(selectedRating);
+    });
+
+    function updateStars(rating) {
+      stars.forEach((star, index) => {
+        if (index < rating) {
+          star.classList.add('active');
+        } else {
+          star.classList.remove('active');
+        }
+      });
+    }
+
+    // Satisfaction option selection
+    satisfactionOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        satisfactionOptions.forEach(opt => opt.classList.remove('selected'));
+        option.classList.add('selected');
+        option.querySelector('input[type="radio"]').checked = true;
+      });
+    });
+
+    // Form validation
+    function validateForm() {
+      const satisfaction = document.querySelector('input[name="satisfaction"]:checked');
+      
+      if (!satisfaction) {
+        errorMessage.innerHTML = '<div class="error">⚠️ Please select your satisfaction level.</div>';
+        return false;
+      }
+
+      errorMessage.innerHTML = '';
+      return true;
+    }
+
+    form.onsubmit = async e => {
       e.preventDefault();
-      const payload={
-        complaint_id:complaintId,
-        satisfaction_level:document.getElementById('satisfaction_level').value,
-        additional_comments:document.getElementById('additional_comments').value,
-        feedback_date:new Date().toISOString().split('T')[0]
-      };
-      const {error}=await supabase.from('complaint_feedback').insert([payload]);
-      if(error)showToast('Save failed','error');
-      else{showToast('Feedback saved','success');history.back();}
+
+      if (!validateForm()) {
+        return;
+      }
+
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = '💾 Submitting...';
+      submitBtn.disabled = true;
+
+      try {
+        const satisfaction = document.querySelector('input[name="satisfaction"]:checked').value;
+        const comments = document.getElementById('additional_comments').value.trim();
+        const rating = parseInt(ratingInput.value) || null;
+
+        const payload = {
+          complaint_id: complaintId,
+          satisfaction_level: satisfaction,
+          additional_comments: comments || null,
+          rating: rating,
+          feedback_date: new Date().toISOString().split('T')[0]
+        };
+
+        const { error } = await supabase.from('complaint_feedback').insert([payload]);
+
+        if (error) throw error;
+
+        // Show success message
+        form.innerHTML = `
+          <div class="success-message">
+            <div class="icon">✅</div>
+            <h2>Thank You for Your Feedback!</h2>
+            <p>Your feedback has been submitted successfully. We appreciate your time and will use your input to improve our services.</p>
+          </div>
+        `;
+
+        showToast('✅ Feedback submitted successfully', 'success');
+
+        setTimeout(() => {
+          history.back();
+        }, 2500);
+      } catch (error) {
+        console.error('Submit error:', error);
+        errorMessage.innerHTML = '<div class="error">❌ <strong>Failed to submit feedback.</strong><br>Please try again or contact support if the problem persists.</div>';
+        showToast('❌ Failed to submit feedback', 'error');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
     };
   </script>
 </body>

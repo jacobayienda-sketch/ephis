@@ -4,69 +4,517 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Complaint Assignment | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <script type="module" src="main.js"></script>
   <style>
-    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;padding:1rem;}
-    header{background:#1976d2;color:white;padding:1rem;display:flex;justify-content:space-between;align-items:center;}
-    form{background:white;border-radius:8px;padding:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.1);margin-top:1rem;}
-    label{font-weight:600;display:block;margin-top:0.8rem;}
-    input,textarea,select{width:100%;padding:0.6rem;border:1px solid #ccc;border-radius:6px;margin-top:0.3rem;}
-    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.6rem 1rem;background:#1976d2;color:white;width:100%;margin-top:1rem;}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Animated gradient background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 400px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+      z-index: -1;
+      opacity: 0.05;
+    }
+
+    header {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 1.2rem 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      font-weight: bold;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      color: #0f172a;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .back-btn {
+      background: white;
+      color: #2563eb;
+      border: 2px solid #2563eb;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .back-btn:hover {
+      background: #2563eb;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      flex: 1;
+    }
+
+    .page-intro {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border-left: 4px solid #2563eb;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      border: 1px solid #bfdbfe;
+    }
+
+    .page-intro h2 {
+      color: #1e40af;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .page-intro p {
+      color: #1e40af;
+      font-size: 0.95rem;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    form {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+    }
+
+    .form-section {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .form-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .form-section h2 {
+      font-size: 1.2rem;
+      color: #1f2937;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #374151;
+      font-size: 0.9rem;
+    }
+
+    label .required {
+      color: #dc2626;
+      margin-left: 0.25rem;
+    }
+
+    .field-description {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+      font-weight: normal;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: white;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      background-size: 1.5em 1.5em;
+      padding-right: 2.5rem;
+    }
+
+    .btn {
+      border: none;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      font-weight: 600;
+      width: 100%;
+      padding: 1rem;
+      border-radius: 12px;
+      margin-top: 2rem;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error {
+      color: #dc2626;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .priority-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    .priority-badge.critical {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .priority-badge.high {
+      background: #fed7aa;
+      color: #ea580c;
+    }
+
+    .priority-badge.medium {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .priority-badge.low {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      color: #64748b;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 3rem;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem 0.75rem;
+      }
+
+      header {
+        padding: 1rem;
+      }
+
+      .header-content h1 {
+        font-size: 1.1rem;
+      }
+
+      form {
+        padding: 1.5rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .back-btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.85rem;
+      }
+    }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>Complaint Assignment</h1>
-    <button onclick="history.back()" style="background:white;color:#1976d2;padding:0.4rem 0.8rem;border:none;border-radius:6px;">Back</button>
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo">E</div>
+        <h1>Complaint Assignment</h1>
+      </div>
+      <button class="back-btn" onclick="history.back()">← Back</button>
+    </div>
   </header>
 
-  <form id="assignForm">
-    <label>Officer Name</label>
-    <input id="officer_name" required />
+  <div class="container">
+    <div class="page-intro">
+      <h2>👥 Assign Complaint to Officer</h2>
+      <p>Designate a responsible officer and create an action plan for addressing this complaint. All fields marked with an asterisk (*) are required.</p>
+    </div>
 
-    <label>Officer Contact</label>
-    <input id="officer_contact" />
+    <div id="errorMessage"></div>
 
-    <label>Officer Section</label>
-    <input id="officer_section" />
+    <form id="assignForm">
+      <div class="form-section">
+        <h2>👤 Officer Information</h2>
+        
+        <div class="form-group">
+          <label for="officer_name">
+            Officer Name<span class="required">*</span>
+          </label>
+          <input type="text" id="officer_name" placeholder="Enter full name of the assigned officer" required />
+          <div class="field-description">The officer who will be responsible for handling this complaint</div>
+        </div>
 
-    <label>Action Plan</label>
-    <textarea id="action_plan"></textarea>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="officer_contact">
+              Officer Contact
+            </label>
+            <input type="tel" id="officer_contact" placeholder="Phone or email" />
+            <div class="field-description">Phone number or email address</div>
+          </div>
 
-    <label>Deadline</label>
-    <input type="date" id="action_deadline" />
+          <div class="form-group">
+            <label for="officer_section">
+              Officer Section/Department
+            </label>
+            <input type="text" id="officer_section" placeholder="e.g., Environmental Health, Food Safety" />
+            <div class="field-description">Department or section the officer belongs to</div>
+          </div>
+        </div>
+      </div>
 
-    <label>Priority</label>
-    <select id="action_priority">
-      <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
-    </select>
+      <div class="form-section">
+        <h2>📝 Action Plan Details</h2>
+        
+        <div class="form-group">
+          <label for="action_plan">
+            Action Plan
+          </label>
+          <textarea id="action_plan" rows="5" placeholder="Describe the steps and actions to be taken to address this complaint..."></textarea>
+          <div class="field-description">Outline the specific actions, steps, and procedures the officer should follow</div>
+        </div>
 
-    <button type="submit" class="btn">Assign</button>
-  </form>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="action_deadline">
+              Action Deadline
+            </label>
+            <input type="date" id="action_deadline" />
+            <div class="field-description">Target date for completion</div>
+          </div>
+
+          <div class="form-group">
+            <label for="action_priority">
+              Priority Level<span class="required">*</span>
+            </label>
+            <select id="action_priority" required>
+              <option value="">Select priority...</option>
+              <option value="Low">🟢 Low</option>
+              <option value="Medium">🟡 Medium</option>
+              <option value="High">🟠 High</option>
+              <option value="Critical">🔴 Critical</option>
+            </select>
+            <div class="field-description">Urgency level for this assignment</div>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn" id="submitBtn">💾 Assign Complaint</button>
+    </form>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 EPHIS - Elgeyo Marakwet County Environmental Health System</p>
+  </footer>
 
   <script type="module">
     import { supabase, showToast, requireLogin } from './main.js';
-    const params=new URLSearchParams(window.location.search);
-    const complaintId=params.get('id');
-    const form=document.getElementById('assignForm');
-    await requireLogin();
+    const params = new URLSearchParams(window.location.search);
+    const complaintId = params.get('id');
+    const form = document.getElementById('assignForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorMessage = document.getElementById('errorMessage');
 
-    form.onsubmit=async e=>{
+    // Check if complaint ID exists
+    if (!complaintId) {
+      errorMessage.innerHTML = '<div class="error">❌ <strong>No complaint ID provided.</strong> Please access this page from a valid complaint.</div>';
+      form.style.display = 'none';
+    } else {
+      await requireLogin();
+    }
+
+    // Set minimum date to today
+    const deadlineInput = document.getElementById('action_deadline');
+    const today = new Date().toISOString().split('T')[0];
+    deadlineInput.min = today;
+
+    // Form validation
+    function validateForm() {
+      const officerName = document.getElementById('officer_name').value.trim();
+      const priority = document.getElementById('action_priority').value;
+
+      if (!officerName) {
+        errorMessage.innerHTML = '<div class="error">⚠️ Please enter the officer name.</div>';
+        return false;
+      }
+
+      if (!priority) {
+        errorMessage.innerHTML = '<div class="error">⚠️ Please select a priority level.</div>';
+        return false;
+      }
+
+      errorMessage.innerHTML = '';
+      return true;
+    }
+
+    form.onsubmit = async e => {
       e.preventDefault();
-      const payload={
-        complaint_id:complaintId,
-        officer_name:document.getElementById('officer_name').value,
-        officer_contact:document.getElementById('officer_contact').value,
-        officer_section:document.getElementById('officer_section').value,
-        action_plan:document.getElementById('action_plan').value,
-        action_deadline:document.getElementById('action_deadline').value,
-        action_priority:document.getElementById('action_priority').value,
-        assigned_date:new Date().toISOString().split('T')[0]
-      };
-      const {error}=await supabase.from('complaint_assignments').insert([payload]);
-      if(error)showToast('Save failed','error');
-      else{showToast('Assignment saved','success');history.back();}
+
+      if (!validateForm()) {
+        return;
+      }
+
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = '💾 Assigning...';
+      submitBtn.disabled = true;
+
+      try {
+        const payload = {
+          complaint_id: complaintId,
+          officer_name: document.getElementById('officer_name').value.trim(),
+          officer_contact: document.getElementById('officer_contact').value.trim() || null,
+          officer_section: document.getElementById('officer_section').value.trim() || null,
+          action_plan: document.getElementById('action_plan').value.trim() || null,
+          action_deadline: document.getElementById('action_deadline').value || null,
+          action_priority: document.getElementById('action_priority').value,
+          assigned_date: new Date().toISOString().split('T')[0]
+        };
+
+        const { error } = await supabase.from('complaint_assignments').insert([payload]);
+
+        if (error) throw error;
+
+        // Update complaint status to indicate it's been assigned
+        await supabase
+          .from('complaints')
+          .update({ resolution_status: 'In Progress' })
+          .eq('id', complaintId);
+
+        showToast('✅ Complaint assigned successfully', 'success');
+
+        setTimeout(() => {
+          history.back();
+        }, 1000);
+      } catch (error) {
+        console.error('Assignment error:', error);
+        errorMessage.innerHTML = '<div class="error">❌ <strong>Failed to assign complaint.</strong><br>Please try again or contact support if the problem persists.</div>';
+        showToast('❌ Failed to assign complaint', 'error');
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
     };
   </script>
 </body>

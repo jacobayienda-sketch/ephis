@@ -5,35 +5,76 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EPHIS Staff Login</title>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#1976d2" />
+  <meta name="theme-color" content="#2563eb" />
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    :root {
-      --primary: #1976d2;
-      --accent: #2e7d32;
-      --bg: #f5f6fa;
-      --text: #333;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-      font-family: system-ui, sans-serif;
-      background: var(--bg);
-      margin: 0;
-      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      color: #0f172a;
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+    }
+
+    /* Animated gradient background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+      z-index: -1;
+      opacity: 0.05;
     }
 
     header {
-      background: var(--primary);
-      color: white;
-      text-align: center;
-      padding: 1rem;
-      font-weight: 600;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 1.2rem 2rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .logo svg {
+      width: 28px;
+      height: 28px;
+      fill: white;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      color: #0f172a;
+      font-weight: 700;
+      letter-spacing: -0.02em;
     }
 
     main {
@@ -41,159 +82,366 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2rem 1rem;
+      padding: 3rem 1rem;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 480px;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .login-box {
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      width: 100%;
-      max-width: 400px;
-      padding: 2rem;
+      border-radius: 24px;
+      border: 1px solid #e2e8f0;
+      padding: 3rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    }
+
+    .login-header {
       text-align: center;
-      animation: fadeIn 0.4s ease-in;
+      margin-bottom: 2.5rem;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .login-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
     }
 
-    .login-header h1 {
-      margin: 0;
-      font-size: 1.6rem;
-      color: var(--primary);
+    .login-icon svg {
+      width: 44px;
+      height: 44px;
+      fill: white;
+    }
+
+    .login-header h2 {
+      font-size: 2rem;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
     }
 
     .login-header p {
-      color: #555;
-      font-size: 0.9rem;
-      margin-bottom: 1.5rem;
+      color: #64748b;
+      font-size: 0.95rem;
+      line-height: 1.5;
     }
 
     form {
       display: flex;
       flex-direction: column;
-      gap: 0.8rem;
-      text-align: left;
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
 
     label {
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      color: #334155;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 1.1rem;
     }
 
     input {
-      padding: 0.6rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 0.95rem;
+      width: 100%;
+      padding: 0.9rem 1rem 0.9rem 2.8rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s;
+      background: white;
+      color: #0f172a;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    input::placeholder {
+      color: #94a3b8;
     }
 
     button[type="submit"] {
-      background: var(--primary);
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
       color: white;
       border: none;
-      padding: 0.8rem;
-      border-radius: 6px;
+      padding: 1rem;
+      border-radius: 12px;
       font-weight: 600;
+      font-size: 1.05rem;
       cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
       margin-top: 0.5rem;
-      transition: background 0.2s ease;
     }
 
     button[type="submit"]:hover {
-      background: #1565c0;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    button[type="submit"]:active {
+      transform: translateY(0);
+    }
+
+    .error-message {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      border: 1px solid #fecaca;
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .error-message.show {
+      display: flex;
     }
 
     .forgot-link {
       text-align: center;
-      margin-top: 0.8rem;
+      margin-top: 1.5rem;
     }
 
     .forgot-link a {
-      color: var(--primary);
+      color: #3b82f6;
       text-decoration: none;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      transition: color 0.3s;
     }
 
     .forgot-link a:hover {
+      color: #2563eb;
       text-decoration: underline;
     }
 
-    .error-message {
-      color: #e74c3c;
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 2rem 0 1.5rem;
+      color: #94a3b8;
       font-size: 0.85rem;
-      text-align: center;
-      margin-top: 0.3rem;
     }
 
-    .footer {
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.8rem;
-      background: #e3f2fd;
-      color: #555;
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e2e8f0;
     }
 
-    .footer a {
-      color: var(--primary);
+    .divider span {
+      padding: 0 1rem;
+    }
+
+    .info-box {
+      background: #f1f5f9;
+      padding: 1.2rem;
+      border-radius: 12px;
+      margin-top: 1.5rem;
+      border: 1px solid #e2e8f0;
+    }
+
+    .info-box p {
+      color: #475569;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .info-box a {
+      color: #3b82f6;
       text-decoration: none;
       font-weight: 600;
     }
 
-    .footer a:hover {
+    .info-box a:hover {
       text-decoration: underline;
     }
 
-    #themeToggle {
-      background: transparent;
-      border: none;
-      color: var(--primary);
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
       font-size: 0.9rem;
-      margin-top: 0.8rem;
-      cursor: pointer;
+      color: #64748b;
+      background: white;
+      border-top: 1px solid #e2e8f0;
     }
 
-    @media (max-width: 480px) {
-      .login-box { padding: 1.5rem; }
+    footer a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+      header h1 {
+        font-size: 1.1rem;
+      }
+
+      .logo {
+        width: 40px;
+        height: 40px;
+      }
+
+      .logo svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      .login-box {
+        padding: 2rem 1.5rem;
+        border-radius: 20px;
+      }
+
+      .login-header h2 {
+        font-size: 1.6rem;
+      }
+
+      .login-icon {
+        width: 64px;
+        height: 64px;
+      }
+
+      .login-icon svg {
+        width: 36px;
+        height: 36px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <header>Environmental Public Health Information System (EPHIS)</header>
+  <header>
+    <div class="header-content">
+      <div class="logo">
+        <svg viewBox="0 0 48 48">
+          <path d="M24 4L12 12v12c0 7.5 5.2 14.5 12 16.3 6.8-1.8 12-8.8 12-16.3V12L24 4z"/>
+          <path d="M20 22l4 4 8-8" stroke="white" stroke-width="2" fill="none"/>
+        </svg>
+      </div>
+      <h1>EPHIS Dashboard</h1>
+    </div>
+  </header>
 
   <main>
-    <div class="login-box">
-      <div class="login-header">
-        <h1>Staff Login</h1>
-        <p>Authorized Access – Department of Health Services</p>
+    <div class="login-container">
+      <div class="login-box">
+        <div class="login-header">
+          <div class="login-icon">
+            <svg viewBox="0 0 48 48">
+              <circle cx="24" cy="16" r="8"/>
+              <path d="M8 40c0-8.8 7.2-16 16-16s16 7.2 16 16v4H8v-4z"/>
+            </svg>
+          </div>
+          <h2>Staff Login</h2>
+          <p>Environmental Public Health Information System</p>
+        </div>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <div class="input-wrapper">
+              <span class="input-icon">📧</span>
+              <input 
+                type="email" 
+                id="email" 
+                placeholder="your.email@health.gov" 
+                required 
+                autocomplete="email"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input 
+                type="password" 
+                id="password" 
+                placeholder="Enter your password" 
+                required 
+                autocomplete="current-password"
+              />
+            </div>
+          </div>
+
+          <div id="loginError" class="error-message">
+            <span>⚠️</span>
+            <span id="errorText"></span>
+          </div>
+
+          <button type="submit">Sign In</button>
+        </form>
+
+        <div class="forgot-link">
+          <a href="reset_password.html">Forgot your password?</a>
+        </div>
+
+        <div class="divider">
+          <span>Authorized Personnel Only</span>
+        </div>
+
+        <div class="info-box">
+          <p>
+            This system is for authorized Department of Health Services staff only. 
+            Unauthorized access is prohibited. Need access? 
+            <a href="index.html">Contact your administrator</a>
+          </p>
+        </div>
       </div>
-
-      <form id="loginForm">
-        <label for="email">Email</label>
-        <input type="email" id="email" placeholder="user@domain.com" required />
-
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="••••••••" required />
-
-        <button type="submit">Login</button>
-        <div id="loginError" class="error-message"></div>
-      </form>
-
-      <div class="forgot-link">
-        <a href="reset_password.html">Forgot Password?</a>
-      </div>
-
-      <button id="themeToggle">🌓 Toggle Theme</button>
     </div>
   </main>
 
-  <footer class="footer">
-    © <span id="year"></span> County Health Services |
+  <footer>
+    © <span id="year"></span> County Health Services · 
     <a href="index.html">Return to Home</a>
   </footer>
 
@@ -202,6 +450,7 @@
 
     const loginForm = document.getElementById("loginForm");
     const errorBox = document.getElementById("loginError");
+    const errorText = document.getElementById("errorText");
 
     // Auto redirect if session exists
     async function checkSession() {
@@ -215,18 +464,29 @@
     // Login handler
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      errorBox.textContent = "";
+      errorBox.classList.remove("show");
+      
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = "Signing in...";
+      submitBtn.disabled = true;
+      
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
+      
       const { error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        errorBox.textContent = "Invalid credentials. Please try again.";
+        errorText.textContent = "Invalid credentials. Please check your email and password.";
+        errorBox.classList.add("show");
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
       } else {
         window.location.href = "dashboard.html";
       }
     });
 
+    // Set current year
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </body>

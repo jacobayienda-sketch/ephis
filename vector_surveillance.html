@@ -4,68 +4,443 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EPHIS | Vector Surveillance</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;color:#222;display:flex;flex-direction:column;min-height:100vh;}
-    header{background:#1976d2;color:white;display:flex;justify-content:space-between;align-items:center;padding:0.8rem 1rem;flex-wrap:wrap;}
-    header h1{font-size:1rem;margin:0;font-weight:600;}
-    .btn{border:none;border-radius:6px;cursor:pointer;font-weight:600;padding:0.5rem 1rem;font-size:0.9rem;}
-    .btn-primary{background:#1976d2;color:white;}
-    .btn-secondary{background:#2e7d32;color:white;}
-    .btn-light{background:white;color:#1976d2;border:1px solid #1976d2;}
-    main{flex:1;padding:1rem;max-width:1000px;margin:0 auto;}
-    .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
-    .toolbar input{padding:0.6rem;border:1px solid #ccc;border-radius:6px;width:250px;}
-    .card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
-    .card-header{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:#1976d2;}
-    .badge{border-radius:5px;padding:0.2rem 0.6rem;font-size:0.8rem;font-weight:600;}
-    .badge.Lab{background:#bbdefb;color:#0d47a1;}
-    .badge.Field{background:#c8e6c9;color:#2e7d32;}
-    .pagination{display:flex;justify-content:center;gap:0.5rem;margin-top:1rem;}
-    .pagination button{border:none;background:#1976d2;color:white;border-radius:5px;padding:0.4rem 0.8rem;cursor:pointer;font-weight:600;}
-    .form-card{background:white;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;}
-    form label{font-weight:600;display:block;margin-top:0.5rem;}
-    form input,form select,form textarea{width:100%;padding:0.6rem;border-radius:6px;border:1px solid #ccc;font-size:0.9rem;}
-    footer{text-align:center;background:#e3f2fd;color:#555;padding:0.6rem;font-size:0.8rem;}
-    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1976d2;color:white;padding:0.8rem 1rem;border-radius:6px;opacity:0;transition:opacity 0.3s ease;}
-    .toast.show{opacity:1;}
-    @media(max-width:600px){.toolbar{flex-direction:column;gap:0.5rem;align-items:stretch;}.toolbar input{width:100%;}}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 400px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+      z-index: -1;
+      opacity: 0.05;
+    }
+
+    header {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 1.2rem 2rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .header-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    header h1 {
+      font-size: 1.3rem;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0.7rem 1.3rem;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-light {
+      background: white;
+      color: #475569;
+      border: 2px solid #e2e8f0;
+    }
+
+    .btn-light:hover {
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+
+    main {
+      flex: 1;
+      padding: 2rem 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+      max-width: 400px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+    }
+
+    .toolbar input {
+      width: 100%;
+      padding: 0.9rem 1rem 0.9rem 2.8rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .toolbar input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 1.5rem;
+      margin-bottom: 1.2rem;
+      transition: all 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .card-header span:first-child {
+      font-weight: 700;
+      color: #0f172a;
+      font-size: 1.1rem;
+    }
+
+    .badge {
+      border-radius: 8px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .badge.Lab {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge.Field {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .card p {
+      color: #64748b;
+      line-height: 1.6;
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    .card strong {
+      color: #334155;
+      font-weight: 600;
+    }
+
+    .form-card {
+      background: white;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .form-card h2 {
+      color: #0f172a;
+      margin-bottom: 1.5rem;
+      font-size: 1.3rem;
+    }
+
+    form label {
+      font-weight: 600;
+      display: block;
+      margin-top: 1rem;
+      margin-bottom: 0.4rem;
+      color: #334155;
+      font-size: 0.95rem;
+    }
+
+    form input,
+    form select,
+    form textarea {
+      width: 100%;
+      padding: 0.9rem;
+      border-radius: 10px;
+      border: 2px solid #e2e8f0;
+      font-size: 1rem;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.8rem;
+      margin-top: 2rem;
+    }
+
+    .pagination button {
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      color: white;
+      border-radius: 10px;
+      padding: 0.7rem 1.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .pagination button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    footer {
+      text-align: center;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      color: #64748b;
+      padding: 1.5rem;
+      font-size: 0.9rem;
+      margin-top: 3rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #0f172a;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    .toast.error {
+      background: #dc2626;
+    }
+
+    .loading {
+      text-align: center;
+      color: #94a3b8;
+      padding: 3rem;
+      font-size: 1.1rem;
+    }
+
+    .no-data {
+      text-align: center;
+      color: #94a3b8;
+      padding: 3rem;
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 1.1rem;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-wrapper {
+        max-width: 100%;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>EPHIS – Vector Surveillance Reports</h1>
-    <div>
-      <button class="btn btn-light" onclick="history.back()">Back</button>
-      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+    <div class="header-content">
+      <div class="header-title">
+        <div class="header-icon">🦟</div>
+        <h1>Vector Surveillance Reports</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-light" onclick="history.back()">← Back</button>
+        <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+      </div>
     </div>
   </header>
 
   <main>
     <div class="toolbar">
-      <input type="text" id="searchInput" placeholder="Search vector type or officer..." />
-      <button class="btn btn-primary" id="addBtn">+ Add Surveillance Report</button>
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search vector type or species..." />
+      </div>
+      <button class="btn btn-primary" id="addBtn">+ Add Report</button>
     </div>
 
     <div id="formContainer" style="display:none;" class="form-card">
+      <h2>New Surveillance Report</h2>
       <form id="surveillanceForm">
-        <label>Date</label><input type="date" id="date" required />
-        <label>Vector Type</label><input type="text" id="vector_type" placeholder="e.g. Mosquito, Blackfly..." />
-        <label>Method</label><input type="text" id="method" placeholder="e.g. Light trap, Larval dip, etc." />
-        <label>Density</label><input type="number" step="0.1" id="density" placeholder="Vector density per unit area" />
+        <label>Date *</label>
+        <input type="date" id="date" required />
+
+        <label>Vector Type</label>
+        <input type="text" id="vector_type" placeholder="e.g. Mosquito, Blackfly..." />
+
+        <label>Method</label>
+        <input type="text" id="method" placeholder="e.g. Light trap, Larval dip..." />
+
+        <label>Density</label>
+        <input type="number" step="0.1" id="density" placeholder="Vector density per unit area" />
+
         <label>Lab Analysis</label>
         <select id="lab_analysis">
-          <option value="">Select</option><option value="true">Yes</option><option value="false">No</option>
+          <option value="">Select</option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
         </select>
-        <label>Species Identified</label><input type="text" id="species_identified" placeholder="e.g. Anopheles, Culex..." />
-        <label>Breeding Source</label><input type="text" id="breeding_source" placeholder="e.g. Swamp, stagnant water, etc." />
-        <label>Environmental Condition</label><textarea id="environment_condition" rows="2" placeholder="e.g. High vegetation, poor drainage..."></textarea>
-        <label>Remarks</label><textarea id="remarks" rows="2"></textarea>
-        <div style="text-align:right;margin-top:0.6rem;">
-          <button type="submit" class="btn btn-primary">Save</button>
+
+        <label>Species Identified</label>
+        <input type="text" id="species_identified" placeholder="e.g. Anopheles, Culex..." />
+
+        <label>Breeding Source</label>
+        <input type="text" id="breeding_source" placeholder="e.g. Swamp, stagnant water..." />
+
+        <label>Environmental Condition</label>
+        <textarea id="environment_condition" rows="3" placeholder="e.g. High vegetation, poor drainage..."></textarea>
+
+        <label>Remarks</label>
+        <textarea id="remarks" rows="2"></textarea>
+
+        <div class="form-actions">
           <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Report</button>
         </div>
       </form>
     </div>
@@ -73,13 +448,13 @@
     <div id="cardsContainer"></div>
 
     <div class="pagination">
-      <button id="prevPage">Previous</button>
-      <button id="nextPage">Next</button>
+      <button id="prevPage">← Previous</button>
+      <button id="nextPage">Next →</button>
     </div>
   </main>
 
   <footer>
-    County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span>
+    © <span id="year"></span> County Health Services · EPHIS
   </footer>
 
   <div id="toast" class="toast"></div>
@@ -87,89 +462,133 @@
   <script type="module">
     import { supabase } from "./main.js";
 
-    const toast=document.getElementById("toast");
-    const logoutBtn=document.getElementById("logoutBtn");
-    const addBtn=document.getElementById("addBtn");
-    const cancelBtn=document.getElementById("cancelBtn");
-    const formContainer=document.getElementById("formContainer");
-    const form=document.getElementById("surveillanceForm");
-    const searchInput=document.getElementById("searchInput");
-    const cardsContainer=document.getElementById("cardsContainer");
-    const prevPage=document.getElementById("prevPage");
-    const nextPage=document.getElementById("nextPage");
+    const toast = document.getElementById("toast");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const addBtn = document.getElementById("addBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const formContainer = document.getElementById("formContainer");
+    const form = document.getElementById("surveillanceForm");
+    const searchInput = document.getElementById("searchInput");
+    const cardsContainer = document.getElementById("cardsContainer");
+    const prevPage = document.getElementById("prevPage");
+    const nextPage = document.getElementById("nextPage");
 
-    const urlParams=new URLSearchParams(window.location.search);
-    const siteId=urlParams.get("id");
+    const urlParams = new URLSearchParams(window.location.search);
+    const siteId = urlParams.get("id");
 
-    let page=0;const limit=10;let total=0;
+    let page = 0;
+    const limit = 10;
+    let total = 0;
 
-    function showToast(msg,type="info"){toast.textContent=msg;toast.style.background=type==="error"?"#c62828":"#1976d2";toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
+    function showToast(msg, type = "info") {
+      toast.textContent = msg;
+      toast.className = "toast show" + (type === "error" ? " error" : "");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
 
-    async function checkSession(){const {data}=await supabase.auth.getSession();if(!data.session)window.location.href="login.html";}
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) window.location.href = "login.html";
+    }
     checkSession();
 
-    function toggleForm(show){formContainer.style.display=show?"block":"none";}
-    addBtn.addEventListener("click",()=>toggleForm(true));
-    cancelBtn.addEventListener("click",()=>toggleForm(false));
-
-    async function loadReports(){
-      cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading…</p>";
-      let query=supabase.from("vector_surveillance").select("*",{count:"exact"}).order("date",{ascending:false}).range(page*limit,page*limit+limit-1);
-      if(siteId)query=query.eq("site_id",siteId);
-      const term=searchInput.value.trim();
-      if(term)query=query.or(`vector_type.ilike.%${term}%,species_identified.ilike.%${term}%`);
-      const{data,count,error}=await query;
-      if(error){console.error(error);showToast("Load failed","error");return;}
-      total=count;renderCards(data);
+    function toggleForm(show) {
+      formContainer.style.display = show ? "block" : "none";
     }
 
-    function renderCards(data){
-      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No surveillance reports found</p>";return;}
-      cardsContainer.innerHTML=data.map(r=>{
-        const badge=r.lab_analysis?"badge Lab":"badge Field";
-        const badgeText=r.lab_analysis?"Lab":"Field";
-        return`
+    addBtn.addEventListener("click", () => toggleForm(true));
+    cancelBtn.addEventListener("click", () => toggleForm(false));
+
+    async function loadReports() {
+      cardsContainer.innerHTML = "<p class='loading'>Loading reports...</p>";
+      let query = supabase.from("vector_surveillance").select("*", { count: "exact" })
+        .order("date", { ascending: false }).range(page * limit, page * limit + limit - 1);
+      if (siteId) query = query.eq("site_id", siteId);
+      const term = searchInput.value.trim();
+      if (term) query = query.or(`vector_type.ilike.%${term}%,species_identified.ilike.%${term}%`);
+      const { data, count, error } = await query;
+      if (error) {
+        console.error(error);
+        showToast("Failed to load reports", "error");
+        return;
+      }
+      total = count;
+      renderCards(data);
+    }
+
+    function renderCards(data) {
+      if (!data.length) {
+        cardsContainer.innerHTML = "<p class='no-data'>No surveillance reports found</p>";
+        return;
+      }
+      cardsContainer.innerHTML = data.map(r => {
+        const badge = r.lab_analysis ? "badge Lab" : "badge Field";
+        const badgeText = r.lab_analysis ? "Lab" : "Field";
+        return `
           <div class="card">
             <div class="card-header">
-              <span>${r.vector_type||"Vector"}</span>
+              <span>${r.vector_type || "Vector"}</span>
               <span class="${badge}">${badgeText}</span>
             </div>
-            <p><strong>Date:</strong> ${r.date||"-"} | <strong>Method:</strong> ${r.method||"-"}</p>
-            <p><strong>Density:</strong> ${r.density||"-"} | <strong>Species:</strong> ${r.species_identified||"-"}</p>
-            <p><strong>Breeding Source:</strong> ${r.breeding_source||"-"}</p>
-            <p><strong>Environment:</strong> ${r.environment_condition||"-"}</p>
-            <p><strong>Remarks:</strong> ${r.remarks||"-"}</p>
+            <p><strong>Date:</strong> ${r.date || "-"} | <strong>Method:</strong> ${r.method || "-"}</p>
+            <p><strong>Density:</strong> ${r.density || "-"} | <strong>Species:</strong> ${r.species_identified || "-"}</p>
+            <p><strong>Breeding Source:</strong> ${r.breeding_source || "-"}</p>
+            <p><strong>Environment:</strong> ${r.environment_condition || "-"}</p>
+            ${r.remarks ? `<p><strong>Remarks:</strong> ${r.remarks}</p>` : ""}
           </div>`;
       }).join("");
-      prevPage.disabled=page===0;
-      nextPage.disabled=(page+1)*limit>=total;
+      prevPage.disabled = page === 0;
+      nextPage.disabled = (page + 1) * limit >= total;
     }
 
-    form.addEventListener("submit",async e=>{
+    form.addEventListener("submit", async e => {
       e.preventDefault();
-      const payload={
-        site_id:siteId,
-        date:document.getElementById("date").value,
-        vector_type:document.getElementById("vector_type").value.trim()||null,
-        method:document.getElementById("method").value.trim()||null,
-        density:parseFloat(document.getElementById("density").value)||null,
-        lab_analysis:document.getElementById("lab_analysis").value==="true",
-        species_identified:document.getElementById("species_identified").value.trim()||null,
-        breeding_source:document.getElementById("breeding_source").value.trim()||null,
-        environment_condition:document.getElementById("environment_condition").value.trim()||null,
-        remarks:document.getElementById("remarks").value.trim()||null
+      const payload = {
+        site_id: siteId,
+        date: document.getElementById("date").value,
+        vector_type: document.getElementById("vector_type").value.trim() || null,
+        method: document.getElementById("method").value.trim() || null,
+        density: parseFloat(document.getElementById("density").value) || null,
+        lab_analysis: document.getElementById("lab_analysis").value === "true",
+        species_identified: document.getElementById("species_identified").value.trim() || null,
+        breeding_source: document.getElementById("breeding_source").value.trim() || null,
+        environment_condition: document.getElementById("environment_condition").value.trim() || null,
+        remarks: document.getElementById("remarks").value.trim() || null
       };
-      const{error}=await supabase.from("vector_surveillance").insert([payload]);
-      if(error){console.error(error);showToast("Save failed","error");return;}
-      showToast("Surveillance report added successfully");
-      form.reset();toggleForm(false);loadReports();
+      const { error } = await supabase.from("vector_surveillance").insert([payload]);
+      if (error) {
+        console.error(error);
+        showToast("Failed to save report", "error");
+        return;
+      }
+      showToast("Report added successfully");
+      form.reset();
+      toggleForm(false);
+      loadReports();
     });
 
-    searchInput.addEventListener("input",()=>{page=0;loadReports();});
-    prevPage.addEventListener("click",()=>{if(page>0){page--;loadReports();}});
-    nextPage.addEventListener("click",()=>{if((page+1)*limit<total){page++;loadReports();}});
-    logoutBtn.addEventListener("click",async()=>{await supabase.auth.signOut();showToast("Logging out…");setTimeout(()=>window.location.href="login.html",800);});
-    document.getElementById("year").textContent=new Date().getFullYear();
+    searchInput.addEventListener("input", () => {
+      page = 0;
+      loadReports();
+    });
+    prevPage.addEventListener("click", () => {
+      if (page > 0) {
+        page--;
+        loadReports();
+      }
+    });
+    nextPage.addEventListener("click", () => {
+      if ((page + 1) * limit < total) {
+        page++;
+        loadReports();
+      }
+    });
+    logoutBtn.addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      showToast("Logging out...");
+      setTimeout(() => window.location.href = "login.html", 800);
+    });
+    document.getElementById("year").textContent = new Date().getFullYear();
     loadReports();
   </script>
 </body>

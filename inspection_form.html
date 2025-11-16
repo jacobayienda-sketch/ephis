@@ -3,41 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EPHIS | Inspection Form | County of Elgeyo Marakwet</title>
+  <title>Inspection Form | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: system-ui, sans-serif;
-      margin: 0;
-      background: #f5f6fa;
-      color: #222;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      color: #0f172a;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 400px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+      z-index: -1;
+      opacity: 0.05;
     }
 
     header {
-      background: #1976d2;
-      color: white;
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.8rem 1rem;
-      flex-wrap: wrap;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 1.2rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    header h1 { font-size: 1.1rem; margin: 0; }
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    header h1 { font-size: 1.3rem; font-weight: 600; color: #0f172a; }
 
     .btn {
-      border: none; border-radius: 6px; cursor: pointer; font-weight: 600; padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      transition: all 0.2s;
+      font-size: 1rem;
     }
-    .btn-primary { background: #1976d2; color: white; }
-    .btn-secondary { background: #2e7d32; color: white; }
-    .btn-light { background: white; color: #1976d2; border: 1px solid #1976d2; }
-    .btn:hover { opacity: 0.9; }
+    .btn-primary { background: linear-gradient(135deg, #0ea5e9, #2563eb); color: white; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+    .btn-secondary { background: linear-gradient(135deg, #059669, #10b981); color: white; }
+    .btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+    .btn-light { background: white; color: #2563eb; border: 2px solid #e2e8f0; }
+    .btn-light:hover { border-color: #2563eb; background: #f8fafc; }
 
     main {
       max-width: 900px;
-      margin: 1rem auto;
+      margin: 2rem auto;
       background: white;
       padding: 1.5rem;
       border-radius: 10px;

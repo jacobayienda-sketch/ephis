@@ -4,33 +4,330 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Public Complaints | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <script type="module" src="main.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    body{font-family:system-ui,sans-serif;background:#f5f6fa;margin:0;color:#222;}
-    header{background:#1976d2;color:white;padding:1rem;text-align:center;font-weight:600;}
-    .container{max-width:480px;margin:auto;padding:1rem;}
-    .tabs{display:flex;justify-content:space-around;margin-bottom:1rem;}
-    .tab{flex:1;text-align:center;padding:0.6rem;cursor:pointer;border-bottom:3px solid transparent;font-weight:600;}
-    .tab.active{border-color:#1976d2;color:#1976d2;}
-    form{background:white;padding:1rem;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.1);}
-    label{font-weight:600;display:block;margin-top:0.8rem;}
-    input,select,textarea{width:100%;padding:0.6rem;border:1px solid #ccc;border-radius:6px;margin-top:0.3rem;}
-    textarea{min-height:80px;resize:vertical;}
-    #map{height:250px;border-radius:8px;margin-top:0.5rem;}
-    .btn{border:none;background:#1976d2;color:white;font-weight:600;width:100%;padding:0.8rem;border-radius:6px;margin-top:1rem;cursor:pointer;}
-    .card{background:white;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.1);padding:1rem;margin-top:1rem;}
-    .tag{display:inline-block;padding:0.2rem 0.5rem;border-radius:5px;font-size:0.8rem;font-weight:600;text-transform:capitalize;}
-    .tag.pending{background:#fff3cd;color:#856404;}
-    .tag.resolved{background:#d4edda;color:#155724;}
-    .tag.inprogress{background:#cce5ff;color:#004085;}
-    .alert{background:#e3f2fd;color:#004085;padding:0.8rem;border-radius:6px;margin-top:1rem;font-weight:600;}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Animated gradient background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 600px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+      z-index: -1;
+      opacity: 0.08;
+    }
+
+    header {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 1.2rem 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      font-weight: bold;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      color: #0f172a;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      flex: 1;
+    }
+
+    .tabs {
+      display: flex;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 1rem;
+      cursor: pointer;
+      background: #f8fafc;
+      border: none;
+      font-weight: 600;
+      color: #64748b;
+      transition: all 0.2s ease;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab.active {
+      background: white;
+      color: #2563eb;
+      border-bottom-color: #2563eb;
+    }
+
+    .tab:hover:not(.active) {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    form {
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: #374151;
+      font-size: 0.9rem;
+    }
+
+    label:first-child {
+      margin-top: 0;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: white;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    #map {
+      height: 280px;
+      border-radius: 12px;
+      margin-top: 0.5rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .btn {
+      border: none;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      font-weight: 600;
+      width: 100%;
+      padding: 1rem;
+      border-radius: 12px;
+      margin-top: 2rem;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: capitalize;
+      margin-top: 0.5rem;
+    }
+
+    .tag.pending {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .tag.resolved {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .tag.inprogress {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .alert {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      color: #1e40af;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-top: 1.5rem;
+      font-weight: 500;
+      border: 1px solid #93c5fd;
+    }
+
+    .alert a {
+      color: #1d4ed8;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .alert a:hover {
+      text-decoration: underline;
+    }
+
+    #coordsLabel {
+      color: #6b7280;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      display: block;
+    }
+
+    /* Results section improvements */
+    #results {
+      margin-top: 1rem;
+    }
+
+    #results .card {
+      position: relative;
+    }
+
+    #results .card b {
+      color: #1f2937;
+      font-size: 1.1rem;
+    }
+
+    #results .card small {
+      color: #6b7280;
+    }
+
+    #results .card p {
+      margin: 0.75rem 0;
+      line-height: 1.5;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 640px) {
+      .container {
+        padding: 1rem 0.75rem;
+      }
+      
+      header {
+        padding: 1rem;
+      }
+      
+      form {
+        padding: 1.5rem;
+      }
+      
+      .header-content h1 {
+        font-size: 1.2rem;
+      }
+    }
+
+    /* Loading states */
+    .loading {
+      text-align: center;
+      color: #6b7280;
+      padding: 2rem;
+      font-style: italic;
+    }
+
+    .error {
+      color: #dc2626;
+      text-align: center;
+      padding: 1rem;
+      background: #fef2f2;
+      border-radius: 8px;
+      border: 1px solid #fecaca;
+    }
   </style>
 </head>
 
 <body>
-<header>EPHIS | Public Complaints Portal</header>
+<header>
+  <div class="header-content">
+    <div class="logo">E</div>
+    <h1>EPHIS | Public Complaints Portal</h1>
+  </div>
+</header>
 
 <div class="container">
   <div class="tabs">
@@ -89,6 +386,13 @@
   </div>
 </div>
 
+<footer style="text-align: center; padding: 2rem 1rem; font-size: 0.9rem; color: #64748b; background: white; border-top: 1px solid #e2e8f0; margin-top: 3rem;">
+  <p>&copy; 2025 EPHIS - County Health Services</p>
+  <p style="margin-top: 0.5rem;">
+    <a href="index.html" style="color: #3b82f6; text-decoration: none; font-weight: 600;">← Back to EPHIS Home</a>
+  </p>
+</footer>
+
 <script type="module">
   import { supabase, showToast } from './main.js';
 
@@ -111,17 +415,27 @@
   // Map setup with reverse geocoding
   document.addEventListener('DOMContentLoaded',()=>{
     const map=L.map('map').setView([0.3,35.4],7);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      attribution:'© OpenStreetMap',
+      maxZoom: 18
+    }).addTo(map);
+    
     map.on('click',async e=>{
       coords={lat:e.latlng.lat,lng:e.latlng.lng};
       if(marker) map.removeLayer(marker);
       marker=L.marker([coords.lat,coords.lng]).addTo(map);
-      coordsLabel.textContent='Fetching address...';
-      const resp=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json`);
-      const data=await resp.json();
-      const address=data.display_name||'Unnamed location';
-      coordsLabel.textContent=`${address} (Lat: ${coords.lat.toFixed(5)}, Lng: ${coords.lng.toFixed(5)})`;
-      coordsLabel.dataset.address=address;
+      coordsLabel.innerHTML='📍 <em>Fetching address...</em>';
+      
+      try {
+        const resp=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json`);
+        const data=await resp.json();
+        const address=data.display_name||'Unnamed location';
+        coordsLabel.innerHTML=`📍 <strong>${address}</strong><br><small>Coordinates: ${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}</small>`;
+        coordsLabel.dataset.address=address;
+      } catch(error) {
+        coordsLabel.innerHTML=`📍 <strong>Location selected</strong><br><small>Coordinates: ${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}</small>`;
+        console.warn('Address lookup failed:', error);
+      }
     });
   });
 
@@ -136,9 +450,20 @@
   // Submit Complaint
   reportForm.onsubmit=async e=>{
     e.preventDefault();
-    if(!coords){alert('Please click on the map to pick a location');return;}
-    const address=coordsLabel.dataset.address||'';
-    const trackingCode=generateTrackingCode();
+    
+    if(!coords){
+      alert('⚠️ Please click on the map to select a location before submitting');
+      return;
+    }
+
+    const submitBtn = e.target.querySelector('.btn');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = '📤 Submitting...';
+    submitBtn.disabled = true;
+
+    try {
+      const address=coordsLabel.dataset.address||'';
+      const trackingCode=generateTrackingCode();
 
     const payload={
       complaint_type:document.getElementById('complaint_type').value,
@@ -178,15 +503,32 @@
 
     confirmation.innerHTML = `
   <div class="alert">
-    Complaint submitted successfully.<br>
-    <b>Your tracking code:</b> ${trackingCode}<br>
-    <a href="complaint_confirmation.html?code=${trackingCode}" target="_blank">
-      View or Print Confirmation
+    ✅ <strong>Complaint submitted successfully!</strong><br><br>
+    <div style="background: white; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+      <strong>Your tracking code:</strong><br>
+      <code style="font-size: 1.1rem; color: #1d4ed8; background: #f3f4f6; padding: 0.5rem; border-radius: 4px; display: inline-block; margin-top: 0.5rem;">${trackingCode}</code>
+    </div>
+    <p style="margin: 1rem 0;"><small>💡 Save this tracking code to check the status of your complaint later.</small></p>
+    <a href="complaint_confirmation.html?code=${trackingCode}" target="_blank" 
+       style="display: inline-block; background: #1d4ed8; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; margin-top: 0.5rem; font-weight: 600;">
+      📄 View Confirmation Details
     </a>
   </div>`;
 
     reportForm.reset();
     coords=null;coordsLabel.textContent='';
+    
+    } catch(error) {
+      console.error('Submission error:', error);
+      confirmation.innerHTML = `
+        <div class="error">
+          ❌ <strong>Error submitting complaint</strong><br>
+          Please check your internet connection and try again. If the problem persists, please contact support.
+        </div>`;
+    } finally {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    }
   };
 
   async function ensureBucket(){
@@ -199,23 +541,43 @@
   trackForm.onsubmit=async e=>{
     e.preventDefault();
     const key=document.getElementById('searchKey').value.trim();
-    results.innerHTML='<p style="text-align:center;color:gray;">Loading...</p>';
-    const {data,error}=await supabase
-      .from('complaints')
-      .select('tracking_code,complaint_type,location,urgency,resolution_status,submission_date,description')
-      .or(`reporter_contact.ilike.%${key}%,reporter_name.ilike.%${key}%,tracking_code.ilike.%${key}%`)
-      .order('submission_date',{ascending:false}).limit(5);
-    if(error){results.innerHTML='<p style="color:red;text-align:center;">Error loading data</p>';return;}
-    if(!data.length){results.innerHTML='<p style="text-align:center;color:gray;">No complaints found</p>';return;}
-    results.innerHTML=data.map(c=>`
-      <div class="card">
-        <b>${c.complaint_type}</b><br>
-        <small>${c.location||''} • ${c.submission_date||''}</small>
-        <p>${c.description}</p>
-        <p><b>Tracking Code:</b> ${c.tracking_code}</p>
-        <span class="tag ${c.resolution_status?.toLowerCase().replace(' ','')||'pending'}">${c.resolution_status||'Pending'}</span>
-        <br><small>Urgency: ${c.urgency||'Medium'}</small>
-      </div>`).join('');
+    if(!key){
+      results.innerHTML='<div class="error">Please enter a search term</div>';
+      return;
+    }
+    results.innerHTML='<div class="loading">🔍 Searching for your complaints...</div>';
+    
+    try {
+      const {data,error}=await supabase
+        .from('complaints')
+        .select('tracking_code,complaint_type,location,urgency,resolution_status,submission_date,description')
+        .or(`reporter_contact.ilike.%${key}%,reporter_name.ilike.%${key}%,tracking_code.ilike.%${key}%`)
+        .order('submission_date',{ascending:false}).limit(5);
+        
+      if(error) throw error;
+      
+      if(!data.length){
+        results.innerHTML='<div class="loading">No complaints found matching your search</div>';
+        return;
+      }
+      
+      results.innerHTML=data.map(c=>`
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+            <b>${c.complaint_type}</b>
+            <span class="tag ${c.resolution_status?.toLowerCase().replace(/\s+/g,'') || 'pending'}">${c.resolution_status||'Pending'}</span>
+          </div>
+          <small style="color: #6b7280;">${c.location||'Location not specified'} • ${c.submission_date ? new Date(c.submission_date).toLocaleDateString() : ''}</small>
+          <p style="margin: 1rem 0; line-height: 1.5;">${c.description}</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+            <div><b>Tracking Code:</b> <code style="background: #f3f4f6; padding: 0.2rem 0.4rem; border-radius: 4px;">${c.tracking_code}</code></div>
+            <small style="color: #6b7280;">Urgency: ${c.urgency||'Medium'}</small>
+          </div>
+        </div>`).join('');
+    } catch(error) {
+      console.error('Error:', error);
+      results.innerHTML='<div class="error">❌ Error loading data. Please try again.</div>';
+    }
   };
 </script>
 </body>

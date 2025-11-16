@@ -4,83 +4,333 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Complaint Form | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <script type="module" src="main.js"></script>
   <style>
-    body {
-      font-family: system-ui, sans-serif;
-      background: #f5f6fa;
+    * {
       margin: 0;
-      color: #222;
+      padding: 0;
+      box-sizing: border-box;
     }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Animated gradient background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 400px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+      z-index: -1;
+      opacity: 0.05;
+    }
+
     header {
-      background: #1976d2;
-      color: white;
-      padding: 1rem;
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 1.2rem 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 1rem;
       flex-wrap: wrap;
     }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      font-weight: bold;
+      color: white;
+      font-size: 1.2rem;
+    }
+
     header h1 {
-      margin: 0;
-      font-size: 1.1rem;
+      font-size: 1.4rem;
+      color: #0f172a;
+      font-weight: 700;
+      letter-spacing: -0.02em;
     }
-    main {
-      padding: 1rem;
-      max-width: 700px;
-      margin: auto;
-    }
-    form {
+
+    .back-btn {
       background: white;
-      padding: 1rem;
+      color: #2563eb;
+      border: 2px solid #2563eb;
+      padding: 0.6rem 1.2rem;
       border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-    label {
-      display: block;
       font-weight: 600;
-      margin-top: 0.8rem;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 0.6rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-top: 0.3rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
       font-size: 0.95rem;
     }
+
+    .back-btn:hover {
+      background: #2563eb;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    form {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+    }
+
+    .form-section {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .form-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .form-section h2 {
+      font-size: 1.2rem;
+      color: #1f2937;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #374151;
+      font-size: 0.9rem;
+    }
+
+    label .required {
+      color: #dc2626;
+      margin-left: 0.25rem;
+    }
+
+    .field-description {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+      font-weight: normal;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: white;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
     textarea {
       resize: vertical;
+      min-height: 120px;
     }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      background-size: 1.5em 1.5em;
+      padding-right: 2.5rem;
+    }
+
     .btn {
       border: none;
-      border-radius: 6px;
+      border-radius: 10px;
       cursor: pointer;
       font-weight: 600;
-      padding: 0.6rem 1rem;
+      padding: 0.85rem 1.5rem;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
     }
+
     .btn-primary {
-      background: #1976d2;
-      color: #fff;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
     }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    }
+
     .btn-danger {
-      background: #c62828;
-      color: #fff;
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
     }
+
+    .btn-danger:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(220, 38, 38, 0.3);
+    }
+
     .btn-secondary {
-      background: #eee;
-      color: #333;
+      background: white;
+      color: #4b5563;
+      border: 2px solid #d1d5db;
     }
+
+    .btn-secondary:hover {
+      background: #f9fafb;
+      border-color: #9ca3af;
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .actions {
       display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      margin-top: 1.5rem;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 2px solid #f1f5f9;
     }
-    @media (max-width: 600px) {
+
+    .actions .btn-primary {
+      flex: 1;
+    }
+
+    .actions-secondary {
+      display: flex;
+      gap: 1rem;
+      margin-left: auto;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      color: #64748b;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 3rem;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      main {
+        padding: 1rem 0.75rem;
+      }
+
+      header {
+        padding: 1rem;
+      }
+
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header-content h1 {
+        font-size: 1.2rem;
+      }
+
+      form {
+        padding: 1.5rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
       .actions {
         flex-direction: column;
+      }
+
+      .actions-secondary {
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .actions-secondary .btn {
+        flex: 1;
+      }
+
+      .back-btn {
+        width: 100%;
+        justify-content: center;
       }
     }
   </style>
@@ -88,52 +338,114 @@
 
 <body>
   <header>
-    <h1 id="form-title">New Complaint</h1>
-    <button class="btn btn-secondary" onclick="window.location.href='complaints.html'">← Back to List</button>
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo">E</div>
+        <h1 id="form-title">📝 New Complaint</h1>
+      </div>
+      <button class="back-btn" onclick="window.location.href='complaints.html'">← Back to List</button>
+    </div>
   </header>
 
   <main>
     <form id="complaint-form">
-      <label for="complaint_type">Complaint Type</label>
-      <input type="text" name="complaint_type" id="complaint_type" required>
+      <div class="form-section">
+        <h2>📋 Basic Information</h2>
+        
+        <div class="form-group">
+          <label for="complaint_type">
+            Complaint Type<span class="required">*</span>
+          </label>
+          <input type="text" name="complaint_type" id="complaint_type" placeholder="e.g., Water Quality, Waste Management, Noise Pollution" required>
+          <div class="field-description">Specify the category or type of complaint</div>
+        </div>
 
-      <label for="incident_date">Incident Date</label>
-      <input type="date" name="incident_date" id="incident_date" required>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="incident_date">
+              Incident Date<span class="required">*</span>
+            </label>
+            <input type="date" name="incident_date" id="incident_date" required>
+          </div>
 
-      <label for="incident_time">Incident Time</label>
-      <input type="time" name="incident_time" id="incident_time">
+          <div class="form-group">
+            <label for="incident_time">
+              Incident Time
+            </label>
+            <input type="time" name="incident_time" id="incident_time">
+          </div>
+        </div>
 
-      <label for="location">Location</label>
-      <input type="text" name="location" id="location" required>
+        <div class="form-group">
+          <label for="location">
+            Location<span class="required">*</span>
+          </label>
+          <input type="text" name="location" id="location" placeholder="Enter the specific location or address" required>
+          <div class="field-description">Provide the exact location where the incident occurred</div>
+        </div>
 
-      <label for="description">Description</label>
-      <textarea name="description" id="description" rows="3"></textarea>
+        <div class="form-group">
+          <label for="description">
+            Description
+          </label>
+          <textarea name="description" id="description" rows="4" placeholder="Provide detailed information about the complaint..."></textarea>
+          <div class="field-description">Include all relevant details about the incident or issue</div>
+        </div>
+      </div>
 
-      <label for="urgency">Urgency</label>
-      <select name="urgency" id="urgency">
-        <option value="">Select</option>
-        <option>Low</option>
-        <option>Medium</option>
-        <option>High</option>
-        <option>Critical</option>
-      </select>
+      <div class="form-section">
+        <h2>📈 Priority & Status</h2>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="urgency">
+              Urgency Level
+            </label>
+            <select name="urgency" id="urgency">
+              <option value="">Select urgency...</option>
+              <option value="Low">🟢 Low</option>
+              <option value="Medium">🟡 Medium</option>
+              <option value="High">🟠 High</option>
+              <option value="Critical">🔴 Critical</option>
+            </select>
+            <div class="field-description">Indicate the severity of the issue</div>
+          </div>
 
-      <label for="resolution_status">Resolution Status</label>
-      <select name="resolution_status" id="resolution_status">
-        <option value="">Select</option>
-        <option>Pending</option>
-        <option>In Progress</option>
-        <option>Resolved</option>
-        <option>Escalated</option>
-      </select>
+          <div class="form-group">
+            <label for="resolution_status">
+              Resolution Status
+            </label>
+            <select name="resolution_status" id="resolution_status">
+              <option value="">Select status...</option>
+              <option value="Pending">⏳ Pending</option>
+              <option value="In Progress">🔄 In Progress</option>
+              <option value="Resolved">✅ Resolved</option>
+              <option value="Escalated">⬆️ Escalated</option>
+            </select>
+            <div class="field-description">Current status of the complaint</div>
+          </div>
+        </div>
+      </div>
 
       <div class="actions">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
-        <button type="button" class="btn btn-danger" id="delete-btn">Delete</button>
+        <button type="submit" class="btn btn-primary" id="save-btn">
+          💾 Save Complaint
+        </button>
+        <div class="actions-secondary">
+          <button type="button" class="btn btn-secondary" id="cancel-btn">
+            ❌ Cancel
+          </button>
+          <button type="button" class="btn btn-danger" id="delete-btn">
+            🗑️ Delete
+          </button>
+        </div>
       </div>
     </form>
   </main>
+
+  <footer>
+    <p>&copy; 2024 EPHIS - Elgeyo Marakwet County Environmental Health System</p>
+  </footer>
 
   <script type="module">
     import {
@@ -151,6 +463,7 @@
     const form = document.getElementById("complaint-form");
     const cancelBtn = document.getElementById("cancel-btn");
     const deleteBtn = document.getElementById("delete-btn");
+    const saveBtn = document.getElementById("save-btn");
     const title = document.getElementById("form-title");
     const params = new URLSearchParams(window.location.search);
     const complaintId = params.get("id");
@@ -162,51 +475,73 @@
     cancelBtn.onclick = () => window.location.href = "complaints.html";
 
     // Hide delete if new record
-    if (!complaintId) deleteBtn.style.display = "none";
+    if (!complaintId) {
+      deleteBtn.style.display = "none";
+    }
 
     // Load data for edit
     if (complaintId) {
       try {
         const record = await fetchById("complaints", complaintId);
         populateForm(form, record);
-        title.textContent = "Edit Complaint";
+        title.innerHTML = "✏️ Edit Complaint";
+        saveBtn.innerHTML = "💾 Update Complaint";
       } catch (err) {
-        showToast("Error loading record: " + err.message, "error");
+        showToast("❌ Error loading record: " + err.message, "error");
       }
     }
 
     // Save handler
     form.onsubmit = async (e) => {
       e.preventDefault();
-      const payload = getFormData(form);
+      
+      const originalText = saveBtn.innerHTML;
+      saveBtn.innerHTML = "💾 Saving...";
+      saveBtn.disabled = true;
 
       try {
+        const payload = getFormData(form);
         const { data: userData } = await supabase.auth.getUser();
         payload.created_by = userData?.user?.id || null;
 
         if (complaintId) {
           await updateRecord("complaints", complaintId, payload);
-          showToast("Complaint updated", "success");
+          showToast("✅ Complaint updated successfully", "success");
         } else {
           await insertRecord("complaints", payload);
-          showToast("Complaint added", "success");
+          showToast("✅ Complaint added successfully", "success");
         }
 
-        window.location.href = "complaints.html";
+        setTimeout(() => {
+          window.location.href = "complaints.html";
+        }, 800);
       } catch (err) {
-        showToast("Save failed: " + err.message, "error");
+        console.error('Save error:', err);
+        showToast("❌ Save failed: " + err.message, "error");
+        saveBtn.innerHTML = originalText;
+        saveBtn.disabled = false;
       }
     };
 
     // Delete handler
     deleteBtn.onclick = async () => {
-      if (!confirm("Delete this complaint?")) return;
+      if (!confirm("⚠️ Are you sure you want to delete this complaint? This action cannot be undone.")) return;
+      
+      const originalText = deleteBtn.innerHTML;
+      deleteBtn.innerHTML = "🗑️ Deleting...";
+      deleteBtn.disabled = true;
+
       try {
         await deleteRecord("complaints", complaintId);
-        showToast("Complaint deleted", "success");
-        window.location.href = "complaints.html";
+        showToast("✅ Complaint deleted successfully", "success");
+        setTimeout(() => {
+          window.location.href = "complaints.html";
+        }, 800);
       } catch (err) {
-        showToast("Delete failed: " + err.message, "error");
+        console.error('Delete error:', err);
+        showToast("❌ Delete failed: " + err.message, "error");
+        deleteBtn.innerHTML = originalText;
+        deleteBtn.disabled = false;
       }
     };
   </script>

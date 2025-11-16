@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IPC Assessment Form | EPHIS</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#2563eb" />
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module" src="main.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f8fafc;
+  min-height: 100vh;
+  color: #0f172a;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 400px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+  z-index: -1;
+  opacity: 0.05;
+}
+
+header {
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  padding: 1.2rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-content h1 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+main { padding: 2rem; max-width: 800px; margin: 0 auto; }
+.form-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  padding: 2rem;
+  margin-top: 1rem;
+}
+.form-card h2 { font-size: 1.5rem; margin-bottom: 1.5rem; color: #0f172a; }
+label { font-weight: 600; color: #475569; margin-top: 1rem; display: block; margin-bottom: 0.5rem; font-size: 0.9rem; }
+label:first-of-type { margin-top: 0; }
+input, select, textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+textarea { min-height: 100px; resize: vertical; }
+.btn { border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-weight: 600; transition: all 0.2s; cursor: pointer; font-size: 1rem; }
+.btn-primary { background: linear-gradient(135deg, #0ea5e9, #2563eb); color: white; }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+.btn-light { background: white; color: #2563eb; border: 2px solid #e2e8f0; }
+.btn-light:hover { border-color: #2563eb; background: #f8fafc; }
+.form-actions { margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end; }
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transition: opacity 0.3s; }
+.toast.show { opacity: 1; }
+
+@media (max-width: 768px) {
+  main { padding: 1rem; }
+  .form-card { padding: 1.5rem; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="header-content">
+    <div class="logo">E</div>
+    <h1>IPC Assessment Form</h1>
+  </div>
+  <button class="btn btn-light" onclick="history.back()">← Back</button>
+</header>
+
+<main>
+<div class="form-card">
+<h2>🏥 IPC Assessment Details</h2>
+<form id="ipcForm">
+<label>Facility Name</label><input type="text" id="facility_name" required>
+<label>Assessment Date</label><input type="date" id="assessment_date" required>
+<label>Auditor Name</label><input type="text" id="auditor_name">
+<label>Compliance Level</label>
+<select id="compliance_level"><option value="">Select</option><option>High</option><option>Moderate</option><option>Low</option></select>
+<label>Compliance Score (%)</label><input type="number" id="compliance_score" step="0.1">
+<label>Remarks</label><textarea id="remarks"></textarea>
+<div class="form-actions">
+  <button type="button" class="btn btn-light" onclick="history.back()">Cancel</button>
+  <button type="submit" class="btn btn-primary">💾 Save Assessment</button>
+</div>
+</form>
+</div>
+</main>
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import { supabase } from "./main.js";
+const toast=document.getElementById("toast");
+function showToast(m){toast.textContent=m;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
+document.getElementById("ipcForm").addEventListener("submit",async e=>{
+e.preventDefault();
+const payload={
+facility_name:facility_name.value.trim(),
+assessment_date:assessment_date.value,
+auditor_name:auditor_name.value.trim(),
+compliance_level:compliance_level.value,
+compliance_score:parseFloat(compliance_score.value)||null,
+remarks:remarks.value.trim()
+};
+const {error}=await supabase.from("ipc_facility_assessments").insert([payload]);
+if(error){console.error(error);showToast("Save failed");}else{showToast("Saved successfully");setTimeout(()=>history.back(),1000);}
+});
+</script>
+</body>
+</html>

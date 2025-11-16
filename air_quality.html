@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Air Quality Monitoring | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <script type="module" src="main.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 400px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+      z-index: -1;
+      opacity: 0.05;
+    }
+
+    header {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 1.2rem 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      font-weight: bold;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      color: #0f172a;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-light {
+      background: white;
+      color: #2563eb;
+      border: 2px solid #2563eb;
+    }
+
+    .btn-light:hover {
+      background: #2563eb;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-secondary {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    main {
+      flex: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      width: 100%;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 400px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.8rem;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: white;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .search-box::before {
+      content: '🔍';
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .status-badge {
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-badge.active {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .status-badge.inactive {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .card-body {
+      font-size: 0.95rem;
+      color: #475569;
+      line-height: 1.8;
+    }
+
+    .card-body p {
+      margin-bottom: 0.5rem;
+    }
+
+    .card-body strong {
+      color: #1e293b;
+      font-weight: 600;
+    }
+
+    .actions {
+      margin-top: 1.2rem;
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      padding-top: 1rem;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .actions a {
+      text-decoration: none;
+      background: #eff6ff;
+      color: #2563eb;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      border: 1px solid #dbeafe;
+    }
+
+    .actions a:hover {
+      background: #2563eb;
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    .expand {
+      background: #f8fafc;
+      padding: 1rem;
+      margin-top: 1rem;
+      border-left: 3px solid #2563eb;
+      border-radius: 8px;
+      display: none;
+      animation: slideDown 0.2s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-top: 2rem;
+    }
+
+    .pagination button {
+      border: none;
+      background: white;
+      color: #2563eb;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid #2563eb;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background: #2563eb;
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    .pagination button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      color: #64748b;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 3rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #2563eb;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+    }
+
+    .toast.show { opacity: 1; }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #64748b;
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 1rem;
+      }
+
+      .header-content h1 {
+        font-size: 1.1rem;
+      }
+
+      main {
+        padding: 1rem;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-box {
+        max-width: 100%;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .card {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-content">
+    <div class="header-left">
+      <div class="logo">E</div>
+      <h1>Air Quality Monitoring</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-light" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="toolbar">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search stations..." />
+    </div>
+    <button class="btn btn-primary" id="newBtn">+ New Station</button>
+  </div>
+
+  <div id="cardsContainer"></div>
+
+  <div class="pagination">
+    <button id="prevPage">← Previous</button>
+    <button id="nextPage">Next →</button>
+  </div>
+</main>
+
+<footer>
+  <p>&copy; <span id="year"></span> EPHIS - Elgeyo Marakwet County Environmental Health System</p>
+</footer>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+  import { supabase } from "./main.js";
+
+  const cardsContainer = document.getElementById("cardsContainer");
+  const searchInput = document.getElementById("searchInput");
+  const toast = document.getElementById("toast");
+  const prevPage = document.getElementById("prevPage");
+  const nextPage = document.getElementById("nextPage");
+  const newBtn = document.getElementById("newBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  let page = 0;
+  const limit = 10;
+  let total = 0;
+
+  function showToast(msg, type = "info") {
+    toast.textContent = msg;
+    toast.style.background = type === "error" ? "#c62828" : "#1976d2";
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3000);
+  }
+
+  async function checkSession() {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) window.location.href = "login.html";
+  }
+  checkSession();
+
+  async function loadStations() {
+    cardsContainer.innerHTML = "<p style='text-align:center;color:gray;'>Loading...</p>";
+
+    let query = supabase
+      .from("air_monitoring_network")
+      .select("id, station_name, station_type, operator, sub_county, ward, status, install_date", { count: "exact" })
+      .order("created_at", { ascending: false })
+      .range(page * limit, page * limit + limit - 1);
+
+    const term = searchInput.value.trim();
+    if (term) query = query.or(`station_name.ilike.%${term}%,station_type.ilike.%${term}%`);
+
+    const { data, count, error } = await query;
+
+    if (error) {
+      console.error(error);
+      showToast("Failed to load stations", "error");
+      return;
+    }
+
+    total = count;
+    renderCards(data);
+  }
+
+  function renderCards(data) {
+    if (!data.length) {
+      cardsContainer.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">🏭</div>
+          <h3>No stations found</h3>
+          <p>Start by adding a new air quality monitoring station</p>
+        </div>
+      `;
+      return;
+    }
+
+    cardsContainer.innerHTML = data
+      .map(
+        (s) => {
+          const statusClass = (s.status || 'Active').toLowerCase() === 'active' ? 'active' : 'inactive';
+          return `
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">${s.station_name || 'Unnamed Station'}</span>
+          <span class="status-badge ${statusClass}">${s.status || "Active"}</span>
+        </div>
+
+        <div class="card-body">
+          <p><strong>Type:</strong> ${s.station_type || "-"}</p>
+          <p><strong>Operator:</strong> ${s.operator || "-"}</p>
+          <p><strong>Location:</strong> ${s.sub_county || "-"} – ${s.ward || "-"}</p>
+          <p><strong>Installed:</strong> ${s.install_date || "-"}</p>
+        </div>
+
+        <div class="actions">
+          <a href="air_station_form.html?id=${s.id}">✏️ Edit</a>
+          <a href="air_readings.html?station_id=${s.id}">📊 Readings</a>
+          <a href="air_alerts.html?station_id=${s.id}">🚨 Alerts</a>
+          <a href="#" onclick="event.preventDefault(); toggleExpand('${s.id}')">ℹ️ Details</a>
+        </div>
+
+        <div class="expand" id="expand-${s.id}">
+          <p><strong>Ward:</strong> ${s.ward || 'N/A'}</p>
+          <p><strong>Status:</strong> ${s.status || 'Active'}</p>
+          <p><strong>Operator:</strong> ${s.operator || 'N/A'}</p>
+          <p><strong>Sub County:</strong> ${s.sub_county || 'N/A'}</p>
+        </div>
+      </div>
+    `;
+        }
+      )
+      .join("");
+
+    prevPage.disabled = page === 0;
+    nextPage.disabled = (page + 1) * limit >= total;
+  }
+
+  window.toggleExpand = (id) => {
+    const el = document.getElementById("expand-" + id);
+    el.style.display = el.style.display === "block" ? "none" : "block";
+  };
+
+  prevPage.addEventListener("click", () => {
+    if (page > 0) {
+      page--;
+      loadStations();
+    }
+  });
+
+  nextPage.addEventListener("click", () => {
+    if ((page + 1) * limit < total) {
+      page++;
+      loadStations();
+    }
+  });
+
+  searchInput.addEventListener("input", () => {
+    page = 0;
+    loadStations();
+  });
+
+  newBtn.addEventListener("click", () => (window.location.href = "air_station_form.html"));
+
+  logoutBtn.addEventListener("click", async () => {
+    await supabase.auth.signOut();
+    showToast("Logging out...");
+    setTimeout(() => (window.location.href = "login.html"), 900);
+  });
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+  loadStations();
+</script>
+</body>
+</html>

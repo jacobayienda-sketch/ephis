@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Building Inspections | EPHIS</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#2563eb" />
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module" src="main.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f8fafc;
+  min-height: 100vh;
+  color: #0f172a;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 400px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+  z-index: -1;
+  opacity: 0.05;
+}
+
+header {
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  padding: 1.2rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-content h1 { font-size: 1.3rem; font-weight: 600; color: #0f172a; }
+.header-actions { display: flex; gap: 0.75rem; }
+
+main { padding: 2rem; max-width: 1000px; margin: 0 auto; }
+
+.card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem; margin-bottom: 1rem; transition: transform 0.2s, box-shadow 0.2s; }
+.card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.card-header { display: flex; justify-content: space-between; align-items: center; color: #0f172a; font-weight: 600; margin-bottom: 0.75rem; }
+.actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
+.actions a { text-decoration: none; color: white; background: linear-gradient(135deg, #0ea5e9, #2563eb); border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.9rem; transition: all 0.2s; }
+.actions a:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
+
+.btn { border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 1rem; }
+.btn-primary { background: linear-gradient(135deg, #0ea5e9, #2563eb); color: white; }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+.btn-light { background: white; color: #2563eb; border: 2px solid #e2e8f0; }
+.btn-light:hover { border-color: #2563eb; background: #f8fafc; }
+
+.empty-state { text-align: center; padding: 3rem; color: #64748b; }
+.empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transition: opacity 0.3s; }
+.toast.show { opacity: 1; }
+
+@media (max-width: 768px) {
+  main { padding: 1rem; }
+  .card-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  .header-content h1 { font-size: 1.1rem; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="header-content">
+    <div class="logo">E</div>
+    <h1>🔍 Building Inspections</h1>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-light" onclick="history.back()">← Back</button>
+    <button class="btn btn-primary" id="addBtn">+ New Inspection</button>
+  </div>
+</header>
+
+<main>
+<div id="cardsContainer"></div>
+</main>
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import { supabase } from "./main.js";
+const toast=document.getElementById("toast");
+function showToast(m){toast.textContent=m;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
+const params=new URLSearchParams(window.location.search);
+const appId=params.get("id");
+
+async function load(){
+const{data,error}=await supabase.from("building_inspections").select("*").eq("application_id",appId).order("inspection_date",{ascending:false});
+if(error){console.error(error);showToast("Failed to load inspections");return;}
+const c=document.getElementById("cardsContainer");
+if(!data.length){c.innerHTML="<p>No inspections found.</p>";return;}
+c.innerHTML=data.map(i=>`
+<div class="card">
+<div class="card-header"><span>${i.officer_name||'Officer'}</span><span>${i.inspection_date||''}</span></div>
+<p><b>Result:</b> ${i.inspection_result||'-'}</p>
+<p>${i.remarks||''}</p>
+<div class="actions"><a href="building_inspection_form.html?id=${i.id}&application_id=${appId}">Edit</a></div>
+</div>`).join("");
+}
+
+document.getElementById("addBtn").onclick=()=>window.location.href=`building_inspection_form.html?application_id=${appId}`;
+document.getElementById("year").textContent=new Date().getFullYear();
+load();
+</script>
+</body>
+</html>
