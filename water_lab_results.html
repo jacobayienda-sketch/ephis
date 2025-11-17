@@ -3,82 +3,430 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#2563eb" />
   <title>EPHIS | Water Lab Results</title>
-  <meta name="theme-color" content="#2563eb">
-  <link rel="icon" href="icon-192.png">
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="manifest.json" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8fafc;margin:0;color:#0f172a;display:flex;flex-direction:column;min-height:100vh;position:relative;}
-    body::before{content:'';position:fixed;top:0;left:0;right:0;height:400px;background:linear-gradient(135deg,#0ea5e9 0%,#2563eb 50%,#7c3aed 100%);opacity:0.05;z-index:0;pointer-events:none;}
-    header{background:white;box-shadow:0 1px 3px rgba(0,0,0,0.1);display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;position:sticky;top:0;z-index:10;flex-wrap:wrap;}
-    .logo{width:40px;height:40px;background:linear-gradient(135deg,#2563eb,#7c3aed);border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:1.1rem;}
-    header h1{font-size:1.1rem;margin:0 0 0 12px;font-weight:700;color:#1e293b;display:flex;align-items:center;}
-    .btn{border:none;border-radius:8px;cursor:pointer;font-weight:600;padding:0.5rem 1rem;font-size:0.9rem;transition:all 0.2s;}
-    .btn-primary{background:linear-gradient(135deg,#2563eb,#3b82f6);color:white;}
-    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.4);}
-    .btn-secondary{background:linear-gradient(135deg,#10b981,#34d399);color:white;}
-    .btn-secondary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(16,185,129,0.4);}
-    .btn-light{background:white;color:#2563eb;border:1px solid #e2e8f0;}
-    .btn-light:hover{background:#f1f5f9;}
-    main{flex:1;padding:1rem;max-width:1000px;margin:0 auto;position:relative;z-index:1;}
-    .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
-    .search-container{position:relative;flex:1;max-width:300px;}
-    .search-container input{padding:0.75rem 1rem 0.75rem 2.5rem;border:1px solid #e2e8f0;border-radius:12px;width:100%;font-size:0.9rem;background:white;transition:all 0.2s;}
-    .search-container input:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,0.1);}
-    .search-container svg{position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:#64748b;}
-    .card{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.1);padding:1rem;margin-bottom:1rem;transition:all 0.2s;border:1px solid #f1f5f9;}
-    .card:hover{box-shadow:0 4px 12px rgba(0,0,0,0.1);transform:translateY(-1px);}
-    .card-header{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:#1e293b;}
-    .actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.75rem;}
-    .actions a{text-decoration:none;color:white;background:linear-gradient(135deg,#2563eb,#3b82f6);border-radius:8px;padding:0.4rem 0.8rem;font-size:0.85rem;font-weight:600;transition:all 0.2s;}
-    .actions a:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(37,99,235,0.4);}
-    .pagination{display:flex;justify-content:center;gap:0.5rem;margin-top:1rem;}
-    .pagination button{border:none;background:linear-gradient(135deg,#2563eb,#3b82f6);color:white;border-radius:8px;padding:0.5rem 1rem;cursor:pointer;font-weight:600;transition:all 0.2s;}
-    .pagination button:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(37,99,235,0.4);}
-    .form-card{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.1);padding:1.5rem;margin-bottom:1rem;border:1px solid #f1f5f9;}
-    form label{font-weight:600;display:block;margin-top:0.75rem;color:#374151;}
-    form input,form select,form textarea{width:100%;padding:0.75rem;border-radius:8px;border:1px solid #e2e8f0;font-size:0.9rem;transition:all 0.2s;}
-    form input:focus,form select:focus,form textarea:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,0.1);}
-    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#2563eb,#3b82f6);color:white;padding:1rem 1.5rem;border-radius:12px;opacity:0;transition:opacity 0.3s ease;box-shadow:0 4px 12px rgba(37,99,235,0.4);}
-    .toast.show{opacity:1;}
-    @media(max-width:600px){.toolbar{flex-direction:column;gap:0.75rem;align-items:stretch;}.search-container{max-width:100%;}}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'SF Pro Display', system-ui, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+      min-height: 100vh;
+      color: #1e293b;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    header {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    
+    .btn {
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.9rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2), 0 2px 4px -1px rgba(37, 99, 235, 0.1);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.15);
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -1px rgba(16, 185, 129, 0.1);
+    }
+    
+    .btn-secondary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.15);
+    }
+    
+    .btn-light {
+      background: white;
+      color: #2563eb;
+      border: 2px solid #e0f2fe;
+    }
+    
+    .btn-light:hover {
+      background: #f0f9ff;
+      border-color: #bae6fd;
+      transform: translateY(-1px);
+    }
+    
+    .btn-link {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: white;
+      padding: 0.5rem 0.875rem;
+      font-size: 0.85rem;
+      box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
+    }
+    
+    .btn-link:hover {
+      box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+    }
+    
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 250px;
+      max-width: 400px;
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      pointer-events: none;
+    }
+    
+    .toolbar input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.75rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      background: white;
+    }
+    
+    .toolbar input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid #f1f5f9;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+      border-color: #e0e7ff;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 1.05rem;
+    }
+    
+    .badge {
+      border-radius: 8px;
+      padding: 0.375rem 0.875rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    
+    .badge.Safe {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      color: #065f46;
+    }
+    
+    .badge.Unsafe {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      color: #991b1b;
+    }
+    
+    .badge.Pending {
+      background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+      color: #3730a3;
+    }
+    
+    .card p {
+      color: #64748b;
+      font-size: 0.95rem;
+      margin: 0.5rem 0;
+    }
+    
+    .card p strong {
+      color: #475569;
+      font-weight: 600;
+    }
+    
+    .parameter-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 0.75rem 0;
+    }
+    
+    .parameter-tag {
+      background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+      color: #5b21b6;
+      padding: 0.375rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid #c4b5fd;
+    }
+    
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #f1f5f9;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-top: 2rem;
+    }
+    
+    .pagination button {
+      border: none;
+      background: white;
+      color: #2563eb;
+      border: 2px solid #e0f2fe;
+      border-radius: 10px;
+      padding: 0.625rem 1.25rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    
+    .pagination button:hover:not(:disabled) {
+      background: #f0f9ff;
+      border-color: #bae6fd;
+      transform: translateY(-1px);
+    }
+    
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .form-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -1px rgba(0,0,0,0.04);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid #f1f5f9;
+    }
+    
+    form label {
+      font-weight: 600;
+      display: block;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      color: #334155;
+      font-size: 0.9rem;
+    }
+    
+    form input, form select, form textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      border: 2px solid #e2e8f0;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    
+    form input:focus, form select:focus, form textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    footer {
+      text-align: center;
+      background: white;
+      color: #64748b;
+      padding: 1.5rem;
+      font-size: 0.85rem;
+      margin-top: 3rem;
+      border-top: 1px solid #f1f5f9;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.15);
+      font-weight: 500;
+      z-index: 1000;
+    }
+    
+    .toast.show { opacity: 1; }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #94a3b8;
+    }
+    
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1rem;
+      opacity: 0.5;
+    }
+    
+    @media(max-width: 768px) {
+      .header-container { flex-wrap: wrap; padding: 1rem; }
+      header h1 { font-size: 1.1rem; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .search-wrapper { max-width: 100%; }
+      .card { padding: 1.25rem; }
+      .form-card { padding: 1.5rem; }
+    }
   </style>
 </head>
 
 <body>
   <header>
-    <div style="display: flex; align-items: center;">
-      <div class="logo">E</div>
-      <h1>🧪 Water Lab Results</h1>
-    </div>
-    <div>
-      <button class="btn btn-light" onclick="history.back()">Back</button>
-      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+    <div class="header-container">
+      <div class="logo-section">
+        <div class="logo-icon">🔬</div>
+        <h1>Water Lab Results</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-light" onclick="history.back()">← Back</button>
+        <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+      </div>
     </div>
   </header>
 
   <main>
     <div class="toolbar">
-      <div class="search-container">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="21 21l-4.35-4.35"></path>
+      <div class="search-wrapper">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
         </svg>
-        <input type="text" id="searchInput" placeholder="Search lab results...">
+        <input type="text" id="searchInput" placeholder="Search lab or parameter..." />
       </div>
       <button class="btn btn-primary" id="addBtn">+ Add Result</button>
     </div>
 
     <div id="formContainer" style="display:none;" class="form-card">
       <form id="labForm">
-        <label>Lab Reference</label><input type="text" id="lab_ref" placeholder="LAB-2025-001" required />
-        <label>Analysis Date</label><input type="date" id="analysis_date" required />
-        <label>Lab Name</label><input type="text" id="lab_name" placeholder="Iten County Lab" />
-        <label>Parameters Tested (comma separated)</label><input type="text" id="parameters" placeholder="E. coli, pH, Turbidity" />
-        <label>Result Values (comma separated)</label><input type="text" id="result_values" placeholder="Absent,7.2,5" />
-        <label>Units</label><input type="text" id="units" placeholder="CFU,pH,NTU" />
+        <label>Lab Reference</label>
+        <input type="text" id="lab_ref" placeholder="LAB-2025-001" required />
+        
+        <label>Analysis Date</label>
+        <input type="date" id="analysis_date" required />
+        
+        <label>Lab Name</label>
+        <input type="text" id="lab_name" placeholder="Iten County Lab" />
+        
+        <label>Parameters Tested (comma separated)</label>
+        <input type="text" id="parameters" placeholder="E. coli, pH, Turbidity" />
+        
+        <label>Result Values (comma separated)</label>
+        <input type="text" id="result_values" placeholder="Absent,7.2,5" />
+        
+        <label>Units</label>
+        <input type="text" id="units" placeholder="CFU,pH,NTU" />
+        
         <label>Classification</label>
         <select id="classification">
           <option value="">Select</option>
@@ -86,12 +434,19 @@
           <option>Unsafe</option>
           <option>Pending</option>
         </select>
-        <label>Turnaround Days</label><input type="number" id="turnaround_days" placeholder="2" />
-        <label>QA Reference</label><input type="text" id="qa_reference" placeholder="QA-01" />
-        <label>Technician</label><input type="text" id="technician" placeholder="Officer Name" />
-        <div style="text-align:right;margin-top:0.6rem;">
-          <button type="submit" class="btn btn-primary">Save</button>
+        
+        <label>Turnaround Days</label>
+        <input type="number" id="turnaround_days" placeholder="2" />
+        
+        <label>QA Reference</label>
+        <input type="text" id="qa_reference" placeholder="QA-01" />
+        
+        <label>Technician</label>
+        <input type="text" id="technician" placeholder="Officer Name" />
+        
+        <div style="text-align:right;margin-top:1.5rem;display:flex;gap:0.75rem;justify-content:flex-end;">
           <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Result</button>
         </div>
       </form>
     </div>
@@ -99,8 +454,8 @@
     <div id="cardsContainer"></div>
 
     <div class="pagination">
-      <button id="prevPage">Previous</button>
-      <button id="nextPage">Next</button>
+      <button id="prevPage">← Previous</button>
+      <button id="nextPage">Next →</button>
     </div>
   </main>
 
@@ -112,87 +467,147 @@
 
   <script type="module">
     import { supabase } from "./main.js";
-    const toast=document.getElementById("toast");
-    const logoutBtn=document.getElementById("logoutBtn");
-    const addBtn=document.getElementById("addBtn");
-    const cancelBtn=document.getElementById("cancelBtn");
-    const formContainer=document.getElementById("formContainer");
-    const form=document.getElementById("labForm");
-    const searchInput=document.getElementById("searchInput");
-    const cardsContainer=document.getElementById("cardsContainer");
-    const prevPage=document.getElementById("prevPage");
-    const nextPage=document.getElementById("nextPage");
+    const toast = document.getElementById("toast");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const addBtn = document.getElementById("addBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const formContainer = document.getElementById("formContainer");
+    const form = document.getElementById("labForm");
+    const searchInput = document.getElementById("searchInput");
+    const cardsContainer = document.getElementById("cardsContainer");
+    const prevPage = document.getElementById("prevPage");
+    const nextPage = document.getElementById("nextPage");
 
-    const urlParams=new URLSearchParams(window.location.search);
-    const sampleId=urlParams.get("sample");
+    const urlParams = new URLSearchParams(window.location.search);
+    const sampleId = urlParams.get("sample");
 
-    let page=0;const limit=10;let total=0;
+    let page = 0;
+    const limit = 10;
+    let total = 0;
 
-    function showToast(msg,type="info"){toast.textContent=msg;toast.style.background=type==="error"?"#c62828":"#1976d2";toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
+    function showToast(msg, type = "info") {
+      toast.textContent = msg;
+      toast.style.background = type === "error" 
+        ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)" 
+        : "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
 
-    async function checkSession(){const {data}=await supabase.auth.getSession();if(!data.session)window.location.href="login.html";}
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) window.location.href = "login.html";
+    }
     checkSession();
 
-    function toggleForm(show){formContainer.style.display=show?"block":"none";}
-    addBtn.addEventListener("click",()=>toggleForm(true));
-    cancelBtn.addEventListener("click",()=>toggleForm(false));
+    function toggleForm(show) {
+      formContainer.style.display = show ? "block" : "none";
+      if (show) formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    addBtn.addEventListener("click", () => toggleForm(true));
+    cancelBtn.addEventListener("click", () => toggleForm(false));
 
-    async function loadLabResults(){
-      cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading…</p>";
-      let query=supabase.from("water_lab_results").select("*",{count:"exact"}).order("analysis_date",{ascending:false}).eq("sample_id",sampleId).range(page*limit,page*limit+limit-1);
-      const term=searchInput.value.trim();
-      if(term)query=query.or(`lab_name.ilike.%${term}%,parameters::text.ilike.%${term}%`);
-      const{data,count,error}=await query;
-      if(error){console.error(error);showToast("Load failed","error");return;}
-      total=count;renderCards(data);
+    async function loadLabResults() {
+      cardsContainer.innerHTML = "<div class='empty-state'><p>Loading...</p></div>";
+      
+      let query = supabase
+        .from("water_lab_results")
+        .select("*", { count: "exact" })
+        .order("analysis_date", { ascending: false })
+        .eq("sample_id", sampleId)
+        .range(page * limit, page * limit + limit - 1);
+      
+      const term = searchInput.value.trim();
+      if (term) query = query.or(`lab_name.ilike.%${term}%,parameters::text.ilike.%${term}%`);
+      
+      const { data, count, error } = await query;
+      
+      if (error) {
+        console.error(error);
+        showToast("Failed to load lab results", "error");
+        return;
+      }
+      
+      total = count;
+      renderCards(data);
     }
 
-    function renderCards(data){
-      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No lab results found</p>";return;}
-      cardsContainer.innerHTML=data.map(r=>{
-        const badge=r.classification==="Unsafe"?"badge Unsafe":r.classification==="Safe"?"badge Safe":"badge Pending";
-        return`
+    function renderCards(data) {
+      if (!data.length) {
+        cardsContainer.innerHTML = "<div class='empty-state'><svg viewBox='0 0 24 24' fill='currentColor'><path d='M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z'/></svg><p>No lab results found</p></div>";
+        return;
+      }
+      
+      cardsContainer.innerHTML = data.map(r => {
+        const badgeClass = r.classification === "Unsafe" ? "badge Unsafe" : 
+                          r.classification === "Safe" ? "badge Safe" : 
+                          "badge Pending";
+        return `
           <div class="card">
             <div class="card-header">
-              <span>${r.lab_ref||"Result"}</span><span class="${badge}">${r.classification||"Pending"}</span>
+              <span>${r.lab_ref || "Result"}</span>
+              <span class="${badgeClass}">${r.classification || "Pending"}</span>
             </div>
-            <p><strong>Lab:</strong> ${r.lab_name||"-"} | <strong>Date:</strong> ${r.analysis_date||"-"}</p>
-            <p><strong>Parameters:</strong> ${(r.parameters||[]).join(", ")}</p>
-            <p><strong>Values:</strong> ${r.result_values||"-"} | <strong>Units:</strong> ${r.units||"-"}</p>
-            <p><strong>Technician:</strong> ${r.technician||"-"} | <strong>Turnaround:</strong> ${r.turnaround_days||"-"} days</p>
+            <p><strong>Lab:</strong> ${r.lab_name || "—"} | <strong>Date:</strong> ${r.analysis_date || "—"}</p>
+            <div class="parameter-tags">
+              ${(r.parameters || []).map(p => `<span class="parameter-tag">${p}</span>`).join('')}
+            </div>
+            <p><strong>Values:</strong> ${r.result_values || "—"} | <strong>Units:</strong> ${r.units || "—"}</p>
+            <p><strong>Technician:</strong> ${r.technician || "—"} | <strong>Turnaround:</strong> ${r.turnaround_days || "—"} days</p>
             <div class="actions">
-              <a href="water_alerts.html?sample=${r.sample_id}">Alerts</a>
+              <a href="water_alerts.html?sample=${r.sample_id}" class="btn btn-link">View Alerts</a>
             </div>
-          </div>`;}).join("");
-      prevPage.disabled=page===0;
-      nextPage.disabled=(page+1)*limit>=total;
+          </div>
+        `;
+      }).join("");
+      
+      prevPage.disabled = page === 0;
+      nextPage.disabled = (page + 1) * limit >= total;
     }
 
-    form.addEventListener("submit",async e=>{
+    form.addEventListener("submit", async e => {
       e.preventDefault();
-      const payload={
-        sample_id:sampleId,
-        lab_ref:document.getElementById("lab_ref").value.trim(),
-        analysis_date:document.getElementById("analysis_date").value,
-        lab_name:document.getElementById("lab_name").value.trim(),
-        parameters:document.getElementById("parameters").value.split(",").map(v=>v.trim()).filter(Boolean),
-        result_values:document.getElementById("result_values").value.trim(),
-        units:document.getElementById("units").value.trim(),
-        classification:document.getElementById("classification").value||"Pending",
-        turnaround_days:parseFloat(document.getElementById("turnaround_days").value)||null,
-        qa_reference:document.getElementById("qa_reference").value.trim()||null,
-        technician:document.getElementById("technician").value.trim()||null
+      
+      const payload = {
+        sample_id: sampleId,
+        lab_ref: document.getElementById("lab_ref").value.trim(),
+        analysis_date: document.getElementById("analysis_date").value,
+        lab_name: document.getElementById("lab_name").value.trim(),
+        parameters: document.getElementById("parameters").value.split(",").map(v => v.trim()).filter(Boolean),
+        result_values: document.getElementById("result_values").value.trim(),
+        units: document.getElementById("units").value.trim(),
+        classification: document.getElementById("classification").value || "Pending",
+        turnaround_days: parseFloat(document.getElementById("turnaround_days").value) || null,
+        qa_reference: document.getElementById("qa_reference").value.trim() || null,
+        technician: document.getElementById("technician").value.trim() || null
       };
-      const{error}=await supabase.from("water_lab_results").insert([payload]);
-      if(error){console.error(error);showToast("Save failed","error");return;}
+      
+      const { error } = await supabase.from("water_lab_results").insert([payload]);
+      
+      if (error) {
+        console.error(error);
+        showToast("Failed to save lab result", "error");
+        return;
+      }
+      
       showToast("Lab result added successfully");
-      form.reset();toggleForm(false);loadLabResults();
+      form.reset();
+      toggleForm(false);
+      loadLabResults();
     });
 
-    searchInput.addEventListener("input",()=>{page=0;loadLabResults();});
-    prevPage.addEventListener("click",()=>{if(page>0){page--;loadLabResults();}});
-    nextPage.addEventListener("click",()=>{if((page+1)*limit<total){page++;loadLabResults();}});
-    logoutBtn.addEventListener("click",async()=>{await supabase.auth.signOut();showToast("Logging out…");setTimeout(()=>window.location.href="login.html",800);});
+    searchInput.addEventListener("input", () => { page = 0; loadLabResults(); });
+    prevPage.addEventListener("click", () => { if (page > 0) { page--; loadLabResults(); }});
+    nextPage.addEventListener("click", () => { if ((page + 1) * limit < total) { page++; loadLabResults(); }});
+    
+    logoutBtn.addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      showToast("Logging out...");
+      setTimeout(() => window.location.href = "login.html", 800);
+    });
+    
+    document.getElementById("year").textContent = new Date().getFullYear();
     loadLabResults();
   </script>
 </body>

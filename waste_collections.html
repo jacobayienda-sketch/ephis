@@ -3,146 +3,406 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Waste Collections | EPHIS</title>
-  <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#2563eb" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <title>EPHIS | Waste Collections</title>
+  <link rel="manifest" href="manifest.json" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'SF Pro Display', system-ui, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
       min-height: 100vh;
-      color: #0f172a;
+      color: #1e293b;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 400px;
-      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
-      z-index: -1;
-      opacity: 0.05;
-    }
-
+    
     header {
       background: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      padding: 1.2rem 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
       position: sticky;
       top: 0;
       z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 1rem;
     }
-
-    .logo {
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .logo-icon {
       width: 40px;
       height: 40px;
-      background: linear-gradient(135deg, #0ea5e9, #2563eb);
-      border-radius: 8px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
       color: white;
+      font-weight: 700;
       font-size: 1.2rem;
     }
-
-    .header-content {
+    
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .header-actions {
       display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    
+    .btn {
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.9rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2), 0 2px 4px -1px rgba(37, 99, 235, 0.1);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.15);
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -1px rgba(16, 185, 129, 0.1);
+    }
+    
+    .btn-secondary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.15);
+    }
+    
+    .btn-light {
+      background: white;
+      color: #2563eb;
+      border: 2px solid #e0f2fe;
+    }
+    
+    .btn-light:hover {
+      background: #f0f9ff;
+      border-color: #bae6fd;
+      transform: translateY(-1px);
+    }
+    
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
       gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
     }
-
-    .header-content h1 { font-size: 1.3rem; font-weight: 600; color: #0f172a; }
-    .header-actions { display: flex; gap: 0.75rem; }
-
-    .btn { border: none; border-radius: 8px; cursor: pointer; font-weight: 600; padding: 0.75rem 1.5rem; font-size: 1rem; transition: all 0.2s; }
-    .btn-primary { background: linear-gradient(135deg, #0ea5e9, #2563eb); color: white; }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
-    .btn-secondary { background: linear-gradient(135deg, #059669, #10b981); color: white; }
-    .btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
-    .btn-light { background: white; color: #2563eb; border: 2px solid #e2e8f0; }
-    .btn-light:hover { border-color: #2563eb; background: #f8fafc; }
-
-    main { padding: 2rem; max-width: 1000px; margin: 0 auto; }
-    .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; gap: 1rem; }
-    .toolbar input { padding: 0.75rem 1rem 0.75rem 2.8rem; border: 2px solid #e2e8f0; border-radius: 10px; width: 300px; font-size: 1rem; transition: all 0.2s; background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23475569" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat 0.75rem center; }
-    .toolbar input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-
-    .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem; margin-bottom: 1rem; transition: transform 0.2s, box-shadow 0.2s; }
-    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .card-header { display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: #0f172a; margin-bottom: 0.75rem; }
-
-    .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
-    .actions a { text-decoration: none; color: white; background: linear-gradient(135deg, #0ea5e9, #2563eb); border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.9rem; transition: all 0.2s; }
-    .actions a:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
-
-    .pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem; }
-    .pagination button { border: 2px solid #e2e8f0; background: white; color: #2563eb; border-radius: 8px; padding: 0.5rem 1rem; cursor: pointer; font-weight: 600; transition: all 0.2s; }
-    .pagination button:hover { border-color: #2563eb; background: #f8fafc; transform: scale(1.05); }
-
-    .form-card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 2rem; margin-bottom: 1rem; }
-    form label { font-weight: 600; display: block; margin-top: 0.75rem; color: #0f172a; }
-    form input, form select, form textarea { width: 100%; padding: 0.75rem; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 0.95rem; transition: all 0.2s; }
-    form input:focus, form select:focus, form textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transition: opacity 0.3s; }
+    
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 250px;
+      max-width: 400px;
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      pointer-events: none;
+    }
+    
+    .toolbar input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.75rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      background: white;
+    }
+    
+    .toolbar input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid #f1f5f9;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+      border-color: #e0f2fe;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 1.05rem;
+    }
+    
+    .card p {
+      color: #64748b;
+      font-size: 0.95rem;
+      margin: 0.5rem 0;
+    }
+    
+    .card p strong {
+      color: #475569;
+      font-weight: 600;
+    }
+    
+    .material-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 0.75rem 0;
+    }
+    
+    .material-tag {
+      background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+      color: #075985;
+      padding: 0.375rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid #7dd3fc;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-top: 2rem;
+    }
+    
+    .pagination button {
+      border: none;
+      background: white;
+      color: #2563eb;
+      border: 2px solid #e0f2fe;
+      border-radius: 10px;
+      padding: 0.625rem 1.25rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    
+    .pagination button:hover:not(:disabled) {
+      background: #f0f9ff;
+      border-color: #bae6fd;
+      transform: translateY(-1px);
+    }
+    
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .form-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -1px rgba(0,0,0,0.04);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid #f1f5f9;
+    }
+    
+    form label {
+      font-weight: 600;
+      display: block;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      color: #334155;
+      font-size: 0.9rem;
+    }
+    
+    form input, form select, form textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      border: 2px solid #e2e8f0;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    
+    form input:focus, form select:focus, form textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    footer {
+      text-align: center;
+      background: white;
+      color: #64748b;
+      padding: 1.5rem;
+      font-size: 0.85rem;
+      margin-top: 3rem;
+      border-top: 1px solid #f1f5f9;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.15);
+      font-weight: 500;
+      z-index: 1000;
+    }
+    
     .toast.show { opacity: 1; }
-
-    @media (max-width: 768px) {
-      main { padding: 1rem; }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #94a3b8;
+    }
+    
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1rem;
+      opacity: 0.5;
+    }
+    
+    @media(max-width: 768px) {
+      .header-container { flex-wrap: wrap; padding: 1rem; }
+      header h1 { font-size: 1.1rem; }
       .toolbar { flex-direction: column; align-items: stretch; }
-      .toolbar input { width: 100%; }
-      .header-content h1 { font-size: 1.1rem; }
+      .search-wrapper { max-width: 100%; }
+      .card { padding: 1.25rem; }
+      .form-card { padding: 1.5rem; }
     }
   </style>
 </head>
 
 <body>
   <header>
-    <div class="header-content">
-      <div class="logo">E</div>
-      <h1>🗑️ Waste Collections</h1>
-    </div>
-    <div class="header-actions">
-      <button class="btn btn-light" onclick="history.back()">← Back</button>
-      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+    <div class="header-container">
+      <div class="logo-section">
+        <div class="logo-icon">🗑️</div>
+        <h1>Waste Collections</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-light" onclick="history.back()">← Back</button>
+        <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+      </div>
     </div>
   </header>
 
   <main>
     <div class="toolbar">
-      <input type="text" id="searchInput" placeholder="Search collection zone or contractor..." />
+      <div class="search-wrapper">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search collection zone or contractor..." />
+      </div>
       <button class="btn btn-primary" id="addBtn">+ Add Collection</button>
     </div>
 
     <div id="formContainer" style="display:none;" class="form-card">
       <form id="collectionForm">
-        <label>Collection Zone</label><input type="text" id="collection_zone" required />
-        <label>Waste Type (comma separated)</label><input type="text" id="waste_type" placeholder="Plastic, Organic, Metal" />
+        <label>Collection Zone</label>
+        <input type="text" id="collection_zone" placeholder="Zone name or area" required />
+        
+        <label>Waste Type (comma separated)</label>
+        <input type="text" id="waste_type" placeholder="Plastic, Organic, Metal" />
+        
         <label>Frequency</label>
         <select id="frequency">
           <option value="">Select</option>
-          <option>Daily</option><option>Weekly</option><option>Biweekly</option><option>Monthly</option><option>Quarterly</option><option>Adhoc</option>
+          <option>Daily</option>
+          <option>Weekly</option>
+          <option>Biweekly</option>
+          <option>Monthly</option>
+          <option>Quarterly</option>
+          <option>Adhoc</option>
         </select>
-        <label>Contractor</label><input type="text" id="contractor" placeholder="Company or individual" />
-        <label>Vehicle Details</label><input type="text" id="vehicle_details" placeholder="e.g., Truck KDG 123A" />
-        <label>Waste Volume (tons)</label><input type="number" step="0.1" id="waste_volume" />
-        <label>Disposal Method</label><input type="text" id="disposal_method" placeholder="Landfill, Composting, Transfer..." />
-        <label>Disposal Date</label><input type="date" id="disposal_date" />
-        <label>Disposal Site</label><input type="text" id="disposal_site" placeholder="Site name or location" />
-        <div style="text-align:right;margin-top:0.6rem;">
-          <button type="submit" class="btn btn-primary">Save</button>
+        
+        <label>Contractor</label>
+        <input type="text" id="contractor" placeholder="Company or individual" />
+        
+        <label>Vehicle Details</label>
+        <input type="text" id="vehicle_details" placeholder="e.g., Truck KDG 123A" />
+        
+        <label>Waste Volume (tons)</label>
+        <input type="number" step="0.1" id="waste_volume" placeholder="25.5" />
+        
+        <label>Disposal Method</label>
+        <input type="text" id="disposal_method" placeholder="Landfill, Composting, Transfer..." />
+        
+        <label>Disposal Date</label>
+        <input type="date" id="disposal_date" />
+        
+        <label>Disposal Site</label>
+        <input type="text" id="disposal_site" placeholder="Site name or location" />
+        
+        <div style="text-align:right;margin-top:1.5rem;display:flex;gap:0.75rem;justify-content:flex-end;">
           <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Collection</button>
         </div>
       </form>
     </div>
@@ -150,92 +410,151 @@
     <div id="cardsContainer"></div>
 
     <div class="pagination">
-      <button id="prevPage">Previous</button>
-      <button id="nextPage">Next</button>
+      <button id="prevPage">← Previous</button>
+      <button id="nextPage">Next →</button>
     </div>
   </main>
+
+  <footer>
+    County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span>
+  </footer>
 
   <div id="toast" class="toast"></div>
 
   <script type="module">
     import { supabase } from "./main.js";
-    const toast=document.getElementById("toast");
-    const logoutBtn=document.getElementById("logoutBtn");
-    const addBtn=document.getElementById("addBtn");
-    const cancelBtn=document.getElementById("cancelBtn");
-    const formContainer=document.getElementById("formContainer");
-    const form=document.getElementById("collectionForm");
-    const searchInput=document.getElementById("searchInput");
-    const cardsContainer=document.getElementById("cardsContainer");
-    const prevPage=document.getElementById("prevPage");
-    const nextPage=document.getElementById("nextPage");
+    const toast = document.getElementById("toast");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const addBtn = document.getElementById("addBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const formContainer = document.getElementById("formContainer");
+    const form = document.getElementById("collectionForm");
+    const searchInput = document.getElementById("searchInput");
+    const cardsContainer = document.getElementById("cardsContainer");
+    const prevPage = document.getElementById("prevPage");
+    const nextPage = document.getElementById("nextPage");
 
-    const urlParams=new URLSearchParams(window.location.search);
-    const siteId=urlParams.get("id");
+    const urlParams = new URLSearchParams(window.location.search);
+    const siteId = urlParams.get("id");
 
-    let page=0;const limit=10;let total=0;
+    let page = 0;
+    const limit = 10;
+    let total = 0;
 
-    function showToast(msg,type="info"){toast.textContent=msg;toast.style.background=type==="error"?"#c62828":"#1976d2";toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
+    function showToast(msg, type = "info") {
+      toast.textContent = msg;
+      toast.style.background = type === "error" 
+        ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)" 
+        : "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
 
-    async function checkSession(){const {data}=await supabase.auth.getSession();if(!data.session)window.location.href="login.html";}
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) window.location.href = "login.html";
+    }
     checkSession();
 
-    function toggleForm(show){formContainer.style.display=show?"block":"none";}
-    addBtn.addEventListener("click",()=>toggleForm(true));
-    cancelBtn.addEventListener("click",()=>toggleForm(false));
+    function toggleForm(show) {
+      formContainer.style.display = show ? "block" : "none";
+      if (show) formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    addBtn.addEventListener("click", () => toggleForm(true));
+    cancelBtn.addEventListener("click", () => toggleForm(false));
 
-    async function loadCollections(){
-      cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading…</p>";
-      let query=supabase.from("waste_collections").select("*",{count:"exact"}).order("disposal_date",{ascending:false}).eq("site_id",siteId).range(page*limit,page*limit+limit-1);
-      const term=searchInput.value.trim();
-      if(term)query=query.or(`collection_zone.ilike.%${term}%,contractor.ilike.%${term}%`);
-      const{data,count,error}=await query;
-      if(error){console.error(error);showToast("Load failed","error");return;}
-      total=count;renderCards(data);
+    async function loadCollections() {
+      cardsContainer.innerHTML = "<div class='empty-state'><p>Loading...</p></div>";
+      
+      let query = supabase
+        .from("waste_collections")
+        .select("*", { count: "exact" })
+        .order("disposal_date", { ascending: false })
+        .eq("site_id", siteId)
+        .range(page * limit, page * limit + limit - 1);
+      
+      const term = searchInput.value.trim();
+      if (term) query = query.or(`collection_zone.ilike.%${term}%,contractor.ilike.%${term}%`);
+      
+      const { data, count, error } = await query;
+      
+      if (error) {
+        console.error(error);
+        showToast("Failed to load collection records", "error");
+        return;
+      }
+      
+      total = count;
+      renderCards(data);
     }
 
-    function renderCards(data){
-      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No collection records found</p>";return;}
-      cardsContainer.innerHTML=data.map(c=>`
+    function renderCards(data) {
+      if (!data.length) {
+        cardsContainer.innerHTML = "<div class='empty-state'><svg viewBox='0 0 24 24' fill='currentColor'><path d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'/></svg><p>No collection records found</p></div>";
+        return;
+      }
+      
+      cardsContainer.innerHTML = data.map(c => `
         <div class="card">
           <div class="card-header">
-            <span>${c.collection_zone||"Collection Zone"}</span>
-            <span>${c.disposal_date||"–"}</span>
+            <span>${c.collection_zone || "Collection Zone"}</span>
+            <span style="color: #64748b; font-size: 0.9rem;">${c.disposal_date || "—"}</span>
           </div>
-          <p><strong>Waste Types:</strong> ${(c.waste_type||[]).join(", ")}</p>
-          <p><strong>Contractor:</strong> ${c.contractor||"-"} | <strong>Frequency:</strong> ${c.frequency||"-"}</p>
-          <p><strong>Volume:</strong> ${c.waste_volume||"-"} tons | <strong>Method:</strong> ${c.disposal_method||"-"}</p>
-          <p><strong>Disposal Site:</strong> ${c.disposal_site||"-"} | <strong>Vehicle:</strong> ${c.vehicle_details||"-"}</p>
-        </div>`).join("");
-      prevPage.disabled=page===0;
-      nextPage.disabled=(page+1)*limit>=total;
+          <div class="material-tags">
+            ${(c.waste_type || []).map(w => `<span class="material-tag">${w}</span>`).join('')}
+          </div>
+          <p><strong>Contractor:</strong> ${c.contractor || "—"} | <strong>Frequency:</strong> ${c.frequency || "—"}</p>
+          <p><strong>Volume:</strong> ${c.waste_volume || "—"} tons | <strong>Method:</strong> ${c.disposal_method || "—"}</p>
+          <p><strong>Disposal Site:</strong> ${c.disposal_site || "—"} | <strong>Vehicle:</strong> ${c.vehicle_details || "—"}</p>
+        </div>
+      `).join("");
+      
+      prevPage.disabled = page === 0;
+      nextPage.disabled = (page + 1) * limit >= total;
     }
 
-    form.addEventListener("submit",async e=>{
+    form.addEventListener("submit", async e => {
       e.preventDefault();
-      const payload={
-        site_id:siteId,
-        collection_zone:document.getElementById("collection_zone").value.trim(),
-        waste_type:document.getElementById("waste_type").value.split(",").map(v=>v.trim()).filter(Boolean),
-        frequency:document.getElementById("frequency").value||null,
-        contractor:document.getElementById("contractor").value.trim()||null,
-        vehicle_details:document.getElementById("vehicle_details").value.trim()||null,
-        waste_volume:parseFloat(document.getElementById("waste_volume").value)||null,
-        disposal_method:document.getElementById("disposal_method").value.trim()||null,
-        disposal_date:document.getElementById("disposal_date").value||null,
-        disposal_site:document.getElementById("disposal_site").value.trim()||null
+      
+      const payload = {
+        site_id: siteId,
+        collection_zone: document.getElementById("collection_zone").value.trim(),
+        waste_type: document.getElementById("waste_type").value.split(",").map(v => v.trim()).filter(Boolean),
+        frequency: document.getElementById("frequency").value || null,
+        contractor: document.getElementById("contractor").value.trim() || null,
+        vehicle_details: document.getElementById("vehicle_details").value.trim() || null,
+        waste_volume: parseFloat(document.getElementById("waste_volume").value) || null,
+        disposal_method: document.getElementById("disposal_method").value.trim() || null,
+        disposal_date: document.getElementById("disposal_date").value || null,
+        disposal_site: document.getElementById("disposal_site").value.trim() || null
       };
-      const{error}=await supabase.from("waste_collections").insert([payload]);
-      if(error){console.error(error);showToast("Save failed","error");return;}
+      
+      const { error } = await supabase.from("waste_collections").insert([payload]);
+      
+      if (error) {
+        console.error(error);
+        showToast("Failed to save collection", "error");
+        return;
+      }
+      
       showToast("Collection added successfully");
-      form.reset();toggleForm(false);loadCollections();
+      form.reset();
+      toggleForm(false);
+      loadCollections();
     });
 
-    searchInput.addEventListener("input",()=>{page=0;loadCollections();});
-    prevPage.addEventListener("click",()=>{if(page>0){page--;loadCollections();}});
-    nextPage.addEventListener("click",()=>{if((page+1)*limit<total){page++;loadCollections();}});
-    logoutBtn.addEventListener("click",async()=>{await supabase.auth.signOut();showToast("Logging out…");setTimeout(()=>window.location.href="login.html",800);});
-    document.getElementById("year").textContent=new Date().getFullYear();
+    searchInput.addEventListener("input", () => { page = 0; loadCollections(); });
+    prevPage.addEventListener("click", () => { if (page > 0) { page--; loadCollections(); }});
+    nextPage.addEventListener("click", () => { if ((page + 1) * limit < total) { page++; loadCollections(); }});
+    
+    logoutBtn.addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      showToast("Logging out...");
+      setTimeout(() => window.location.href = "login.html", 800);
+    });
+    
+    document.getElementById("year").textContent = new Date().getFullYear();
     loadCollections();
   </script>
 </body>

@@ -3,62 +3,431 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#2563eb" />
   <title>EPHIS | Water Performance Dashboard</title>
-  <meta name="theme-color" content="#2563eb">
-  <link rel="icon" href="icon-192.png">
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="manifest.json" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8fafc;margin:0;color:#0f172a;display:flex;flex-direction:column;min-height:100vh;position:relative;}
-    body::before{content:'';position:fixed;top:0;left:0;right:0;height:400px;background:linear-gradient(135deg,#0ea5e9 0%,#2563eb 50%,#7c3aed 100%);opacity:0.05;z-index:0;pointer-events:none;}
-    header{background:white;box-shadow:0 1px 3px rgba(0,0,0,0.1);display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;position:sticky;top:0;z-index:10;flex-wrap:wrap;}
-    .logo{width:40px;height:40px;background:linear-gradient(135deg,#2563eb,#7c3aed);border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:1.1rem;}
-    header h1{font-size:1.1rem;margin:0 0 0 12px;font-weight:700;color:#1e293b;display:flex;align-items:center;}
-    .btn{border:none;border-radius:8px;cursor:pointer;font-weight:600;padding:0.5rem 1rem;font-size:0.9rem;transition:all 0.2s;}
-    .btn-primary{background:linear-gradient(135deg,#2563eb,#3b82f6);color:white;}
-    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.4);}
-    .btn-secondary{background:linear-gradient(135deg,#10b981,#34d399);color:white;}
-    .btn-secondary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(16,185,129,0.4);}
-    .btn-light{background:white;color:#2563eb;border:1px solid #e2e8f0;}
-    .btn-light:hover{background:#f1f5f9;}
-    main{flex:1;padding:1rem;max-width:900px;margin:0 auto;position:relative;z-index:1;}
-    .card{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.1);padding:1.5rem;margin-bottom:1rem;transition:all 0.2s;border:1px solid #f1f5f9;}
-    .card:hover{box-shadow:0 4px 12px rgba(0,0,0,0.1);transform:translateY(-1px);}
-    .card h2{margin-top:0;color:#1e293b;font-size:1.1rem;font-weight:700;}
-    .metric{display:flex;justify-content:space-between;align-items:center;margin:0.75rem 0;}
-    .metric span:first-child{font-weight:600;color:#374151;}
-    .metric-value{font-size:1.2rem;font-weight:700;background:linear-gradient(135deg,#2563eb,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-    .updated{text-align:right;font-size:0.85rem;color:#6b7280;margin-top:0.75rem;}
-    .form-card{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.1);padding:1.5rem;margin-bottom:1rem;border:1px solid #f1f5f9;}
-    form label{font-weight:600;display:block;margin-top:0.75rem;color:#374151;}
-    form input{width:100%;padding:0.75rem;border-radius:8px;border:1px solid #e2e8f0;font-size:0.9rem;transition:all 0.2s;}
-    form input:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,0.1);}
-    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#2563eb,#3b82f6);color:white;padding:1rem 1.5rem;border-radius:12px;opacity:0;transition:opacity 0.3s ease;box-shadow:0 4px 12px rgba(37,99,235,0.4);}
-    .toast.show{opacity:1;}
-    @media(max-width:600px){.metric{flex-direction:column;align-items:flex-start;gap:0.3rem;}}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'SF Pro Display', system-ui, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+      min-height: 100vh;
+      color: #1e293b;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    header {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    
+    .btn {
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.9rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2), 0 2px 4px -1px rgba(37, 99, 235, 0.1);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.15);
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -1px rgba(16, 185, 129, 0.1);
+    }
+    
+    .btn-secondary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.15);
+    }
+    
+    .btn-light {
+      background: white;
+      color: #2563eb;
+      border: 2px solid #e0f2fe;
+    }
+    
+    .btn-light:hover {
+      background: #f0f9ff;
+      border-color: #bae6fd;
+      transform: translateY(-1px);
+    }
+    
+    main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid #f1f5f9;
+    }
+    
+    .card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+      border-color: #e0f2fe;
+    }
+    
+    .card h2 {
+      margin: 0 0 1.5rem 0;
+      color: #1e293b;
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .card h2::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      border-radius: 2px;
+    }
+    
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .metric {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      padding: 1.5rem;
+      border-radius: 10px;
+      border: 1px solid #bae6fd;
+      transition: all 0.2s;
+    }
+    
+    .metric:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.15);
+    }
+    
+    .metric-label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #0369a1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+    
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #0c4a6e;
+      line-height: 1;
+    }
+    
+    .metric-unit {
+      font-size: 0.9rem;
+      color: #0369a1;
+      font-weight: 600;
+      margin-left: 0.25rem;
+    }
+    
+    .updated {
+      text-align: right;
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .updated::before {
+      content: '🕐 ';
+    }
+    
+    .form-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -1px rgba(0,0,0,0.04);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid #f1f5f9;
+    }
+    
+    .form-card h2 {
+      margin: 0 0 1.5rem 0;
+      color: #1e293b;
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .form-card h2::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      border-radius: 2px;
+    }
+    
+    form label {
+      font-weight: 600;
+      display: block;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      color: #334155;
+      font-size: 0.9rem;
+    }
+    
+    form input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      border: 2px solid #e2e8f0;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    
+    form input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    footer {
+      text-align: center;
+      background: white;
+      color: #64748b;
+      padding: 1.5rem;
+      font-size: 0.85rem;
+      margin-top: 3rem;
+      border-top: 1px solid #f1f5f9;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.15);
+      font-weight: 500;
+      z-index: 1000;
+    }
+    
+    .toast.show { opacity: 1; }
+    
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      color: #64748b;
+    }
+    
+    .loading::after {
+      content: '';
+      width: 20px;
+      height: 20px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 0.75rem;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .icon-wrapper {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    
+    .icon-wrapper svg {
+      width: 24px;
+      height: 24px;
+      color: #1e40af;
+    }
+    
+    @media(max-width: 768px) {
+      .header-container { flex-wrap: wrap; padding: 1rem; }
+      header h1 { font-size: 1.1rem; }
+      .card, .form-card { padding: 1.5rem; }
+      .metrics-grid { grid-template-columns: 1fr; }
+      .metric-value { font-size: 1.75rem; }
+    }
   </style>
 </head>
 
 <body>
   <header>
-    <div style="display: flex; align-items: center;">
-      <div class="logo">E</div>
-      <h1>💧 Water Quality Performance</h1>
-    </div>
-    <div>
-      <button class="btn btn-light" onclick="history.back()">Back</button>
-      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+    <div class="header-container">
+      <div class="logo-section">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            <path d="M12 14c-3 0-5.5 1.5-5.5 3.5V19h11v-1.5c0-2-2.5-3.5-5.5-3.5z" opacity="0.5"/>
+          </svg>
+        </div>
+        <h1>Water Quality Performance</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-light" onclick="history.back()">← Back</button>
+        <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+      </div>
     </div>
   </header>
 
   <main>
     <div id="metricsContainer" class="card">
       <h2>Performance Overview</h2>
-      <div class="metric"><span>Water Supply Coverage:</span> <span class="metric-value" id="coveragePercent">–</span></div>
-      <div class="metric"><span>Safe Sources:</span> <span class="metric-value" id="safeSources">–</span></div>
-      <div class="metric"><span>Average Turnaround Time:</span> <span class="metric-value" id="avgTurnaround">–</span></div>
-      <div class="metric"><span>Alerts Resolved:</span> <span class="metric-value" id="alertsResolved">–</span></div>
+      
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+          </div>
+          <span class="metric-label">Water Supply Coverage</span>
+          <div>
+            <span class="metric-value" id="coveragePercent">—</span>
+          </div>
+        </div>
+        
+        <div class="metric">
+          <div class="icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <span class="metric-label">Safe Sources</span>
+          <div>
+            <span class="metric-value" id="safeSources">—</span>
+          </div>
+        </div>
+        
+        <div class="metric">
+          <div class="icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <span class="metric-label">Avg Turnaround Time</span>
+          <div>
+            <span class="metric-value" id="avgTurnaround">—</span>
+          </div>
+        </div>
+        
+        <div class="metric">
+          <div class="icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </div>
+          <span class="metric-label">Alerts Resolved</span>
+          <div>
+            <span class="metric-value" id="alertsResolved">—</span>
+          </div>
+        </div>
+      </div>
+      
       <div class="updated" id="lastUpdated"></div>
     </div>
 
@@ -66,19 +435,19 @@
       <h2>Update Performance Data</h2>
       <form id="performanceForm">
         <label>Water Supply Coverage (%)</label>
-        <input type="number" step="0.1" id="coverage_percent" required />
+        <input type="number" step="0.1" id="coverage_percent" placeholder="e.g., 85.5" required />
 
         <label>Safe Sources (%)</label>
-        <input type="number" step="0.1" id="safe_sources_percent" required />
+        <input type="number" step="0.1" id="safe_sources_percent" placeholder="e.g., 92.3" required />
 
         <label>Average Turnaround (Days)</label>
-        <input type="number" step="0.1" id="avg_turnaround_days" required />
+        <input type="number" step="0.1" id="avg_turnaround_days" placeholder="e.g., 3.5" required />
 
         <label>Alerts Resolved (Count)</label>
-        <input type="number" step="1" id="alerts_resolved" required />
+        <input type="number" step="1" id="alerts_resolved" placeholder="e.g., 12" required />
 
-        <div style="text-align:right;margin-top:0.6rem;">
-          <button type="submit" class="btn btn-primary">Save</button>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">💾 Save Performance Data</button>
         </div>
       </form>
     </div>
@@ -93,47 +462,110 @@
   <script type="module">
     import { supabase } from "./main.js";
 
-    const toast=document.getElementById("toast");
-    const logoutBtn=document.getElementById("logoutBtn");
-    const form=document.getElementById("performanceForm");
-    const coveragePercent=document.getElementById("coveragePercent");
-    const safeSources=document.getElementById("safeSources");
-    const avgTurnaround=document.getElementById("avgTurnaround");
-    const alertsResolved=document.getElementById("alertsResolved");
-    const lastUpdated=document.getElementById("lastUpdated");
+    const toast = document.getElementById("toast");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const form = document.getElementById("performanceForm");
+    const coveragePercent = document.getElementById("coveragePercent");
+    const safeSources = document.getElementById("safeSources");
+    const avgTurnaround = document.getElementById("avgTurnaround");
+    const alertsResolved = document.getElementById("alertsResolved");
+    const lastUpdated = document.getElementById("lastUpdated");
 
-    function showToast(msg,type="info"){toast.textContent=msg;toast.style.background=type==="error"?"#c62828":"#1976d2";toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
-
-    async function checkSession(){const {data}=await supabase.auth.getSession();if(!data.session)window.location.href="login.html";}
-    checkSession();
-
-    async function loadPerformance(){
-      const{data,error}=await supabase.from("water_performance").select("*").order("updated_at",{ascending:false}).limit(1).single();
-      if(error||!data){showToast("No performance data found","error");return;}
-      coveragePercent.textContent=data.coverage_percent?data.coverage_percent+"%":"–";
-      safeSources.textContent=data.safe_sources_percent?data.safe_sources_percent+"%":"–";
-      avgTurnaround.textContent=data.avg_turnaround_days?data.avg_turnaround_days+" days":"–";
-      alertsResolved.textContent=data.alerts_resolved??"–";
-      lastUpdated.textContent="Last updated: "+(data.updated_at?new Date(data.updated_at).toLocaleString():"–");
+    function showToast(msg, type = "info") {
+      toast.textContent = msg;
+      toast.style.background = type === "error" 
+        ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)" 
+        : "linear-gradient(135deg, #10b981 0%, #059669 100%)";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
     }
 
-    form.addEventListener("submit",async e=>{
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) window.location.href = "login.html";
+    }
+    checkSession();
+
+    async function loadPerformance() {
+      const metricsContainer = document.getElementById("metricsContainer");
+      const originalContent = metricsContainer.innerHTML;
+      metricsContainer.innerHTML = "<div class='loading'>Loading performance data</div>";
+      
+      const { data, error } = await supabase
+        .from("water_performance")
+        .select("*")
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (error || !data) {
+        metricsContainer.innerHTML = originalContent;
+        showToast("No performance data found", "error");
+        coveragePercent.textContent = "—";
+        safeSources.textContent = "—";
+        avgTurnaround.textContent = "—";
+        alertsResolved.textContent = "—";
+        lastUpdated.textContent = "No data available";
+        return;
+      }
+      
+      metricsContainer.innerHTML = originalContent;
+      
+      coveragePercent.innerHTML = data.coverage_percent 
+        ? `${data.coverage_percent}<span class="metric-unit">%</span>` 
+        : "—";
+      safeSources.innerHTML = data.safe_sources_percent 
+        ? `${data.safe_sources_percent}<span class="metric-unit">%</span>` 
+        : "—";
+      avgTurnaround.innerHTML = data.avg_turnaround_days 
+        ? `${data.avg_turnaround_days}<span class="metric-unit">days</span>` 
+        : "—";
+      alertsResolved.textContent = data.alerts_resolved ?? "—";
+      lastUpdated.textContent = data.updated_at 
+        ? `Last updated: ${new Date(data.updated_at).toLocaleString()}` 
+        : "No update date available";
+    }
+
+    form.addEventListener("submit", async e => {
       e.preventDefault();
-      const payload={
-        coverage_percent:parseFloat(document.getElementById("coverage_percent").value)||0,
-        safe_sources_percent:parseFloat(document.getElementById("safe_sources_percent").value)||0,
-        avg_turnaround_days:parseFloat(document.getElementById("avg_turnaround_days").value)||0,
-        alerts_resolved:parseInt(document.getElementById("alerts_resolved").value)||0,
-        updated_by:"System",
-        updated_at:new Date()
+      
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = "Saving...";
+      submitBtn.disabled = true;
+      
+      const payload = {
+        coverage_percent: parseFloat(document.getElementById("coverage_percent").value) || 0,
+        safe_sources_percent: parseFloat(document.getElementById("safe_sources_percent").value) || 0,
+        avg_turnaround_days: parseFloat(document.getElementById("avg_turnaround_days").value) || 0,
+        alerts_resolved: parseInt(document.getElementById("alerts_resolved").value) || 0,
+        updated_by: "System",
+        updated_at: new Date()
       };
-      const{error}=await supabase.from("water_performance").insert([payload]);
-      if(error){console.error(error);showToast("Save failed","error");return;}
-      showToast("Performance updated successfully");
-      form.reset();loadPerformance();
+      
+      const { error } = await supabase.from("water_performance").insert([payload]);
+      
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+      
+      if (error) {
+        console.error(error);
+        showToast("Failed to save performance data", "error");
+        return;
+      }
+      
+      showToast("Performance data updated successfully");
+      form.reset();
+      loadPerformance();
     });
 
-    logoutBtn.addEventListener("click",async()=>{await supabase.auth.signOut();showToast("Logging out…");setTimeout(()=>window.location.href="login.html",800);});
+    logoutBtn.addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      showToast("Logging out...");
+      setTimeout(() => window.location.href = "login.html", 800);
+    });
+    
+    document.getElementById("year").textContent = new Date().getFullYear();
     loadPerformance();
   </script>
 </body>

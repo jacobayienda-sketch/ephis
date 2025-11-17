@@ -3,390 +3,348 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#2563eb" />
   <title>EPHIS | Vector Surveillance</title>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#2563eb" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'SF Pro Display', system-ui, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
       min-height: 100vh;
-      color: #0f172a;
-      display: flex;
-      flex-direction: column;
+      color: #1e293b;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 400px;
-      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
-      z-index: -1;
-      opacity: 0.05;
-    }
-
+    
     header {
       background: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      padding: 1.2rem 2rem;
-      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
     }
-
-    .header-content {
+    
+    .header-container {
       max-width: 1200px;
       margin: 0 auto;
+      padding: 1rem 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
       gap: 1rem;
     }
-
-    .header-title {
+    
+    .logo-section {
       display: flex;
       align-items: center;
-      gap: 0.8rem;
+      gap: 0.75rem;
     }
-
-    .header-icon {
+    
+    .logo-icon {
       width: 40px;
       height: 40px;
-      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
+      color: white;
+      font-weight: 700;
       font-size: 1.2rem;
     }
-
+    
     header h1 {
-      font-size: 1.3rem;
-      color: #0f172a;
+      font-size: 1.25rem;
       font-weight: 700;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-
+    
     .header-actions {
       display: flex;
-      gap: 0.8rem;
+      gap: 0.75rem;
+      align-items: center;
     }
-
+    
     .btn {
       border: none;
       border-radius: 10px;
       cursor: pointer;
       font-weight: 600;
-      padding: 0.7rem 1.3rem;
-      font-size: 0.95rem;
-      transition: all 0.3s;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.9rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
     }
-
+    
     .btn-primary {
-      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       color: white;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2), 0 2px 4px -1px rgba(37, 99, 235, 0.1);
     }
-
+    
     .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.15);
     }
-
+    
     .btn-secondary {
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: white;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+      box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -1px rgba(16, 185, 129, 0.1);
     }
-
+    
     .btn-secondary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.15);
     }
-
+    
     .btn-light {
       background: white;
-      color: #475569;
-      border: 2px solid #e2e8f0;
+      color: #2563eb;
+      border: 2px solid #e0f2fe;
     }
-
+    
     .btn-light:hover {
-      border-color: #3b82f6;
-      color: #3b82f6;
+      background: #f0f9ff;
+      border-color: #bae6fd;
+      transform: translateY(-1px);
     }
-
+    
     main {
-      flex: 1;
-      padding: 2rem 1rem;
       max-width: 1200px;
       margin: 0 auto;
-      width: 100%;
+      padding: 2rem 1.5rem;
     }
-
+    
     .toolbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
       gap: 1rem;
       margin-bottom: 2rem;
+      flex-wrap: wrap;
     }
-
+    
     .search-wrapper {
       position: relative;
       flex: 1;
+      min-width: 250px;
       max-width: 400px;
     }
-
+    
     .search-icon {
       position: absolute;
       left: 1rem;
       top: 50%;
       transform: translateY(-50%);
       color: #94a3b8;
+      pointer-events: none;
     }
-
+    
     .toolbar input {
       width: 100%;
-      padding: 0.9rem 1rem 0.9rem 2.8rem;
+      padding: 0.75rem 1rem 0.75rem 2.75rem;
       border: 2px solid #e2e8f0;
       border-radius: 12px;
-      font-size: 1rem;
-      transition: all 0.3s;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      background: white;
     }
-
+    
     .toolbar input:focus {
       outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
-
+    
     .card {
       background: white;
-      border-radius: 16px;
-      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
       padding: 1.5rem;
-      margin-bottom: 1.2rem;
-      transition: all 0.3s;
+      margin-bottom: 1rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid #f1f5f9;
     }
-
+    
     .card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+      border-color: #e0f2fe;
     }
-
+    
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid #f1f5f9;
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 1.05rem;
     }
-
-    .card-header span:first-child {
-      font-weight: 700;
-      color: #0f172a;
-      font-size: 1.1rem;
-    }
-
+    
     .badge {
       border-radius: 8px;
-      padding: 0.3rem 0.8rem;
-      font-size: 0.85rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.02em;
+      padding: 0.375rem 0.875rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
     }
-
+    
     .badge.Lab {
-      background: #dbeafe;
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
       color: #1e40af;
     }
-
+    
     .badge.Field {
-      background: #d1fae5;
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
       color: #065f46;
     }
-
+    
     .card p {
       color: #64748b;
-      line-height: 1.6;
+      font-size: 0.95rem;
       margin: 0.5rem 0;
-      font-size: 0.95rem;
     }
-
-    .card strong {
-      color: #334155;
+    
+    .card p strong {
+      color: #475569;
       font-weight: 600;
     }
-
-    .form-card {
-      background: white;
-      border-radius: 16px;
-      border: 1px solid #e2e8f0;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-
-    .form-card h2 {
-      color: #0f172a;
-      margin-bottom: 1.5rem;
-      font-size: 1.3rem;
-    }
-
-    form label {
-      font-weight: 600;
-      display: block;
-      margin-top: 1rem;
-      margin-bottom: 0.4rem;
-      color: #334155;
-      font-size: 0.95rem;
-    }
-
-    form input,
-    form select,
-    form textarea {
-      width: 100%;
-      padding: 0.9rem;
-      border-radius: 10px;
-      border: 2px solid #e2e8f0;
-      font-size: 1rem;
-      transition: all 0.3s;
-      font-family: inherit;
-    }
-
-    form input:focus,
-    form select:focus,
-    form textarea:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-    }
-
-    .form-actions {
-      display: flex;
-      gap: 0.8rem;
-      justify-content: flex-end;
-      margin-top: 1.5rem;
-    }
-
+    
     .pagination {
       display: flex;
       justify-content: center;
-      gap: 0.8rem;
+      gap: 0.75rem;
       margin-top: 2rem;
     }
-
+    
     .pagination button {
       border: none;
-      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
-      color: white;
+      background: white;
+      color: #2563eb;
+      border: 2px solid #e0f2fe;
       border-radius: 10px;
-      padding: 0.7rem 1.5rem;
+      padding: 0.625rem 1.25rem;
       cursor: pointer;
       font-weight: 600;
-      transition: all 0.3s;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      transition: all 0.2s;
     }
-
+    
     .pagination button:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+      background: #f0f9ff;
+      border-color: #bae6fd;
+      transform: translateY(-1px);
     }
-
+    
     .pagination button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
-
+    
+    .form-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -1px rgba(0,0,0,0.04);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid #f1f5f9;
+    }
+    
+    form label {
+      font-weight: 600;
+      display: block;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      color: #334155;
+      font-size: 0.9rem;
+    }
+    
+    form input, form select, form textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      border: 2px solid #e2e8f0;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    
+    form input:focus, form select:focus, form textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
     footer {
       text-align: center;
       background: white;
-      border-top: 1px solid #e2e8f0;
       color: #64748b;
       padding: 1.5rem;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       margin-top: 3rem;
+      border-top: 1px solid #f1f5f9;
     }
-
+    
     .toast {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #0f172a;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       color: white;
       padding: 1rem 1.5rem;
       border-radius: 12px;
       opacity: 0;
       transition: opacity 0.3s ease;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.15);
+      font-weight: 500;
       z-index: 1000;
     }
-
-    .toast.show {
-      opacity: 1;
-    }
-
-    .toast.error {
-      background: #dc2626;
-    }
-
-    .loading {
+    
+    .toast.show { opacity: 1; }
+    
+    .empty-state {
       text-align: center;
+      padding: 3rem 1rem;
       color: #94a3b8;
-      padding: 3rem;
-      font-size: 1.1rem;
     }
-
-    .no-data {
-      text-align: center;
-      color: #94a3b8;
-      padding: 3rem;
+    
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1rem;
+      opacity: 0.5;
     }
-
-    @media (max-width: 768px) {
-      header h1 {
-        font-size: 1.1rem;
-      }
-
-      .toolbar {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .search-wrapper {
-        max-width: 100%;
-      }
-
-      .form-actions {
-        flex-direction: column;
-      }
-
-      .btn {
-        width: 100%;
-      }
+    
+    @media(max-width: 768px) {
+      .header-container { flex-wrap: wrap; padding: 1rem; }
+      header h1 { font-size: 1.1rem; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .search-wrapper { max-width: 100%; }
+      .card { padding: 1.25rem; }
+      .form-card { padding: 1.5rem; }
     }
   </style>
 </head>
 
 <body>
   <header>
-    <div class="header-content">
-      <div class="header-title">
-        <div class="header-icon">🦟</div>
-        <h1>Vector Surveillance Reports</h1>
+    <div class="header-container">
+      <div class="logo-section">
+        <div class="logo-icon">E</div>
+        <h1>Vector Surveillance</h1>
       </div>
       <div class="header-actions">
         <button class="btn btn-light" onclick="history.back()">← Back</button>
@@ -398,47 +356,48 @@
   <main>
     <div class="toolbar">
       <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+        </svg>
         <input type="text" id="searchInput" placeholder="Search vector type or species..." />
       </div>
       <button class="btn btn-primary" id="addBtn">+ Add Report</button>
     </div>
 
     <div id="formContainer" style="display:none;" class="form-card">
-      <h2>New Surveillance Report</h2>
       <form id="surveillanceForm">
-        <label>Date *</label>
+        <label>Date</label>
         <input type="date" id="date" required />
-
+        
         <label>Vector Type</label>
         <input type="text" id="vector_type" placeholder="e.g. Mosquito, Blackfly..." />
-
+        
         <label>Method</label>
-        <input type="text" id="method" placeholder="e.g. Light trap, Larval dip..." />
-
+        <input type="text" id="method" placeholder="e.g. Light trap, Larval dip" />
+        
         <label>Density</label>
         <input type="number" step="0.1" id="density" placeholder="Vector density per unit area" />
-
+        
         <label>Lab Analysis</label>
         <select id="lab_analysis">
           <option value="">Select</option>
           <option value="true">Yes</option>
           <option value="false">No</option>
         </select>
-
+        
         <label>Species Identified</label>
         <input type="text" id="species_identified" placeholder="e.g. Anopheles, Culex..." />
-
+        
         <label>Breeding Source</label>
-        <input type="text" id="breeding_source" placeholder="e.g. Swamp, stagnant water..." />
-
+        <input type="text" id="breeding_source" placeholder="e.g. Swamp, stagnant water" />
+        
         <label>Environmental Condition</label>
-        <textarea id="environment_condition" rows="3" placeholder="e.g. High vegetation, poor drainage..."></textarea>
-
+        <textarea id="environment_condition" rows="2" placeholder="e.g. High vegetation, poor drainage"></textarea>
+        
         <label>Remarks</label>
         <textarea id="remarks" rows="2"></textarea>
-
-        <div class="form-actions">
+        
+        <div style="text-align:right;margin-top:1.5rem;display:flex;gap:0.75rem;justify-content:flex-end;">
           <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
           <button type="submit" class="btn btn-primary">Save Report</button>
         </div>
@@ -454,7 +413,7 @@
   </main>
 
   <footer>
-    © <span id="year"></span> County Health Services · EPHIS
+    County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span>
   </footer>
 
   <div id="toast" class="toast"></div>
@@ -482,7 +441,10 @@
 
     function showToast(msg, type = "info") {
       toast.textContent = msg;
-      toast.className = "toast show" + (type === "error" ? " error" : "");
+      toast.style.background = type === "error" 
+        ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)" 
+        : "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)";
+      toast.classList.add("show");
       setTimeout(() => toast.classList.remove("show"), 3000);
     }
 
@@ -494,55 +456,69 @@
 
     function toggleForm(show) {
       formContainer.style.display = show ? "block" : "none";
+      if (show) formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-
+    
     addBtn.addEventListener("click", () => toggleForm(true));
     cancelBtn.addEventListener("click", () => toggleForm(false));
 
     async function loadReports() {
-      cardsContainer.innerHTML = "<p class='loading'>Loading reports...</p>";
-      let query = supabase.from("vector_surveillance").select("*", { count: "exact" })
-        .order("date", { ascending: false }).range(page * limit, page * limit + limit - 1);
+      cardsContainer.innerHTML = "<div class='empty-state'><p>Loading...</p></div>";
+      
+      let query = supabase
+        .from("vector_surveillance")
+        .select("*", { count: "exact" })
+        .order("date", { ascending: false })
+        .range(page * limit, page * limit + limit - 1);
+      
       if (siteId) query = query.eq("site_id", siteId);
+      
       const term = searchInput.value.trim();
       if (term) query = query.or(`vector_type.ilike.%${term}%,species_identified.ilike.%${term}%`);
+      
       const { data, count, error } = await query;
+      
       if (error) {
         console.error(error);
         showToast("Failed to load reports", "error");
         return;
       }
+      
       total = count;
       renderCards(data);
     }
 
     function renderCards(data) {
       if (!data.length) {
-        cardsContainer.innerHTML = "<p class='no-data'>No surveillance reports found</p>";
+        cardsContainer.innerHTML = "<div class='empty-state'><svg viewBox='0 0 24 24' fill='currentColor'><path d='M9 2a1 1 0 000 2h2a1 1 0 100-2H9z'/><path fill-rule='evenodd' d='M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z' clip-rule='evenodd'/></svg><p>No surveillance reports found</p></div>";
         return;
       }
+      
       cardsContainer.innerHTML = data.map(r => {
         const badge = r.lab_analysis ? "badge Lab" : "badge Field";
-        const badgeText = r.lab_analysis ? "Lab" : "Field";
+        const badgeText = r.lab_analysis ? "Lab Analysis" : "Field Report";
         return `
           <div class="card">
             <div class="card-header">
-              <span>${r.vector_type || "Vector"}</span>
+              <span>${r.vector_type || "Vector Report"}</span>
               <span class="${badge}">${badgeText}</span>
             </div>
-            <p><strong>Date:</strong> ${r.date || "-"} | <strong>Method:</strong> ${r.method || "-"}</p>
-            <p><strong>Density:</strong> ${r.density || "-"} | <strong>Species:</strong> ${r.species_identified || "-"}</p>
-            <p><strong>Breeding Source:</strong> ${r.breeding_source || "-"}</p>
-            <p><strong>Environment:</strong> ${r.environment_condition || "-"}</p>
-            ${r.remarks ? `<p><strong>Remarks:</strong> ${r.remarks}</p>` : ""}
-          </div>`;
+            <p><strong>Date:</strong> ${r.date || "—"} | <strong>Method:</strong> ${r.method || "—"}</p>
+            <p><strong>Density:</strong> ${r.density || "—"} | <strong>Species:</strong> ${r.species_identified || "—"}</p>
+            <p><strong>Breeding Source:</strong> ${r.breeding_source || "—"}</p>
+            <p><strong>Environment:</strong> ${r.environment_condition || "—"}</p>
+            ${r.remarks ? `<p><strong>Remarks:</strong> ${r.remarks}</p>` : ''}
+          </div>
+        `;
       }).join("");
+      
       prevPage.disabled = page === 0;
       nextPage.disabled = (page + 1) * limit >= total;
     }
 
     form.addEventListener("submit", async e => {
       e.preventDefault();
+      
       const payload = {
         site_id: siteId,
         date: document.getElementById("date").value,
@@ -555,39 +531,31 @@
         environment_condition: document.getElementById("environment_condition").value.trim() || null,
         remarks: document.getElementById("remarks").value.trim() || null
       };
+      
       const { error } = await supabase.from("vector_surveillance").insert([payload]);
+      
       if (error) {
         console.error(error);
         showToast("Failed to save report", "error");
         return;
       }
+      
       showToast("Report added successfully");
       form.reset();
       toggleForm(false);
       loadReports();
     });
 
-    searchInput.addEventListener("input", () => {
-      page = 0;
-      loadReports();
-    });
-    prevPage.addEventListener("click", () => {
-      if (page > 0) {
-        page--;
-        loadReports();
-      }
-    });
-    nextPage.addEventListener("click", () => {
-      if ((page + 1) * limit < total) {
-        page++;
-        loadReports();
-      }
-    });
+    searchInput.addEventListener("input", () => { page = 0; loadReports(); });
+    prevPage.addEventListener("click", () => { if (page > 0) { page--; loadReports(); }});
+    nextPage.addEventListener("click", () => { if ((page + 1) * limit < total) { page++; loadReports(); }});
+    
     logoutBtn.addEventListener("click", async () => {
       await supabase.auth.signOut();
       showToast("Logging out...");
       setTimeout(() => window.location.href = "login.html", 800);
     });
+    
     document.getElementById("year").textContent = new Date().getFullYear();
     loadReports();
   </script>
