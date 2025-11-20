@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EPHIS | Officer Dashboard</title>
+<link rel="manifest" href="manifest.json" />
+<script type="module" src="main.js"></script>
+<style>
+/* Inherits theme from food_control.html */
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;background:linear-gradient(135deg,#f8fafc 0%,#fef3c7 100%);margin:0;}
+header{background:white;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.header-container{max-width:1400px;margin:0 auto;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;}
+.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;}
+h1{font-size:1.2rem;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+main{max-width:1400px;margin:0 auto;padding:2rem 1.5rem;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;}
+.card{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);padding:1.5rem;text-align:center;}
+.card h2{color:#2563eb;margin:0 0 0.25rem;font-size:1.1rem;}
+.card p{font-size:1.8rem;font-weight:700;margin:0;}
+.actions{margin-top:2rem;display:flex;flex-wrap:wrap;gap:0.75rem;}
+.btn{border:none;border-radius:10px;padding:0.625rem 1.25rem;font-weight:600;cursor:pointer;}
+.btn-primary{background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);color:white;}
+.btn-secondary{background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:white;}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);color:white;padding:1rem 1.5rem;border-radius:12px;opacity:0;transition:opacity 0.3s;}
+.toast.show{opacity:1;}
+footer{text-align:center;padding:1.5rem;background:white;color:#64748b;font-size:0.85rem;}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="header-container">
+    <div class="logo-icon">👤</div>
+    <h1>Officer Dashboard</h1>
+    <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+  </div>
+</header>
+
+<main>
+  <div class="grid" id="kpiGrid">
+    <div class="card"><h2>Active Tasks</h2><p id="taskCount">0</p></div>
+    <div class="card"><h2>Follow-ups</h2><p id="followCount">0</p></div>
+    <div class="card"><h2>Alerts</h2><p id="alertCount">0</p></div>
+    <div class="card"><h2>Compliance Rate</h2><p id="complianceRate">0%</p></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" onclick="window.location.href='my_tasks.html'">View My Tasks</button>
+    <button class="btn btn-primary" onclick="window.location.href='my_followups.html'">Log Follow-up</button>
+    <button class="btn btn-primary" onclick="window.location.href='my_alerts.html'">View Alerts</button>
+    <button class="btn btn-primary" onclick="window.location.href='performance.html'">My Performance</button>
+  </div>
+</main>
+
+<footer>County Government of Elgeyo Marakwet • EPHIS © <span id="year"></span></footer>
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import { supabase } from "./main.js";
+const toast=document.getElementById("toast");
+function showToast(m){toast.textContent=m;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
+document.getElementById("year").textContent=new Date().getFullYear();
+
+async function checkSession(){
+  const {data}=await supabase.auth.getSession();
+  if(!data.session) window.location.href="login.html";
+  else loadKPIs(data.session.user);
+}
+checkSession();
+
+async function loadKPIs(user){
+  const uid=user.id;
+  const [{count:tasks},{count:followups},{count:alerts}] = await Promise.all([
+    supabase.from("officer_assignments").select("*",{count:"exact"}).eq("officer_id",uid).eq("status","Pending"),
+    supabase.from("building_followups").select("*",{count:"exact"}).eq("created_by",uid),
+    supabase.from("building_alerts").select("*",{count:"exact"}).eq("resolved",false)
+  ]);
+
+  const {data:inspections}=await supabase.from("building_inspections")
+    .select("inspection_result",{count:"exact"}).eq("created_by",uid);
+  const compliant=(inspections||[]).filter(i=>i.inspection_result==="Compliant").length;
+  const rate=inspections?.length?((compliant/inspections.length)*100).toFixed(1):0;
+
+  document.getElementById("taskCount").textContent=tasks||0;
+  document.getElementById("followCount").textContent=followups||0;
+  document.getElementById("alertCount").textContent=alerts||0;
+  document.getElementById("complianceRate").textContent=rate+"%";
+}
+
+document.getElementById("logoutBtn").onclick=async()=>{await supabase.auth.signOut();showToast("Logging out...");setTimeout(()=>window.location.href="login.html",800);}
+</script>
+</body>
+</html>

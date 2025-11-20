@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EPHIS | My Performance</title>
+<link rel="manifest" href="manifest.json" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/recharts/umd/Recharts.min.js"></script>
+<script type="module" src="main.js"></script>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;
+background:linear-gradient(135deg,#f8fafc 0%,#fef3c7 100%);margin:0;color:#1e293b;}
+header{background:white;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.header-container{max-width:1400px;margin:0 auto;padding:1rem 1.5rem;
+display:flex;justify-content:space-between;align-items:center;}
+h1{font-size:1.2rem;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);
+-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+main{max-width:1400px;margin:0 auto;padding:1.5rem;}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:2rem;}
+.card{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);padding:1rem;text-align:center;}
+.card h2{margin:0;color:#2563eb;font-size:1.05rem;}
+.card p{margin:0.2rem 0;font-size:1.5rem;font-weight:700;}
+.chart-section{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);
+padding:1.5rem;margin-top:1.5rem;}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
+background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);
+color:white;padding:1rem 1.5rem;border-radius:12px;opacity:0;transition:opacity 0.3s;}
+.toast.show{opacity:1;}
+footer{text-align:center;background:white;color:#64748b;font-size:0.85rem;padding:1rem;}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="header-container">
+    <h1>My Performance</h1>
+    <button class="btn-secondary" onclick="window.location.href='officer_dashboard.html'"
+    style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:white;border:none;border-radius:10px;padding:0.5rem 1rem;font-weight:600;cursor:pointer;">
+    Back</button>
+  </div>
+</header>
+
+<main>
+  <div class="kpi-grid" id="kpiGrid">
+    <div class="card"><h2>Inspections</h2><p id="inspCount">0</p></div>
+    <div class="card"><h2>Follow-ups</h2><p id="fupCount">0</p></div>
+    <div class="card"><h2>Enforcements</h2><p id="enfCount">0</p></div>
+    <div class="card"><h2>Compliance Rate</h2><p id="compRate">0%</p></div>
+  </div>
+
+  <section class="chart-section">
+    <h2 style="color:#2563eb;">Workload Mix (Tasks by Type)</h2>
+    <div id="pieChart" style="width:100%;height:320px;"></div>
+  </section>
+
+  <section class="chart-section">
+    <h2 style="color:#2563eb;">Compliance Trend</h2>
+    <div id="lineChart" style="width:100%;height:320px;"></div>
+  </section>
+</main>
+
+<footer>County Government of Elgeyo Marakwet • EPHIS © <span id="year"></span></footer>
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import { supabase } from "./main.js";
+const toast=document.getElementById("toast");
+function showToast(m){toast.textContent=m;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
+document.getElementById("year").textContent=new Date().getFullYear();
+
+async function checkSession(){
+  const {data}=await supabase.auth.getSession();
+  if(!data.session) window.location.href="login.html";
+  else loadPerformance(data.session.user.id);
+}
+checkSession();
+
+async function loadPerformance(userId){
+  const {data,error}=await supabase.from("vw_officer_performance").select("*").eq("officer_id",userId).single();
+  if(error){console.error(error);showToast("Failed to load performance");return;}
+  if(!data){showToast("No performance data available");return;}
+  document.getElementById("inspCount").textContent=data.total_inspections||0;
+  document.getElementById("fupCount").textContent=data.total_followups||0;
+  document.getElementById("enfCount").textContent=data.total_enforcements||0;
+  document.getElementById("compRate").textContent=(data.compliance_rate||0)+"%";
+  renderCharts(data);
+}
+
+function renderCharts(data){
+  const total=(data.total_inspections||0)+(data.total_followups||0)+(data.total_enforcements||0);
+  const pieData=[
+    {name:"Inspections",value:data.total_inspections||0},
+    {name:"Follow-ups",value:data.total_followups||0},
+    {name:"Enforcements",value:data.total_enforcements||0}
+  ];
+
+  const lineData=[
+    {month:"Jan",compliance:data.compliance_rate||0},
+    {month:"Feb",compliance:data.compliance_rate||0},
+    {month:"Mar",compliance:data.compliance_rate||0},
+    {month:"Apr",compliance:data.compliance_rate||0}
+  ];
+
+  // Pie Chart
+  ReactDOM.render(
+    React.createElement(Recharts.ResponsiveContainer,{width:"100%",height:300},
+      React.createElement(Recharts.PieChart,null,
+        React.createElement(Recharts.Pie,{data:pieData,dataKey:"value",nameKey:"name",outerRadius:120,fill:"#2563eb",label:true}),
+        React.createElement(Recharts.Tooltip,null)
+      )
+    ), document.getElementById("pieChart")
+  );
+
+  // Line Chart
+  ReactDOM.render(
+    React.createElement(Recharts.ResponsiveContainer,{width:"100%",height:300},
+      React.createElement(Recharts.LineChart,{data:lineData},
+        React.createElement(Recharts.CartesianGrid,{strokeDasharray:"3 3"}),
+        React.createElement(Recharts.XAxis,{dataKey:"month"}),
+        React.createElement(Recharts.YAxis,{domain:[0,100]}),
+        React.createElement(Recharts.Tooltip,null),
+        React.createElement(Recharts.Line,{type:"monotone",dataKey:"compliance",stroke:"#f59e0b",strokeWidth:3,dot:true})
+      )
+    ), document.getElementById("lineChart")
+  );
+}
+</script>
+</body>
+</html>

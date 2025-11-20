@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EPHIS | My Follow-ups</title>
+<link rel="manifest" href="manifest.json" />
+<script type="module" src="main.js"></script>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;
+background:linear-gradient(135deg,#f8fafc 0%,#fef3c7 100%);margin:0;color:#1e293b;}
+header{background:white;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.header-container{max-width:1400px;margin:0 auto;padding:1rem 1.5rem;
+display:flex;justify-content:space-between;align-items:center;}
+h1{font-size:1.2rem;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);
+-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+main{max-width:1400px;margin:0 auto;padding:1.5rem;}
+form{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);
+padding:1.5rem;margin-bottom:1.5rem;}
+label{display:block;margin-top:0.6rem;font-weight:600;}
+input,textarea,select{width:100%;padding:0.6rem;border-radius:8px;border:1px solid #cbd5e1;margin-top:0.3rem;}
+button{border:none;border-radius:10px;padding:0.625rem 1.25rem;font-weight:600;cursor:pointer;}
+.btn-primary{background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);color:white;}
+.btn-secondary{background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:white;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;}
+.card{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);padding:1rem;}
+.card h3{margin:0 0 0.3rem;color:#2563eb;font-size:1.05rem;}
+.card p{margin:0.2rem 0;font-size:0.9rem;}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
+background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);
+color:white;padding:1rem 1.5rem;border-radius:12px;opacity:0;transition:opacity 0.3s;}
+.toast.show{opacity:1;}
+footer{text-align:center;background:white;color:#64748b;font-size:0.85rem;padding:1rem;}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="header-container">
+    <h1>My Follow-ups</h1>
+    <button class="btn-secondary" onclick="window.location.href='officer_dashboard.html'">Back</button>
+  </div>
+</header>
+
+<main>
+  <form id="followupForm">
+    <h2 style="color:#2563eb;">Log a Follow-up</h2>
+    <label>Related Record Type</label>
+    <select id="recordType" required>
+      <option value="">Select Type</option>
+      <option value="Inspection">Inspection</option>
+      <option value="Complaint">Complaint</option>
+      <option value="Enforcement">Enforcement</option>
+    </select>
+
+    <label>Record ID (if applicable)</label>
+    <input type="text" id="recordId" placeholder="Record UUID or Reference" />
+
+    <label>Follow-up Date</label>
+    <input type="date" id="followupDate" required />
+
+    <label>Findings</label>
+    <textarea id="findings" rows="3" placeholder="Summary of findings..." required></textarea>
+
+    <label>Status</label>
+    <select id="status" required>
+      <option value="Ongoing">Ongoing</option>
+      <option value="Resolved">Resolved</option>
+      <option value="Referred">Referred</option>
+    </select>
+
+    <label>Attachment (optional)</label>
+    <input type="file" id="fileUpload" accept="image/*,application/pdf" />
+
+    <div style="margin-top:1rem;">
+      <button class="btn-primary" type="submit">Save Follow-up</button>
+    </div>
+  </form>
+
+  <h2 style="color:#2563eb;">My Logged Follow-ups</h2>
+  <div class="grid" id="followupGrid"></div>
+</main>
+
+<footer>County Government of Elgeyo Marakwet • EPHIS © <span id="year"></span></footer>
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import { supabase } from "./main.js";
+const toast=document.getElementById("toast");
+function showToast(m){toast.textContent=m;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
+document.getElementById("year").textContent=new Date().getFullYear();
+
+let officerId=null;
+
+async function checkSession(){
+  const {data}=await supabase.auth.getSession();
+  if(!data.session) window.location.href="login.html";
+  else {officerId=data.session.user.id;loadFollowups();}
+}
+checkSession();
+
+document.getElementById("followupForm").addEventListener("submit",async(e)=>{
+  e.preventDefault();
+  const recordType=document.getElementById("recordType").value;
+  const recordId=document.getElementById("recordId").value.trim();
+  const followupDate=document.getElementById("followupDate").value;
+  const findings=document.getElementById("findings").value.trim();
+  const status=document.getElementById("status").value;
+
+  let fileUrl=null;
+  const file=document.getElementById("fileUpload").files[0];
+  if(file){
+    const { data: upload, error: upErr } = await supabase.storage.from("evidence").upload(`followups/${Date.now()}_${file.name}`,file,{upsert:true});
+    if(!upErr) fileUrl=supabase.storage.from("evidence").getPublicUrl(upload.path).data.publicUrl;
+  }
+
+  const { error } = await supabase.from("building_followups").insert([{
+    record_type:recordType,
+    record_id:recordId||null,
+    followup_date:followupDate,
+    findings,
+    status,
+    attachment_url:fileUrl,
+    created_by:officerId
+  }]);
+  if(error){console.error(error);showToast("Error saving follow-up");}
+  else{showToast("Follow-up saved");loadFollowups();e.target.reset();}
+});
+
+async function loadFollowups(){
+  const {data,error}=await supabase.from("building_followups")
+    .select("*").eq("created_by",officerId).order("followup_date",{ascending:false});
+  if(error){console.error(error);showToast("Error loading follow-ups");return;}
+  renderFollowups(data);
+}
+
+function renderFollowups(list){
+  const grid=document.getElementById("followupGrid");
+  if(!list.length){grid.innerHTML="<p>No follow-ups logged yet.</p>";return;}
+  grid.innerHTML=list.map(f=>`
+  <div class="card">
+    <h3>${f.record_type||'Follow-up'}</h3>
+    <p><b>Date:</b> ${f.followup_date||'-'}</p>
+    <p><b>Status:</b> ${f.status||'-'}</p>
+    <p>${f.findings||''}</p>
+    ${f.attachment_url?`<a href="${f.attachment_url}" target="_blank" style="color:#2563eb;">View Attachment</a>`:''}
+  </div>`).join("");
+}
+</script>
+</body>
+</html>
