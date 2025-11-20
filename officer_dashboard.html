@@ -1,94 +1,619 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>EPHIS | Officer Dashboard</title>
-<link rel="manifest" href="manifest.json" />
-<script type="module" src="main.js"></script>
-<style>
-/* Inherits theme from food_control.html */
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;background:linear-gradient(135deg,#f8fafc 0%,#fef3c7 100%);margin:0;}
-header{background:white;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
-.header-container{max-width:1400px;margin:0 auto;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;}
-.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;}
-h1{font-size:1.2rem;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-main{max-width:1400px;margin:0 auto;padding:2rem 1.5rem;}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;}
-.card{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);padding:1.5rem;text-align:center;}
-.card h2{color:#2563eb;margin:0 0 0.25rem;font-size:1.1rem;}
-.card p{font-size:1.8rem;font-weight:700;margin:0;}
-.actions{margin-top:2rem;display:flex;flex-wrap:wrap;gap:0.75rem;}
-.btn{border:none;border-radius:10px;padding:0.625rem 1.25rem;font-weight:600;cursor:pointer;}
-.btn-primary{background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);color:white;}
-.btn-secondary{background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:white;}
-.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);color:white;padding:1rem 1.5rem;border-radius:12px;opacity:0;transition:opacity 0.3s;}
-.toast.show{opacity:1;}
-footer{text-align:center;padding:1.5rem;background:white;color:#64748b;font-size:0.85rem;}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Officer Dashboard | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <script type="module" src="main.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --primary-light: #3b82f6;
+      --secondary: #10b981;
+      --secondary-dark: #059669;
+      --accent: #8b5cf6;
+      --warning: #f59e0b;
+      --danger: #dc2626;
+      --bg-main: #f8fafc;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-main);
+      margin: 0;
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 500px;
+      background: linear-gradient(135deg, 
+        rgba(37, 99, 235, 0.08) 0%, 
+        rgba(245, 158, 11, 0.08) 50%, 
+        rgba(16, 185, 129, 0.08) 100%);
+      z-index: -1;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .logo-icon::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: rotate(45deg);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .logo-icon:hover {
+      transform: scale(1.05) rotate(-5deg);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .welcome-section {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--warning), var(--secondary));
+      background-size: 200% 100%;
+      animation: gradientMove 3s ease infinite;
+    }
+
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .welcome-section h2 {
+      font-size: 1.8rem;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .welcome-section p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .kpi-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 2rem;
+      text-align: center;
+      border: 1px solid var(--border);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.5s ease backwards;
+    }
+
+    .kpi-card:nth-child(1) { animation-delay: 0.1s; }
+    .kpi-card:nth-child(2) { animation-delay: 0.2s; }
+    .kpi-card:nth-child(3) { animation-delay: 0.3s; }
+    .kpi-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--card-color);
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform 0.3s;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-xl);
+      border-color: var(--card-color);
+    }
+
+    .kpi-card:hover::before {
+      transform: scaleY(1);
+    }
+
+    .kpi-card.tasks { --card-color: #3b82f6; }
+    .kpi-card.followups { --card-color: #f59e0b; }
+    .kpi-card.alerts { --card-color: #dc2626; }
+    .kpi-card.compliance { --card-color: #10b981; }
+
+    .kpi-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 1rem;
+      background: var(--card-color);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+
+    .kpi-card:hover .kpi-icon {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .kpi-card h2 {
+      color: var(--text-secondary);
+      margin: 0 0 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .kpi-card p {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 0;
+      color: var(--card-color);
+      line-height: 1;
+    }
+
+    .actions-section {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+    }
+
+    .actions-section h2 {
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius);
+      padding: 1rem 1.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+      font-family: inherit;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-light {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-light:hover {
+      border-color: var(--primary);
+      background: var(--bg-main);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text-primary);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-xl);
+      z-index: 1000;
+      font-weight: 500;
+      min-width: 250px;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: white;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+
+    @media (max-width: 768px) {
+      .header-container {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 1.25rem;
+      }
+
+      .logo-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+      }
+
+      main {
+        padding: 1.5rem 1rem;
+      }
+
+      .welcome-section,
+      .actions-section {
+        padding: 1.5rem;
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+      }
+
+      .kpi-card {
+        padding: 1.25rem;
+      }
+
+      .kpi-card p {
+        font-size: 2rem;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<header>
-  <div class="header-container">
-    <div class="logo-icon">👤</div>
-    <h1>Officer Dashboard</h1>
-    <button class="btn btn-secondary" id="logoutBtn">Logout</button>
-  </div>
-</header>
+  <header>
+    <div class="header-container">
+      <div class="header-left">
+        <div class="logo-icon">👤</div>
+        <h1>Officer Dashboard</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-light" onclick="window.location.href='dashboard.html'">← Main Dashboard</button>
+        <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </header>
 
-<main>
-  <div class="grid" id="kpiGrid">
-    <div class="card"><h2>Active Tasks</h2><p id="taskCount">0</p></div>
-    <div class="card"><h2>Follow-ups</h2><p id="followCount">0</p></div>
-    <div class="card"><h2>Alerts</h2><p id="alertCount">0</p></div>
-    <div class="card"><h2>Compliance Rate</h2><p id="complianceRate">0%</p></div>
-  </div>
+  <main>
+    <div class="welcome-section">
+      <h2>Welcome back, <span id="officerName">Officer</span>! 👋</h2>
+      <p>Here's your performance overview and quick actions</p>
+    </div>
 
-  <div class="actions">
-    <button class="btn btn-primary" onclick="window.location.href='my_tasks.html'">View My Tasks</button>
-    <button class="btn btn-primary" onclick="window.location.href='my_followups.html'">Log Follow-up</button>
-    <button class="btn btn-primary" onclick="window.location.href='my_alerts.html'">View Alerts</button>
-    <button class="btn btn-primary" onclick="window.location.href='performance.html'">My Performance</button>
-  </div>
-</main>
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="kpi-card tasks">
+        <div class="kpi-icon">📋</div>
+        <h2>Active Tasks</h2>
+        <p id="taskCount">0</p>
+      </div>
+      <div class="kpi-card followups">
+        <div class="kpi-icon">🔄</div>
+        <h2>Follow-ups</h2>
+        <p id="followCount">0</p>
+      </div>
+      <div class="kpi-card alerts">
+        <div class="kpi-icon">🚨</div>
+        <h2>Alerts</h2>
+        <p id="alertCount">0</p>
+      </div>
+      <div class="kpi-card compliance">
+        <div class="kpi-icon">✅</div>
+        <h2>Compliance Rate</h2>
+        <p id="complianceRate">0%</p>
+      </div>
+    </div>
 
-<footer>County Government of Elgeyo Marakwet • EPHIS © <span id="year"></span></footer>
-<div id="toast" class="toast"></div>
+    <div class="actions-section">
+      <h2>Quick Actions</h2>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="window.location.href='my_tasks.html'">
+          📋 View My Tasks
+        </button>
+        <button class="btn btn-primary" onclick="window.location.href='my_followups.html'">
+          🔄 Log Follow-up
+        </button>
+        <button class="btn btn-primary" onclick="window.location.href='my_alerts.html'">
+          🚨 View Alerts
+        </button>
+        <button class="btn btn-primary" onclick="window.location.href='performance.html'">
+          📊 My Performance
+        </button>
+      </div>
+    </div>
+  </main>
 
-<script type="module">
-import { supabase } from "./main.js";
-const toast=document.getElementById("toast");
-function showToast(m){toast.textContent=m;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
-document.getElementById("year").textContent=new Date().getFullYear();
+  <footer>
+    County Government of Elgeyo Marakwet • EPHIS © <span id="year"></span>
+  </footer>
 
-async function checkSession(){
-  const {data}=await supabase.auth.getSession();
-  if(!data.session) window.location.href="login.html";
-  else loadKPIs(data.session.user);
-}
-checkSession();
+  <div id="toast" class="toast"></div>
 
-async function loadKPIs(user){
-  const uid=user.id;
-  const [{count:tasks},{count:followups},{count:alerts}] = await Promise.all([
-    supabase.from("officer_assignments").select("*",{count:"exact"}).eq("officer_id",uid).eq("status","Pending"),
-    supabase.from("building_followups").select("*",{count:"exact"}).eq("created_by",uid),
-    supabase.from("building_alerts").select("*",{count:"exact"}).eq("resolved",false)
-  ]);
+  <script type="module">
+    import { supabase } from "./main.js";
+    
+    const toast = document.getElementById("toast");
+    
+    function showToast(msg, type = "info") {
+      toast.textContent = msg;
+      toast.style.background = type === "error" ? "#dc2626" : "#2563eb";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+    
+    document.getElementById("year").textContent = new Date().getFullYear();
 
-  const {data:inspections}=await supabase.from("building_inspections")
-    .select("inspection_result",{count:"exact"}).eq("created_by",uid);
-  const compliant=(inspections||[]).filter(i=>i.inspection_result==="Compliant").length;
-  const rate=inspections?.length?((compliant/inspections.length)*100).toFixed(1):0;
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        window.location.href = "login.html";
+      } else {
+        const user = data.session.user;
+        const name = user.user_metadata?.full_name || user.email.split("@")[0] || "Officer";
+        document.getElementById("officerName").textContent = name;
+        loadKPIs(user);
+      }
+    }
+    checkSession();
 
-  document.getElementById("taskCount").textContent=tasks||0;
-  document.getElementById("followCount").textContent=followups||0;
-  document.getElementById("alertCount").textContent=alerts||0;
-  document.getElementById("complianceRate").textContent=rate+"%";
-}
+    async function loadKPIs(user) {
+      const uid = user.id;
+      
+      try {
+        const [{ count: tasks }, { count: followups }, { count: alerts }] = await Promise.all([
+          supabase.from("officer_assignments").select("*", { count: "exact" }).eq("officer_id", uid).eq("status", "Pending"),
+          supabase.from("building_followups").select("*", { count: "exact" }).eq("created_by", uid),
+          supabase.from("building_alerts").select("*", { count: "exact" }).eq("resolved", false)
+        ]);
 
-document.getElementById("logoutBtn").onclick=async()=>{await supabase.auth.signOut();showToast("Logging out...");setTimeout(()=>window.location.href="login.html",800);}
-</script>
+        const { data: inspections } = await supabase
+          .from("building_inspections")
+          .select("inspection_result", { count: "exact" })
+          .eq("created_by", uid);
+          
+        const compliant = (inspections || []).filter(i => i.inspection_result === "Compliant").length;
+        const rate = inspections?.length ? ((compliant / inspections.length) * 100).toFixed(1) : 0;
+
+        // Animate counter
+        animateValue("taskCount", 0, tasks || 0, 1000);
+        animateValue("followCount", 0, followups || 0, 1000);
+        animateValue("alertCount", 0, alerts || 0, 1000);
+        animateValue("complianceRate", 0, parseFloat(rate), 1000, "%");
+      } catch (error) {
+        console.error("Error loading KPIs:", error);
+        showToast("Failed to load dashboard data", "error");
+      }
+    }
+
+    function animateValue(id, start, end, duration, suffix = "") {
+      const element = document.getElementById(id);
+      const range = end - start;
+      const increment = range / (duration / 16);
+      let current = start;
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+          current = end;
+          clearInterval(timer);
+        }
+        element.textContent = Math.floor(current) + suffix;
+      }, 16);
+    }
+
+    document.getElementById("logoutBtn").onclick = async () => {
+      if (confirm("Are you sure you want to logout?")) {
+        await supabase.auth.signOut();
+        showToast("Logging out...");
+        setTimeout(() => window.location.href = "login.html", 800);
+      }
+    };
+  </script>
 </body>
 </html>
