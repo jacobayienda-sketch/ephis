@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Premise Form | EPHIS</title>
+  <title>Premise Documents | EPHIS</title>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#2563eb" />
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
@@ -24,6 +24,7 @@
       --secondary: #10b981;
       --secondary-dark: #059669;
       --accent: #8b5cf6;
+      --danger: #dc2626;
       --bg-main: #f8fafc;
       --bg-card: #ffffff;
       --text-primary: #0f172a;
@@ -124,7 +125,6 @@
 
     .logo:hover {
       transform: scale(1.05) rotate(-5deg);
-      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
     }
 
     .header-content {
@@ -161,7 +161,6 @@
       gap: 0.5rem;
       position: relative;
       overflow: hidden;
-      letter-spacing: 0.01em;
     }
 
     .btn::before {
@@ -218,10 +217,25 @@
       box-shadow: var(--shadow);
     }
 
+    .btn-danger {
+      background: white;
+      color: var(--danger);
+      border: 2px solid #fee2e2;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-danger:hover {
+      background: var(--danger);
+      color: white;
+      border-color: var(--danger);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
     main {
       flex: 1;
       padding: 2.5rem 2rem;
-      max-width: 900px;
+      max-width: 1100px;
       margin: 0 auto;
       width: 100%;
       animation: fadeInUp 0.5s ease;
@@ -238,54 +252,103 @@
       }
     }
 
-    form {
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+      gap: 1.5rem;
+    }
+
+    .card {
       background: white;
       border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-lg);
-      padding: 2.5rem;
-      margin-top: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      padding: 1.75rem;
+      margin-bottom: 1.25rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       border: 1px solid var(--border);
       position: relative;
       overflow: hidden;
     }
 
-    form::before {
+    .card::before {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
-      background-size: 200% 100%;
-      animation: gradientMove 3s ease infinite;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--primary), var(--accent));
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
 
-    @keyframes gradientMove {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+      border-color: transparent;
     }
 
-    form h2 {
-      font-size: 1.75rem;
-      margin-bottom: 2rem;
-      color: var(--text-primary);
-      font-weight: 700;
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-header {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 0.75rem;
-      letter-spacing: -0.02em;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .card p {
+      color: var(--text-secondary);
+      margin-bottom: 0.625rem;
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    .file-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border-radius: var(--radius);
+      margin-top: 0.5rem;
+    }
+
+    .file-link:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateX(4px);
+    }
+
+    .form-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border);
+      animation: slideDown 0.3s ease;
     }
 
     form label {
-      display: block;
       font-weight: 600;
-      color: var(--text-primary);
+      display: block;
+      margin-top: 1.25rem;
       margin-bottom: 0.625rem;
-      margin-top: 1.5rem;
+      color: var(--text-primary);
       font-size: 0.95rem;
-      letter-spacing: 0.01em;
-      transition: color 0.3s ease;
     }
 
     form label:first-of-type {
@@ -293,32 +356,22 @@
     }
 
     form input,
-    form select,
-    form textarea {
+    form select {
       width: 100%;
       padding: 0.875rem 1rem;
-      border: 2px solid var(--border);
       border-radius: var(--radius);
-      font-size: 1rem;
+      border: 2px solid var(--border);
+      font-size: 0.95rem;
       transition: all 0.3s ease;
       font-family: inherit;
-      background: white;
-      color: var(--text-primary);
     }
 
     form input:focus,
-    form select:focus,
-    form textarea:focus {
+    form select:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
       transform: translateY(-1px);
-    }
-
-    form textarea {
-      min-height: 120px;
-      resize: vertical;
-      line-height: 1.6;
     }
 
     form select {
@@ -330,24 +383,26 @@
       padding-right: 3rem;
     }
 
-    .form-group-inline {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      margin-top: 1.5rem;
+    form input[type="file"] {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
     }
 
-    .form-group-inline label {
-      margin-top: 0;
+    form input[type="file"]::file-selector-button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 1rem;
+      transition: all 0.3s ease;
     }
 
-    .form-actions {
-      margin-top: 2.5rem;
-      display: flex;
-      gap: 1rem;
-      justify-content: flex-end;
-      padding-top: 2rem;
-      border-top: 1px solid var(--border);
+    form input[type="file"]::file-selector-button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
     }
 
     footer {
@@ -383,22 +438,46 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Input animations */
-    @keyframes inputFocus {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.01); }
-      100% { transform: scale(1); }
+    .empty-state {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--text-muted);
     }
 
-    form input:focus,
-    form select:focus,
-    form textarea:focus {
-      animation: inputFocus 0.3s ease;
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
     }
 
     @media (max-width: 768px) {
       header {
         padding: 1rem;
+      }
+
+      main {
+        padding: 1.5rem 1rem;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .card {
+        padding: 1.25rem;
       }
 
       .header-content h1 {
@@ -410,45 +489,6 @@
         height: 40px;
         font-size: 1.25rem;
       }
-
-      main {
-        padding: 1.5rem 1rem;
-      }
-
-      form {
-        padding: 1.75rem;
-      }
-
-      form h2 {
-        font-size: 1.5rem;
-      }
-
-      .form-actions {
-        flex-direction: column-reverse;
-      }
-
-      .form-actions .btn {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .form-group-inline {
-        grid-template-columns: 1fr;
-        gap: 0;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .btn {
-        padding: 0.625rem 1rem;
-        font-size: 0.875rem;
-      }
-
-      form h2 {
-        font-size: 1.35rem;
-        flex-direction: column;
-        align-items: flex-start;
-      }
     }
   </style>
 </head>
@@ -457,7 +497,7 @@
   <header>
     <div class="header-content">
       <div class="logo">E</div>
-      <h1>Premise Form</h1>
+      <h1>📄 Premise Documents</h1>
     </div>
     <div class="header-actions">
       <button class="btn btn-light" onclick="window.location.href='premises_management.html'">← Back</button>
@@ -466,60 +506,34 @@
   </header>
 
   <main>
-    <form id="premiseForm">
-      <h2>🏭 Premise Details</h2>
-      
-      <label>Premise Name *</label>
-      <input type="text" id="name" required placeholder="Enter premise name" />
+    <div class="toolbar">
+      <button class="btn btn-primary" id="toggleFormBtn">📤 Upload Document</button>
+    </div>
 
-      <label>Type</label>
-      <input type="text" id="type" placeholder="e.g., Hotel, Factory, Butchery" />
+    <div id="formContainer" style="display:none;" class="form-card">
+      <form id="docForm">
+        <label>Document Type</label>
+        <select id="doc_type" required>
+          <option value="">Select document type</option>
+          <option value="registration_form_url">Registration Form</option>
+          <option value="license_doc_url">License Document</option>
+          <option value="inspection_report_url">Inspection Report</option>
+          <option value="compliance_action_url">Compliance Report</option>
+          <option value="photos_url">Premise Photos</option>
+          <option value="supporting_docs_url">Supporting Documents</option>
+        </select>
 
-      <label>Category</label>
-      <input type="text" id="category" placeholder="e.g., Food, Health, Industrial" />
+        <label>Select File</label>
+        <input type="file" id="file" accept="application/pdf,image/*" required />
 
-      <label>Ownership Type</label>
-      <select id="ownership">
-        <option value="">Select ownership type</option>
-        <option>Public</option>
-        <option>Private</option>
-        <option>Community</option>
-      </select>
-
-      <label>Address / Location</label>
-      <input type="text" id="address" placeholder="Physical location or address" />
-
-      <label>Sub-County Office</label>
-      <input type="text" id="sub_county_office" placeholder="Enter sub-county office" />
-
-      <label>Registration Status</label>
-      <select id="registration_status">
-        <option value="">Select status</option>
-        <option>Registered</option>
-        <option>Pending</option>
-        <option>Suspended</option>
-        <option>Closed</option>
-      </select>
-
-      <div class="form-group-inline">
-        <div>
-          <label>Latitude</label>
-          <input type="number" step="0.000001" id="latitude" placeholder="Optional" />
+        <div style="text-align:right;margin-top:1.5rem;display:flex;gap:0.75rem;justify-content:flex-end;">
+          <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">📤 Upload</button>
         </div>
-        <div>
-          <label>Longitude</label>
-          <input type="number" step="0.000001" id="longitude" placeholder="Optional" />
-        </div>
-      </div>
+      </form>
+    </div>
 
-      <label>Remarks</label>
-      <textarea id="remarks" rows="3" placeholder="Additional notes or comments..."></textarea>
-
-      <div class="form-actions">
-        <button type="button" class="btn btn-light" onclick="window.location.href='premises_management.html'">Cancel</button>
-        <button type="submit" class="btn btn-primary">💾 Save Premise</button>
-      </div>
-    </form>
+    <div id="cardsContainer"></div>
   </main>
 
   <footer>
@@ -531,12 +545,15 @@
   <script type="module">
     import { supabase } from "./main.js";
 
-    const toast = document.getElementById("toast");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const form = document.getElementById("premiseForm");
-
     const params = new URLSearchParams(window.location.search);
     const premiseId = params.get("id");
+    const toast = document.getElementById("toast");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const toggleFormBtn = document.getElementById("toggleFormBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const formContainer = document.getElementById("formContainer");
+    const form = document.getElementById("docForm");
+    const cardsContainer = document.getElementById("cardsContainer");
 
     function showToast(msg, type = "info") {
       toast.textContent = msg;
@@ -551,55 +568,104 @@
     }
     checkSession();
 
-    async function loadPremise() {
-      if (!premiseId) return;
-      const { data, error } = await supabase.from("premises").select("*").eq("id", premiseId).single();
-      if (error) {
+    function toggleForm(show) {
+      formContainer.style.display = show ? "block" : "none";
+    }
+    
+    toggleFormBtn.addEventListener("click", () => toggleForm(true));
+    cancelBtn.addEventListener("click", () => toggleForm(false));
+
+    async function ensureBucket() {
+      const { data } = await supabase.storage.listBuckets();
+      if (!data.some(b => b.name === "premises_docs")) {
+        await supabase.storage.createBucket("premises_docs", { public: true });
+      }
+    }
+
+    async function loadDocs() {
+      cardsContainer.innerHTML = '<div class="loading">Loading documents...</div>';
+      
+      const { data, error } = await supabase
+        .from("premises_documents")
+        .select("*")
+        .eq("premises_id", premiseId)
+        .single();
+        
+      if (error && error.code !== "PGRST116") {
         console.error(error);
+        showToast("Failed to load docs", "error");
         return;
       }
-      document.getElementById("name").value = data.name || "";
-      document.getElementById("type").value = data.type || "";
-      document.getElementById("category").value = data.category || "";
-      document.getElementById("ownership").value = data.ownership || "";
-      document.getElementById("address").value = data.address || "";
-      document.getElementById("sub_county_office").value = data.sub_county_office || "";
-      document.getElementById("registration_status").value = data.registration_status || "";
-      document.getElementById("latitude").value = data.latitude || "";
-      document.getElementById("longitude").value = data.longitude || "";
-      document.getElementById("remarks").value = data.remarks || "";
+      
+      const docs = data || {};
+      const entries = Object.entries(docs).filter(([k, v]) => k.endsWith("_url") && v);
+      
+      if (!entries.length) {
+        cardsContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📄</div>
+            <h3>No documents uploaded</h3>
+            <p>Upload documents for this premise</p>
+          </div>
+        `;
+        return;
+      }
+      
+      cardsContainer.innerHTML = entries.map(([key, url]) => `
+        <div class="card">
+          <div class="card-header">
+            <span>📄 ${key.replace(/_/g, " ").replace(" url", "").toUpperCase()}</span>
+            <button class="btn btn-danger" onclick="deleteDoc('${key}')">🗑️ Delete</button>
+          </div>
+          <p>
+            <a href="${url}" target="_blank" class="file-link">
+              🔗 View File
+            </a>
+          </p>
+        </div>
+      `).join("");
     }
+
+    window.deleteDoc = async (column) => {
+      if (!confirm("Delete this file link?")) return;
+      const update = { [column]: null };
+      const { error } = await supabase
+        .from("premises_documents")
+        .update(update)
+        .eq("premises_id", premiseId);
+        
+      if (error) return showToast("Delete failed", "error");
+      showToast("File removed");
+      loadDocs();
+    };
 
     form.addEventListener("submit", async e => {
       e.preventDefault();
-      const payload = {
-        name: document.getElementById("name").value.trim(),
-        type: document.getElementById("type").value.trim(),
-        category: document.getElementById("category").value.trim(),
-        ownership: document.getElementById("ownership").value || null,
-        address: document.getElementById("address").value.trim(),
-        sub_county_office: document.getElementById("sub_county_office").value.trim(),
-        registration_status: document.getElementById("registration_status").value || null,
-        latitude: parseFloat(document.getElementById("latitude").value) || null,
-        longitude: parseFloat(document.getElementById("longitude").value) || null,
-        remarks: document.getElementById("remarks").value.trim()
-      };
-
-      let error;
-      if (premiseId) {
-        ({ error } = await supabase.from("premises").update(payload).eq("id", premiseId));
-      } else {
-        ({ error } = await supabase.from("premises").insert([payload]));
-      }
-
-      if (error) {
-        console.error(error);
-        showToast("Save failed", "error");
-        return;
-      }
-
-      showToast("Premise saved successfully");
-      setTimeout(() => window.location.href = "premises_management.html", 1000);
+      const file = document.getElementById("file").files[0];
+      const column = document.getElementById("doc_type").value;
+      
+      if (!file) return showToast("Select a file first", "error");
+      
+      await ensureBucket();
+      const path = `${premiseId}/${Date.now()}_${file.name}`;
+      
+      const { error: uploadErr } = await supabase.storage
+        .from("premises_docs")
+        .upload(path, file, { upsert: true });
+        
+      if (uploadErr) return showToast("Upload failed", "error");
+      
+      const { data: urlData } = supabase.storage
+        .from("premises_docs")
+        .getPublicUrl(path);
+        
+      const update = { premises_id: premiseId, [column]: urlData.publicUrl };
+      await supabase.from("premises_documents").upsert(update, { onConflict: "premises_id" });
+      
+      showToast("File uploaded successfully");
+      form.reset();
+      toggleForm(false);
+      loadDocs();
     });
 
     logoutBtn.addEventListener("click", async () => {
@@ -609,7 +675,7 @@
     });
 
     document.getElementById("year").textContent = new Date().getFullYear();
-    loadPremise();
+    loadDocs();
   </script>
 </body>
 </html>
