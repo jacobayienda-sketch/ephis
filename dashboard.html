@@ -1,266 +1,1114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>EPHIS | Dashboard</title>
-<link rel="manifest" href="manifest.json" />
-<script type="module" src="main.js"></script>
-<style>
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;
-background:#f8fafc;margin:0;color:#1e293b;}
-header{background:white;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
-.header-container{max-width:1400px;margin:0 auto;padding:1rem 1.5rem;
-display:flex;justify-content:space-between;align-items:center;}
-h1{font-size:1.2rem;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);
--webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.user-info{display:flex;align-items:center;gap:0.5rem;}
-.user-avatar{background:#2563eb;color:white;font-weight:700;border-radius:50%;
-width:36px;height:36px;display:flex;align-items:center;justify-content:center;}
-.search-bar{max-width:300px;width:100%;}
-.search-bar input{width:100%;padding:0.5rem 0.75rem;border:1px solid #cbd5e1;
-border-radius:8px;font-size:0.9rem;}
-.btn-logout{background:#ef4444;color:white;border:none;border-radius:8px;padding:0.5rem 0.9rem;cursor:pointer;font-weight:600;}
-main{max-width:1400px;margin:0 auto;padding:1.5rem;}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;}
-.card{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);padding:1rem;position:relative;cursor:pointer;}
-.card h3{margin:0 0 0.3rem;color:#2563eb;font-size:1.05rem;}
-.card p{margin:0.2rem 0;font-size:0.9rem;}
-footer{text-align:center;background:white;color:#64748b;font-size:0.85rem;padding:1rem;border-top:1px solid #e5e7eb;}
-.quickbar{display:flex;gap:0.75rem;overflow-x:auto;background:white;border-bottom:1px solid #e5e7eb;padding:0.6rem 1rem;position:sticky;top:60px;z-index:50;}
-.quickbar::-webkit-scrollbar{display:none;}
-.quickbar-item{background:#2563eb;color:white;border:none;border-radius:10px;padding:0.5rem 0.8rem;font-weight:600;white-space:nowrap;cursor:pointer;transition:background 0.2s;}
-.quickbar-item:hover{background:#1d4ed8;}
-.quickbar-empty{color:#94a3b8;font-size:0.9rem;padding:0.3rem 0.5rem;}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EPHIS Dashboard</title>
+  <link rel="manifest" href="manifest.json" />
+  <script type="module" src="main.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --primary-light: #3b82f6;
+      --secondary: #10b981;
+      --secondary-dark: #059669;
+      --accent: #8b5cf6;
+      --danger: #dc2626;
+      --warning: #f59e0b;
+      --bg-main: #f8fafc;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+      --radius: 12px;
+      --radius-lg: 16px;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-main);
+      min-height: 100vh;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    
+    /* Animated gradient background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 500px;
+      background: linear-gradient(135deg, 
+        rgba(37, 99, 235, 0.08) 0%, 
+        rgba(139, 92, 246, 0.08) 50%, 
+        rgba(16, 185, 129, 0.08) 100%);
+      z-index: -1;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+    
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+      animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .logo {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .logo::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: rotate(45deg);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .logo:hover {
+      transform: scale(1.05) rotate(-5deg);
+    }
+    
+    .logo svg {
+      width: 28px;
+      height: 28px;
+      fill: white;
+      position: relative;
+      z-index: 1;
+    }
+    
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 0.95rem;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .user-avatar:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+    
+    .user-name {
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.5rem 1rem;
+      background: #f1f5f9;
+      border-radius: 12px 0 0 12px;
+      border: 1px solid var(--border);
+      border-right: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .user-name:hover {
+      background: #e2e8f0;
+      color: var(--text-primary);
+    }
+    
+    .logout-btn-header {
+      padding: 0.5rem 1.2rem;
+      background: linear-gradient(135deg, var(--danger), #b91c1c);
+      color: white;
+      border: none;
+      border-radius: 0 12px 12px 0;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+    }
+    
+    .logout-btn-header:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    /* Quick Access Bar */
+    .quickbar {
+      display: flex;
+      gap: 0.75rem;
+      overflow-x: auto;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      position: sticky;
+      top: 73px;
+      z-index: 50;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .quickbar::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .quickbar::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    .quickbar-item {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+      font-size: 0.9rem;
+    }
+
+    .quickbar-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .quickbar-empty {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      padding: 0.3rem 0.5rem;
+      font-style: italic;
+    }
+    
+    .search-container {
+      max-width: 700px;
+      margin: 2rem auto 1.5rem;
+      padding: 0 2rem;
+    }
+    
+    .search-wrapper {
+      position: relative;
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      opacity: 0.5;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .search-box:focus + .search-icon {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.1);
+    }
+    
+    .search-box {
+      width: 100%;
+      padding: 1rem 1.2rem 1rem 3.2rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: white;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      color: var(--text-primary);
+      font-family: inherit;
+    }
+    
+    .search-box:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .search-box::placeholder {
+      color: var(--text-muted);
+    }
+    
+    main {
+      padding: 0 2rem 3rem;
+      max-width: 1400px;
+      margin: auto;
+    }
+
+    /* Favorites & Recent Sections */
+    .favorites, .recent-modules {
+      margin: 1.5rem 0;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    .favorites h2, .recent-modules h2 {
+      color: var(--primary);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .fav-grid, .recent-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    .fav-grid button, .recent-grid button {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.7rem 1.2rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    .fav-grid button:hover, .recent-grid button:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+      color: var(--primary);
+    }
+
+    .btn-clear {
+      background: linear-gradient(135deg, var(--danger), #b91c1c);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+    }
+
+    .btn-clear:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+    
+    .section {
+      margin-bottom: 3rem;
+    }
+    
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding: 0 0.5rem;
+    }
+    
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    
+    .section-title h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+    
+    .category-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--card-color);
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform 0.3s;
+    }
+    
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-xl);
+      border-color: var(--card-color);
+    }
+    
+    .card:hover::before {
+      transform: scaleY(1);
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.2rem;
+    }
+    
+    .card-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--card-color);
+      transition: all 0.3s;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .card:hover .card-icon {
+      transform: scale(1.08) rotate(5deg);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .card-icon svg {
+      width: 32px;
+      height: 32px;
+      fill: white;
+    }
+    
+    .card h3 {
+      font-size: 1.15rem;
+      color: var(--text-primary);
+      margin-bottom: 0.6rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+    }
+    
+    .card-description {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    
+    .card-badge {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .badge-active {
+      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+      color: #1e40af;
+    }
+    
+    .badge-priority {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      color: #991b1b;
+    }
+
+    /* Favorite Star */
+    .fav-star {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.4rem;
+      cursor: pointer;
+      opacity: 0.3;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    .fav-star:hover {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+    
+    /* Color scheme for different categories */
+    .card[data-category="core"] { --card-color: #3b82f6; }
+    .card[data-category="environmental"] { --card-color: #10b981; }
+    .card[data-category="health"] { --card-color: #ef4444; }
+    .card[data-category="safety"] { --card-color: #f59e0b; }
+    .card[data-category="infrastructure"] { --card-color: #6366f1; }
+    
+    .no-results {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+    }
+    
+    .no-results svg {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1rem;
+      opacity: 0.3;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      background: white;
+      border-top: 1px solid var(--border);
+    }
+
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+      color: var(--primary-dark);
+    }
+    
+    /* Smooth loading animation */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .card {
+      animation: fadeInUp 0.5s ease-out backwards;
+    }
+    
+    .card:nth-child(1) { animation-delay: 0.05s; }
+    .card:nth-child(2) { animation-delay: 0.1s; }
+    .card:nth-child(3) { animation-delay: 0.15s; }
+    .card:nth-child(4) { animation-delay: 0.2s; }
+    .card:nth-child(5) { animation-delay: 0.25s; }
+    .card:nth-child(6) { animation-delay: 0.3s; }
+    
+    @media (max-width: 768px) {
+      header { padding: 1rem; }
+      header h1 { font-size: 1.1rem; }
+      .grid { grid-template-columns: 1fr; }
+      .section-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+      .logo-section { gap: 0.7rem; }
+      .logo { width: 40px; height: 40px; }
+      .logo svg { width: 24px; height: 24px; }
+      .quickbar { padding: 0.75rem 1rem; top: 65px; }
+      main, .search-container { padding-left: 1rem; padding-right: 1rem; }
+    }
+    
+    @media (max-width: 480px) {
+      .user-name { display: none; }
+    }
+  </style>
 </head>
 
 <body>
-<header>
-  <div class="header-container">
-    <h1>Environmental Public Health Information System (EPHIS)</h1>
-    <div class="user-info">
-      <div class="user-avatar">U</div>
-      <span class="user-name">John Doe</span>
-      <div class="search-bar"><input id="searchInput" type="text" placeholder="Search modules ( / )" /></div>
-      <button id="logout" class="btn-logout">Logout</button>
+  <header>
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo">
+          <svg viewBox="0 0 48 48">
+            <path d="M24 4L12 12v12c0 7.5 5.2 14.5 12 16.3 6.8-1.8 12-8.8 12-16.3V12L24 4z"/>
+            <path d="M20 22l4 4 8-8" stroke="white" stroke-width="2" fill="none"/>
+          </svg>
+        </div>
+        <h1>EPHIS Dashboard</h1>
+      </div>
+      <div class="user-info">
+        <div class="user-avatar">JD</div>
+        <span class="user-name">John Doe</span>
+        <button class="logout-btn-header" id="logout">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Quick access bar -->
+  <div id="quickBar" class="quickbar"></div>
+
+  <div class="search-container">
+    <div class="search-wrapper">
+      <input 
+        type="text" 
+        class="search-box" 
+        placeholder="Search modules... (Press / to focus)" 
+        id="searchInput"
+        aria-label="Search modules"
+      />
+      <span class="search-icon">🔍</span>
     </div>
   </div>
-</header>
 
-<!-- Quick access bar -->
-<div id="quickBar" class="quickbar"></div>
-
-<main>
-  <!-- Example Module Cards -->
-  <div class="grid">
-    <div class="card" data-module="Premises" data-url="premises.html" data-keywords="premises inspection compliance registration">
-      <h3>Premises Management</h3>
-      <p>Register and inspect business premises.</p>
+  <main>
+    <!-- Core Operations -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">
+          <h2>Core Operations</h2>
+        </div>
+        <span class="category-badge">Essential</span>
+      </div>
+      <div class="grid">
+        <div class="card" data-category="core" data-module="Complaints" data-url="complaints.html" data-keywords="complaints incidents reports" onclick="location.href='complaints.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><path d="M6 6h36v28H13l-7 8V6z"/><circle cx="18" cy="18" r="2" fill="white"/><circle cx="24" cy="18" r="2" fill="white"/><circle cx="30" cy="18" r="2" fill="white"/></svg>
+            </div>
+            <span class="card-badge badge-active">Active</span>
+          </div>
+          <h3>Complaints & Incidents</h3>
+          <p class="card-description">Track and manage public health complaints and incident reports efficiently</p>
+        </div>
+        <div class="card" data-category="core" data-module="Premises" data-url="premises_management.html" data-keywords="premises management businesses" onclick="location.href='premises_management.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><path d="M6 22l18-12 18 12v20H6V22z"/><path d="M20 42V26h8v16h-8z" fill="white"/></svg>
+            </div>
+          </div>
+          <h3>Premises Management</h3>
+          <p class="card-description">Register and monitor all regulated business premises and facilities</p>
+        </div>
+        <div class="card" data-category="core" data-module="Inspections" data-url="inspections.html" data-keywords="inspections audits checks" onclick="location.href='inspections.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><circle cx="20" cy="20" r="10" fill="white"/><path d="M28 28l10 10" stroke="white" stroke-width="3" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <h3>Inspections</h3>
+          <p class="card-description">Schedule, conduct, and document comprehensive health inspections</p>
+        </div>
+      </div>
     </div>
-    <div class="card" data-module="Complaints" data-url="complaints.html" data-keywords="complaints incidents reports">
-      <h3>Complaints & Incidents</h3>
-      <p>Report and track public complaints.</p>
-    </div>
-    <div class="card" data-module="Inspections" data-url="inspections.html" data-keywords="inspection schedule followup">
-      <h3>Inspection Management</h3>
-      <p>Plan, conduct, and monitor inspections.</p>
-    </div>
-    <div class="card" data-module="Licensing" data-url="premises_licenses.html" data-keywords="licenses renewal compliance">
-      <h3>Licensing</h3>
-      <p>Issue and renew business licenses.</p>
-    </div>
-    <div class="card" data-module="Water Quality" data-url="water_quality.html" data-keywords="water sampling lab results">
-      <h3>Water Quality Monitoring</h3>
-      <p>Collect and analyze water samples.</p>
-    </div>
-    <div class="card" data-module="Waste Management" data-url="waste_management.html" data-keywords="waste collection disposal">
-      <h3>Waste Management</h3>
-      <p>Monitor collection, disposal and recycling sites.</p>
-    </div>
-    <div class="card" data-module="Vector Control" data-url="vector_control.html" data-keywords="vector mosquito rodent control">
-      <h3>Vector Control</h3>
-      <p>Manage surveillance and interventions.</p>
-    </div>
-    <div class="card" data-module="Food Control" data-url="food_control.html" data-keywords="food safety hygiene licensing">
-      <h3>Food Control</h3>
-      <p>Inspect food premises and enforce hygiene standards.</p>
-    </div>
-    <div class="card" data-module="Officer" data-url="officer_dashboard.html" data-keywords="tasks followups alerts performance">
-      <h3>Officer Operations</h3>
-      <p>Manage field tasks, alerts, and performance.</p>
-    </div>
-  </div>
-</main>
 
-<footer>
-  County Government of Elgeyo Marakwet • EPHIS © <span id="year"></span>
-</footer>
+    <!-- Environmental Health -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">
+          <h2>Environmental Health</h2>
+        </div>
+        <span class="category-badge">7 Modules</span>
+      </div>
+      <div class="grid">
+        <div class="card" data-category="environmental" data-module="Food Control" data-url="food_control.html" data-keywords="food control safety hygiene" onclick="location.href='food_control.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><path d="M12 6h24v6H12zM10 14h28l-2 20H12L10 14z" fill="white"/><circle cx="24" cy="40" r="3" fill="white"/></svg>
+            </div>
+          </div>
+          <h3>Food Control</h3>
+          <p class="card-description">Monitor food safety, hygiene standards, and restaurant compliance</p>
+        </div>
+        <div class="card" data-category="environmental" data-module="Water Quality" data-url="water_quality.html" data-keywords="water quality testing" onclick="location.href='water_quality.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><path d="M24 6C18 14 12 22 12 28a12 12 0 0024 0c0-6-6-14-12-22z" fill="white"/></svg>
+            </div>
+          </div>
+          <h3>Water Quality</h3>
+          <p class="card-description">Test and monitor drinking water safety and quality standards</p>
+        </div>
+        <div class="card" data-category="environmental" data-module="Waste Management" data-url="waste_management.html" data-keywords="waste management disposal" onclick="location.href='waste_management.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><path d="M14 10h20l2 4H12l2-4zm0 6h20v24H14V16z" fill="white"/><path d="M18 20v14M24 20v14M30 20v14" stroke="#10b981" stroke-width="2"/></svg>
+            </div>
+          </div>
+          <h3>Waste Management</h3>
+          <p class="card-description">Oversee waste disposal, recycling programs, and sanitation services</p>
+        </div>
+        <div class="card" data-category="environmental" data-module="Air Quality" data-url="air_quality.html" data-keywords="air quality pollution monitoring" onclick="location.href='air_quality.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><path d="M8 18h32M8 24h28M8 30h32" stroke="white" stroke-width="3" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <h3>Air Quality Monitoring</h3>
+          <p class="card-description">Track air pollution levels and environmental quality indices</p>
+        </div>
+        <div class="card" data-category="environmental" data-module="Pollution Control" data-url="pollution_control.html" data-keywords="pollution control emissions" onclick="location.href='pollution_control.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><rect x="14" y="12" width="20" height="24" rx="2" fill="white"/><circle cx="24" cy="24" r="6" fill="#10b981"/></svg>
+            </div>
+          </div>
+          <h3>Pollution Control</h3>
+          <p class="card-description">Manage and reduce environmental pollution and emissions</p>
+        </div>
+        <div class="card" data-category="environmental" data-module="Sewerage" data-url="sewerage_drainage.html" data-keywords="sewerage drainage systems" onclick="location.href='sewerage_drainage.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="12" stroke="white" stroke-width="4" fill="none"/><path d="M24 12v24M12 24h24" stroke="white" stroke-width="3"/></svg>
+            </div>
+          </div>
+          <h3>Sewerage & Drainage</h3>
+          <p class="card-description">Monitor sanitation infrastructure and drainage systems</p>
+        </div>
+        <div class="card" data-category="environmental" data-module="Climate Health" data-url="climate_health.html" data-keywords="climate change health adaptation" onclick="location.href='climate_health.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="10" fill="white"/><path d="M24 4v8M24 36v8M4 24h8M36 24h8" stroke="white" stroke-width="3"/></svg>
+            </div>
+          </div>
+          <h3>Climate Change & Health</h3>
+          <p class="card-description">Assess climate change impact on public health outcomes</p>
+        </div>
+      </div>
+    </div>
 
-<!-- ==================== JAVASCRIPT ==================== -->
-<script type="module">
-import { supabase } from "./main.js";
+    <!-- Public Health & Safety -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">
+          <h2>Public Health & Safety</h2>
+        </div>
+        <span class="category-badge">6 Modules</span>
+      </div>
+      <div class="grid">
+        <div class="card" data-category="health" data-module="Vector Control" data-url="vector_control.html" data-keywords="vector vermin control pests" onclick="location.href='vector_control.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><circle cx="24" cy="16" r="8" fill="white"/><ellipse cx="24" cy="34" rx="12" ry="8" fill="white"/></svg>
+            </div>
+          </div>
+          <h3>Vector & Vermin Control</h3>
+          <p class="card-description">Manage disease vector and pest control intervention programs</p>
+        </div>
+        <div class="card" data-category="health" data-module="IPC" data-url="ipc.html" data-keywords="infection prevention control ipc" onclick="location.href='ipc.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="10" fill="white"/><path d="M24 4v8M24 36v8M4 24h8M36 24h8M10 10l5 5M33 33l5 5M10 38l5-5M33 15l5-5" stroke="white" stroke-width="2.5"/></svg>
+            </div>
+            <span class="card-badge badge-priority">Priority</span>
+          </div>
+          <h3>Infection Prevention & Control</h3>
+          <p class="card-description">Prevent and control the spread of infectious diseases</p>
+        </div>
+        <div class="card" data-category="health" data-module="Sanitation" data-url="public_sanitation.html" data-keywords="sanitation standards hygiene" onclick="location.href='public_sanitation.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><rect x="10" y="18" width="28" height="18" rx="3" fill="white"/><rect x="18" y="10" width="12" height="8" rx="2" fill="white"/></svg>
+            </div>
+          </div>
+          <h3>Public Sanitation Standards</h3>
+          <p class="card-description">Enforce public hygiene and sanitation compliance codes</p>
+        </div>
+        <div class="card" data-category="safety" data-module="Occupational Health" data-url="occupational_health.html" data-keywords="occupational health safety workplace" onclick="location.href='occupational_health.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><path d="M24 4L12 10v8c0 7.5 5.2 14.5 12 16.3 6.8-1.8 12-8.8 12-16.3v-8L24 4z" fill="white"/><path d="M20 16l3 3 6-6" stroke="#f59e0b" stroke-width="2" fill="none"/></svg>
+            </div>
+          </div>
+          <h3>Occupational Health & Safety</h3>
+          <p class="card-description">Monitor workplace health and safety compliance standards</p>
+        </div>
+        <div class="card" data-category="infrastructure" data-module="Cemeteries" data-url="cemeteries_funeral.html" data-keywords="cemeteries funeral services" onclick="location.href='cemeteries_funeral.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><rect x="10" y="22" width="28" height="16" rx="2" fill="white"/><path d="M18 22V14a6 6 0 0112 0v8" fill="none" stroke="white" stroke-width="3"/></svg>
+            </div>
+          </div>
+          <h3>Cemeteries & Funeral Services</h3>
+          <p class="card-description">Regulate burial and funeral service facility operations</p>
+        </div>
+        <div class="card" data-category="health" data-module="Frontier" data-url="Frontier.html" data-keywords="frontier migration health borders" onclick="location.href='Frontier.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><path d="M24 4L12 12v12c0 7.5 5.2 14.5 12 16.3 6.8-1.8 12-8.8 12-16.3V12L24 4z" fill="white"/></svg>
+            </div>
+          </div>
+          <h3>Frontier & Migration Health</h3>
+          <p class="card-description">Port health services and operations</p>
+        </div>
+      </div>
+    </div>
 
-document.getElementById("year").textContent = new Date().getFullYear();
-let currentUser = null;
+    <!-- Officer Operations -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">
+          <h2>Operations & Management</h2>
+        </div>
+        <span class="category-badge">1 Module</span>
+      </div>
+      <div class="grid">
+        <div class="card" data-category="core" data-module="Officer" data-url="officer_dashboard.html" data-keywords="tasks followups alerts performance" onclick="location.href='officer_dashboard.html'">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 48 48"><rect x="8" y="12" width="32" height="28" rx="2" fill="white"/><path d="M16 20h16M16 26h12M16 32h16" stroke="#3b82f6" stroke-width="2"/></svg>
+            </div>
+          </div>
+          <h3>Officer Operations</h3>
+          <p class="card-description">Manage field tasks, alerts, and performance tracking</p>
+        </div>
+      </div>
+    </div>
+  </main>
 
-// ---- Session & User Info ----
-async function checkSession() {
-  const { data } = await supabase.auth.getSession();
-  if (!data.session) return (window.location.href = "login.html");
-  currentUser = data.session.user;
-  const name =
-    currentUser.user_metadata?.full_name ||
-    currentUser.email.split("@")[0] ||
-    "User";
-  const initials = name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .substring(0, 2)
-    .toUpperCase();
-  document.querySelector(".user-avatar").textContent = initials;
-  const nameEl = document.querySelector(".user-name");
-  nameEl.textContent = name;
-  nameEl.style.cursor = "pointer";
-  nameEl.title = "Go to Officer Dashboard";
-  nameEl.onclick = () => (window.location.href = "officer_dashboard.html");
-  renderFavorites();
-  renderRecentModules();
-  renderQuickBar();
-}
-checkSession();
+  <footer>
+    © <span id="year"></span> County Health Services · 
+    <a href="index.html">Return to Home</a>
+  </footer>
 
-// ---- FAVORITES ----
-function getFavKey() { return `favorites_${currentUser?.id}`; }
-function getFavs() { return JSON.parse(localStorage.getItem(getFavKey())) || []; }
-function saveFavs(f) { localStorage.setItem(getFavKey(), JSON.stringify(f)); }
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script type="module">
+    import { supabase } from "./main.js";
 
-function toggleFav(name, url) {
-  const favs = getFavs();
-  const exists = favs.find((f) => f.name === name);
-  const updated = exists ? favs.filter((f) => f.name !== name) : [...favs, { name, url }];
-  saveFavs(updated); renderFavorites(); renderQuickBar(); highlightFavs();
-}
+    document.getElementById("year").textContent = new Date().getFullYear();
+    let currentUser = null;
 
-function renderFavorites() {
-  if (!currentUser) return;
-  const favs = getFavs();
-  const old = document.querySelector(".favorites"); if (old) old.remove();
-  const sec = document.createElement("section");
-  sec.classList.add("favorites");
-  sec.style.margin = "1rem 0";
-  sec.innerHTML = `
-  <div style="display:flex;justify-content:space-between;align-items:center;">
-    <h2 style="color:#2563eb;">Favorites</h2>
-    ${favs.length ? '<button id="clearFav" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:0.4rem 0.8rem;cursor:pointer;font-weight:600;">Clear</button>' : ''}
-  </div>
-  <div class="fav-grid" style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:0.75rem;">
-    ${favs.length ? favs.map(f=>`<button style="background:white;border:1px solid #e2e8f0;border-radius:10px;padding:0.6rem 1rem;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.05);" onclick="window.location.href='${f.url}'">${f.name}</button>`).join('') : '<p>No favorites yet.</p>'}
-  </div>`;
-  document.querySelector("main").insertBefore(sec, document.querySelector("main").firstChild);
-  if (favs.length) document.getElementById("clearFav").addEventListener("click", () => { localStorage.removeItem(getFavKey()); renderFavorites(); highlightFavs(); renderQuickBar(); });
-}
-
-function highlightFavs() {
-  const favs = getFavs(); const cards = document.querySelectorAll(".card");
-  cards.forEach(c => {
-    let star = c.querySelector(".fav-star");
-    const name = c.querySelector("h3,h2,p")?.textContent.trim();
-    const url = c.dataset.url || "#";
-    const isFav = favs.some(f => f.name === name);
-    if (!star) {
-      star = document.createElement("span");
-      star.classList.add("fav-star");
-      star.textContent = "⭐";
-      star.title = "Toggle Favorite";
-      star.style.cssText="position:absolute;top:8px;right:12px;font-size:1.2rem;cursor:pointer;opacity:0.3;";
-      c.appendChild(star);
+    // ---- Session & User Info ----
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) return (window.location.href = "login.html");
+      currentUser = data.session.user;
+      const name =
+        currentUser.user_metadata?.full_name ||
+        currentUser.email.split("@")[0] ||
+        "User";
+      const initials = name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .substring(0, 2)
+        .toUpperCase();
+      document.querySelector(".user-avatar").textContent = initials;
+      const nameEl = document.querySelector(".user-name");
+      nameEl.textContent = name;
+      nameEl.title = "Go to Officer Dashboard";
+      nameEl.onclick = () => (window.location.href = "officer_dashboard.html");
+      renderFavorites();
+      renderRecentModules();
+      renderQuickBar();
     }
-    star.style.opacity = isFav ? "1" : "0.3";
-    star.onclick = e => { e.stopPropagation(); toggleFav(name, url); };
-  });
-}
-setTimeout(highlightFavs, 800);
+    checkSession();
 
-// ---- RECENTLY ACCESSED ----
-function trackRecent(name,url){
-  const key=`recentModules_${currentUser.id}`;
-  const list=JSON.parse(localStorage.getItem(key))||[];
-  const filtered=list.filter(m=>m.name!==name);
-  filtered.unshift({name,url});
-  localStorage.setItem(key,JSON.stringify(filtered.slice(0,4)));
-}
-function renderRecentModules(){
-  if(!currentUser)return;
-  const key=`recentModules_${currentUser.id}`;
-  const list=JSON.parse(localStorage.getItem(key))||[];
-  const old=document.querySelector(".recent-modules");if(old)old.remove();
-  const sec=document.createElement("section");
-  sec.classList.add("recent-modules");
-  sec.style.margin="1rem 0";
-  sec.innerHTML=`
-  <div style="display:flex;justify-content:space-between;align-items:center;">
-    <h2 style="color:#2563eb;">Recently Accessed</h2>
-    <button id="clearRecent" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:0.4rem 0.8rem;cursor:pointer;font-weight:600;">Clear History</button>
-  </div>
-  <div class="recent-grid" style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:0.75rem;">
-    ${list.length?list.map(m=>`<button style="background:white;border:1px solid #e2e8f0;border-radius:10px;padding:0.6rem 1rem;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.05);" onclick="window.location.href='${m.url}'">${m.name}</button>`).join(''):'<p>No recent modules yet.</p>'}
-  </div>`;
-  document.querySelector("main").insertBefore(sec, document.querySelector(".favorites")?.nextSibling||document.querySelector("main").firstChild);
-  document.getElementById("clearRecent").addEventListener("click",()=>{localStorage.removeItem(key);renderRecentModules();});
-}
+    // ---- FAVORITES ----
+    function getFavKey() { return `favorites_${currentUser?.id}`; }
+    function getFavs() { return JSON.parse(localStorage.getItem(getFavKey())) || []; }
+    function saveFavs(f) { localStorage.setItem(getFavKey(), JSON.stringify(f)); }
 
-// ---- QUICKBAR ----
-function renderQuickBar(){
-  if(!currentUser)return;
-  const favs=JSON.parse(localStorage.getItem(`favorites_${currentUser.id}`))||[];
-  const bar=document.getElementById("quickBar");
-  if(!favs.length){bar.innerHTML='<span class="quickbar-empty">⭐ Pin modules to access them here</span>';return;}
-  bar.innerHTML=favs.map(f=>`<button class="quickbar-item" title="${f.name}" onclick="window.location.href='${f.url}'">${f.name}</button>`).join('');
-}
+    function toggleFav(name, url) {
+      const favs = getFavs();
+      const exists = favs.find((f) => f.name === name);
+      const updated = exists ? favs.filter((f) => f.name !== name) : [...favs, { name, url }];
+      saveFavs(updated);
+      renderFavorites();
+      renderQuickBar();
+      highlightFavs();
+    }
 
-// ---- Search ----
-const searchInput=document.getElementById("searchInput");
-searchInput.addEventListener("keyup",e=>{
-  const q=e.target.value.toLowerCase();
-  const cards=document.querySelectorAll(".card");
-  let visible=0;
-  cards.forEach(c=>{
-    const txt=c.textContent.toLowerCase()+(c.dataset.keywords||"");
-    const match=txt.includes(q);
-    c.style.display=match?"block":"none";if(match)visible++;
-  });
-  let msg=document.querySelector(".no-results");
-  if(!msg){
-    msg=document.createElement("div");
-    msg.classList.add("no-results");
-    msg.innerHTML=`<p style="color:#94a3b8;">No matching modules found.</p>`;
-    document.querySelector("main").appendChild(msg);
-  }
-  msg.style.display=visible?"none":"block";
-});
-document.addEventListener("keydown",e=>{if(e.key==="/"){e.preventDefault();searchInput.focus();}});
+    function renderFavorites() {
+      if (!currentUser) return;
+      const favs = getFavs();
+      const old = document.querySelector(".favorites");
+      if (old) old.remove();
+      
+      if (!favs.length) return; // Don't show empty favorites section
+      
+      const sec = document.createElement("section");
+      sec.classList.add("favorites");
+      sec.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <h2>⭐ Favorites</h2>
+          <button id="clearFav" class="btn-clear">Clear All</button>
+        </div>
+        <div class="fav-grid">
+          ${favs.map(f => `<button onclick="window.location.href='${f.url}'">${f.name}</button>`).join('')}
+        </div>
+      `;
+      
+      const main = document.querySelector("main");
+      main.insertBefore(sec, main.firstChild);
+      
+      document.getElementById("clearFav").addEventListener("click", () => {
+        if (confirm("Clear all favorites?")) {
+          localStorage.removeItem(getFavKey());
+          renderFavorites();
+          renderQuickBar();
+          highlightFavs();
+        }
+      });
+    }
 
-// ---- Click tracking ----
-document.addEventListener("click",e=>{
-  const c=e.target.closest(".card");
-  if(c&&c.dataset.module){
-    const name=c.querySelector("h3,h2,p")?.textContent.trim()||"Module";
-    const url=c.dataset.url||"#";
-    trackRecent(name,url);
-  }
-});
+    function highlightFavs() {
+      const favs = getFavs();
+      const cards = document.querySelectorAll(".card");
+      cards.forEach(c => {
+        let star = c.querySelector(".fav-star");
+        const name = c.querySelector("h3")?.textContent.trim();
+        const url = c.dataset.url || "#";
+        const isFav = favs.some(f => f.name === name);
+        
+        if (!star) {
+          star = document.createElement("span");
+          star.classList.add("fav-star");
+          star.textContent = "⭐";
+          star.title = "Toggle Favorite";
+          c.appendChild(star);
+        }
+        
+        star.style.opacity = isFav ? "1" : "0.3";
+        star.onclick = e => {
+          e.stopPropagation();
+          toggleFav(name, url);
+        };
+      });
+    }
+    setTimeout(highlightFavs, 100);
 
-// ---- Logout ----
-document.getElementById("logout").addEventListener("click",async()=>{
-  if(currentUser){
-    localStorage.removeItem(`recentModules_${currentUser.id}`);
-    localStorage.removeItem(`favorites_${currentUser.id}`);
-  }
-  await supabase.auth.signOut();
-  window.location.href="login.html";
-});
-</script>
+    // ---- RECENTLY ACCESSED ----
+    function trackRecent(name, url) {
+      if (!currentUser) return;
+      const key = `recentModules_${currentUser.id}`;
+      const list = JSON.parse(localStorage.getItem(key)) || [];
+      const filtered = list.filter(m => m.name !== name);
+      filtered.unshift({ name, url });
+      localStorage.setItem(key, JSON.stringify(filtered.slice(0, 5)));
+    }
+
+    function renderRecentModules() {
+      if (!currentUser) return;
+      const key = `recentModules_${currentUser.id}`;
+      const list = JSON.parse(localStorage.getItem(key)) || [];
+      const old = document.querySelector(".recent-modules");
+      if (old) old.remove();
+      
+      if (!list.length) return; // Don't show empty recent section
+      
+      const sec = document.createElement("section");
+      sec.classList.add("recent-modules");
+      sec.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <h2>🕐 Recently Accessed</h2>
+          <button id="clearRecent" class="btn-clear">Clear History</button>
+        </div>
+        <div class="recent-grid">
+          ${list.map(m => `<button onclick="window.location.href='${m.url}'">${m.name}</button>`).join('')}
+        </div>
+      `;
+      
+      const main = document.querySelector("main");
+      const favorites = document.querySelector(".favorites");
+      if (favorites) {
+        main.insertBefore(sec, favorites.nextSibling);
+      } else {
+        main.insertBefore(sec, main.firstChild);
+      }
+      
+      document.getElementById("clearRecent").addEventListener("click", () => {
+        if (confirm("Clear recent history?")) {
+          localStorage.removeItem(key);
+          renderRecentModules();
+        }
+      });
+    }
+
+    // ---- QUICKBAR ----
+    function renderQuickBar() {
+      if (!currentUser) return;
+      const favs = getFavs();
+      const bar = document.getElementById("quickBar");
+      
+      if (!favs.length) {
+        bar.innerHTML = '<span class="quickbar-empty">⭐ Pin modules to quick access bar by clicking the star on any module</span>';
+        return;
+      }
+      
+      bar.innerHTML = favs.map(f => 
+        `<button class="quickbar-item" title="${f.name}" onclick="window.location.href='${f.url}'">${f.name}</button>`
+      ).join('');
+    }
+
+    // ---- Search ----
+    const searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("input", e => {
+      const q = e.target.value.toLowerCase();
+      const cards = document.querySelectorAll(".card");
+      const sections = document.querySelectorAll(".section");
+      let totalVisible = 0;
+      
+      sections.forEach(section => {
+        const sectionCards = section.querySelectorAll(".card");
+        let visibleInSection = 0;
+        
+        sectionCards.forEach(c => {
+          const txt = c.textContent.toLowerCase() + (c.dataset.keywords || "");
+          const match = txt.includes(q);
+          c.style.display = match ? "block" : "none";
+          if (match) {
+            visibleInSection++;
+            totalVisible++;
+          }
+        });
+        
+        // Hide section if no visible cards
+        section.style.display = visibleInSection > 0 ? "block" : "none";
+      });
+      
+      let msg = document.querySelector(".no-results");
+      if (!msg) {
+        msg = document.createElement("div");
+        msg.classList.add("no-results");
+        msg.innerHTML = `
+          <svg viewBox="0 0 48 48" fill="currentColor">
+            <circle cx="20" cy="20" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="M28 28l10 10" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <h3>No matching modules found</h3>
+          <p>Try a different search term</p>
+        `;
+        document.querySelector("main").appendChild(msg);
+      }
+      msg.style.display = totalVisible ? "none" : "block";
+    });
+
+    // Keyboard shortcut for search
+    document.addEventListener("keydown", e => {
+      if (e.key === "/" && !e.target.matches("input, textarea")) {
+        e.preventDefault();
+        searchInput.focus();
+      }
+    });
+
+    // ---- Click tracking ----
+    document.addEventListener("click", e => {
+      const c = e.target.closest(".card");
+      if (c && c.dataset.module) {
+        const name = c.querySelector("h3")?.textContent.trim() || "Module";
+        const url = c.dataset.url || "#";
+        trackRecent(name, url);
+      }
+    });
+
+    // ---- Logout ----
+    document.getElementById("logout").addEventListener("click", async () => {
+      if (confirm("Are you sure you want to logout?")) {
+        // Don't clear localStorage on logout - keep favorites and recent
+        await supabase.auth.signOut();
+        window.location.href = "login.html";
+      }
+    });
+  </script>
 </body>
 </html>
