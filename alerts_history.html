@@ -1,206 +1,593 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>EPHIS | Alerts History</title>
-<link rel="manifest" href="manifest.json" />
-<script type="module" src="main.js"></script>
-<style>
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
-  background: linear-gradient(135deg, #f8fafc 0%, #fef3c7 100%);
-  margin: 0;
-  color: #1e293b;
-}
-header {
-  background: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-}
-.header-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1rem 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-h1 {
-  font-size: 1.2rem;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-main {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1.5rem;
-}
-.filter-bar {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  padding: 1rem 1.5rem;
-  margin-bottom: 1.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: center;
-}
-.filter-bar select,
-.filter-bar input {
-  padding: 0.6rem;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-}
-.btn-primary {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.6rem 1rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-.btn-secondary {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.6rem 1rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1rem;
-}
-.card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  padding: 1rem;
-}
-.card h3 {
-  margin: 0;
-  color: #2563eb;
-  font-size: 1.05rem;
-}
-.card p {
-  margin: 0.25rem 0;
-  font-size: 0.9rem;
-}
-footer {
-  text-align: center;
-  background: white;
-  color: #64748b;
-  font-size: 0.85rem;
-  padding: 1rem;
-}
-.toast {
-  position: fixed;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.toast.show {
-  opacity: 1;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alerts History | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <script type="module" src="main.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --primary-light: #3b82f6;
+      --secondary: #10b981;
+      --secondary-dark: #059669;
+      --accent: #8b5cf6;
+      --warning: #f59e0b;
+      --bg-main: #f8fafc;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-main);
+      margin: 0;
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 500px;
+      background: linear-gradient(135deg, 
+        rgba(16, 185, 129, 0.08) 0%, 
+        rgba(37, 99, 235, 0.08) 50%, 
+        rgba(139, 92, 246, 0.08) 100%);
+      z-index: -1;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-icon::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: rotate(45deg);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--secondary), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.875rem 1.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+      font-family: inherit;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-light {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-light:hover {
+      border-color: var(--primary);
+      background: var(--bg-main);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .filter-bar {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border);
+    }
+
+    .filter-bar h2 {
+      font-size: 1.3rem;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+
+    select, input[type="date"] {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      background: white;
+    }
+
+    select:focus, input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+      transform: translateY(-1px);
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 3rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 1.75rem;
+      border: 1px solid var(--border);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--secondary), var(--primary));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+      border-color: transparent;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card h3 {
+      margin: 0 0 1rem;
+      color: var(--secondary);
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card p {
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .card strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .card a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .card a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text-primary);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-xl);
+      z-index: 1000;
+      font-weight: 500;
+      min-width: 250px;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: white;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+
+    @media (max-width: 768px) {
+      .header-container {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 1.25rem;
+      }
+
+      main {
+        padding: 1.5rem 1rem;
+      }
+
+      .filter-bar {
+        padding: 1.5rem;
+      }
+
+      .filter-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<header>
-  <div class="header-container">
-    <h1>Alerts History</h1>
-    <button class="btn-secondary" onclick="window.location.href='my_alerts.html'">Back</button>
-  </div>
-</header>
+  <header>
+    <div class="header-container">
+      <div class="header-left">
+        <div class="logo-icon">📚</div>
+        <h1>Alerts History</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-light" onclick="window.location.href='my_alerts.html'">← Back to Alerts</button>
+        <button class="btn btn-secondary" onclick="window.location.href='officer_dashboard.html'">Officer Dashboard</button>
+      </div>
+    </div>
+  </header>
 
-<main>
-  <div class="filter-bar">
-    <label>Alert Type</label>
-    <select id="filterType">
-      <option value="">All Types</option>
-      <option value="Contamination">Contamination</option>
-      <option value="Waste Dumping">Waste Dumping</option>
-      <option value="Water Pollution">Water Pollution</option>
-      <option value="Vector Breeding">Vector Breeding</option>
-    </select>
+  <main>
+    <div class="filter-bar">
+      <h2>🔍 Filter History</h2>
+      <div class="filter-grid">
+        <div class="filter-group">
+          <label>Alert Type</label>
+          <select id="filterType">
+            <option value="">All Types</option>
+            <option value="Contamination">Contamination</option>
+            <option value="Waste Dumping">Waste Dumping</option>
+            <option value="Water Pollution">Water Pollution</option>
+            <option value="Vector Breeding">Vector Breeding</option>
+          </select>
+        </div>
 
-    <label>From</label>
-    <input type="date" id="filterStart" />
-    <label>To</label>
-    <input type="date" id="filterEnd" />
+        <div class="filter-group">
+          <label>From</label>
+          <input type="date" id="filterStart" />
+        </div>
 
-    <button id="applyFilter" class="btn-primary">Apply Filter</button>
-  </div>
+        <div class="filter-group">
+          <label>To</label>
+          <input type="date" id="filterEnd" />
+        </div>
+      </div>
 
-  <div class="grid" id="alertGrid"></div>
-</main>
+      <button id="applyFilter" class="btn btn-primary">🔍 Apply Filter</button>
+    </div>
 
-<footer>
-  County Government of Elgeyo Marakwet • EPHIS © <span id="year"></span>
-</footer>
+    <div class="grid" id="alertGrid"></div>
+  </main>
 
-<div id="toast" class="toast"></div>
+  <footer>
+    County Government of Elgeyo Marakwet • EPHIS © <span id="year"></span>
+  </footer>
 
-<script type="module">
-import { supabase } from "./main.js";
-const toast=document.getElementById("toast");
-function showToast(m){toast.textContent=m;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
-document.getElementById("year").textContent=new Date().getFullYear();
-let officerId=null;
+  <div id="toast" class="toast"></div>
 
-async function checkSession(){
-  const {data}=await supabase.auth.getSession();
-  if(!data.session)window.location.href="login.html";
-  else{officerId=data.session.user.id;loadAlerts();}
-}
-checkSession();
+  <script type="module">
+    import { supabase } from "./main.js";
+    
+    const toast = document.getElementById("toast");
+    
+    function showToast(msg, type = "info") {
+      toast.textContent = msg;
+      toast.style.background = type === "error" ? "#dc2626" : "#2563eb";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+    
+    document.getElementById("year").textContent = new Date().getFullYear();
+    
+    let officerId = null;
 
-async function loadAlerts(filters={}){
-  let query=supabase.from("building_alerts")
-    .select("*")
-    .in("status",["Resolved","Referred"])
-    .order("updated_at",{ascending:false});
-  if(filters.type)query=query.eq("alert_type",filters.type);
-  if(filters.start)query=query.gte("alert_date",filters.start);
-  if(filters.end)query=query.lte("alert_date",filters.end);
-  const {data,error}=await query;
-  if(error){console.error(error);showToast("Error loading alerts");return;}
-  renderAlerts(data);
-}
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        window.location.href = "login.html";
+      } else {
+        officerId = data.session.user.id;
+        loadAlerts();
+      }
+    }
+    checkSession();
 
-function renderAlerts(list){
-  const grid=document.getElementById("alertGrid");
-  if(!list.length){grid.innerHTML="<p>No archived alerts match your filters.</p>";return;}
-  grid.innerHTML=list.map(a=>`
-  <div class="card">
-    <h3>${a.alert_type||"Alert"}</h3>
-    <p><b>Date:</b> ${a.alert_date||"-"}</p>
-    <p><b>Status:</b> ${a.status||"-"}</p>
-    <p><b>Remarks:</b> ${a.remarks||"N/A"}</p>
-    <p><b>Resolved By:</b> ${a.updated_by||"N/A"}</p>
-    ${a.evidence_url?`<a href="${a.evidence_url}" target="_blank" style="color:#2563eb;">View Evidence</a>`:""}
-  </div>`).join("");
-}
+    async function loadAlerts(filters = {}) {
+      const grid = document.getElementById("alertGrid");
+      grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><p>Loading history...</p></div>';
+      
+      let query = supabase
+        .from("building_alerts")
+        .select("*")
+        .in("status", ["Resolved", "Referred"])
+        .order("updated_at", { ascending: false });
+        
+      if (filters.type) query = query.eq("alert_type", filters.type);
+      if (filters.start) query = query.gte("alert_date", filters.start);
+      if (filters.end) query = query.lte("alert_date", filters.end);
+      
+      const { data, error } = await query;
+      
+      if (error) {
+        console.error(error);
+        showToast("Error loading alerts", "error");
+        return;
+      }
+      
+      renderAlerts(data);
+    }
 
-document.getElementById("applyFilter").addEventListener("click",()=>{
-  const filters={
-    type:document.getElementById("filterType").value,
-    start:document.getElementById("filterStart").value,
-    end:document.getElementById("filterEnd").value
-  };
-  loadAlerts(filters);
-});
-</script>
+    function renderAlerts(list) {
+      const grid = document.getElementById("alertGrid");
+      
+      if (!list.length) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📚</div>
+            <h3>No archived alerts found</h3>
+            <p>No alerts match your filter criteria</p>
+          </div>
+        `;
+        return;
+      }
+      
+      grid.innerHTML = list.map(a => `
+        <div class="card">
+          <h3>✅ ${a.alert_type || "Alert"}</h3>
+          <p><strong>Date:</strong> ${a.alert_date || "—"}</p>
+          <p><strong>Status:</strong> ${a.status || "—"}</p>
+          <p><strong>Remarks:</strong> ${a.remarks || "N/A"}</p>
+          <p><strong>Resolved By:</strong> ${a.updated_by || "N/A"}</p>
+          ${a.evidence_url ? `<a href="${a.evidence_url}" target="_blank">🔗 View Evidence</a>` : ""}
+        </div>
+      `).join("");
+    }
+
+    document.getElementById("applyFilter").addEventListener("click", () => {
+      const filters = {
+        type: document.getElementById("filterType").value,
+        start: document.getElementById("filterStart").value,
+        end: document.getElementById("filterEnd").value
+      };
+      loadAlerts(filters);
+    });
+  </script>
 </body>
 </html>

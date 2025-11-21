@@ -1,151 +1,713 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>EPHIS | My Follow-ups</title>
-<link rel="manifest" href="manifest.json" />
-<script type="module" src="main.js"></script>
-<style>
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;
-background:linear-gradient(135deg,#f8fafc 0%,#fef3c7 100%);margin:0;color:#1e293b;}
-header{background:white;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
-.header-container{max-width:1400px;margin:0 auto;padding:1rem 1.5rem;
-display:flex;justify-content:space-between;align-items:center;}
-h1{font-size:1.2rem;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);
--webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-main{max-width:1400px;margin:0 auto;padding:1.5rem;}
-form{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);
-padding:1.5rem;margin-bottom:1.5rem;}
-label{display:block;margin-top:0.6rem;font-weight:600;}
-input,textarea,select{width:100%;padding:0.6rem;border-radius:8px;border:1px solid #cbd5e1;margin-top:0.3rem;}
-button{border:none;border-radius:10px;padding:0.625rem 1.25rem;font-weight:600;cursor:pointer;}
-.btn-primary{background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);color:white;}
-.btn-secondary{background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:white;}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;}
-.card{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);padding:1rem;}
-.card h3{margin:0 0 0.3rem;color:#2563eb;font-size:1.05rem;}
-.card p{margin:0.2rem 0;font-size:0.9rem;}
-.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
-background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);
-color:white;padding:1rem 1.5rem;border-radius:12px;opacity:0;transition:opacity 0.3s;}
-.toast.show{opacity:1;}
-footer{text-align:center;background:white;color:#64748b;font-size:0.85rem;padding:1rem;}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Follow-ups | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <script type="module" src="main.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --primary-light: #3b82f6;
+      --secondary: #10b981;
+      --secondary-dark: #059669;
+      --accent: #8b5cf6;
+      --warning: #f59e0b;
+      --bg-main: #f8fafc;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-main);
+      margin: 0;
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 500px;
+      background: linear-gradient(135deg, 
+        rgba(16, 185, 129, 0.08) 0%, 
+        rgba(37, 99, 235, 0.08) 50%, 
+        rgba(139, 92, 246, 0.08) 100%);
+      z-index: -1;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-icon::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: rotate(45deg);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--secondary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    form {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    form::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--secondary), var(--accent), var(--primary));
+      background-size: 200% 100%;
+      animation: gradientMove 3s ease infinite;
+    }
+
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    form h2 {
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      background: white;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+      transform: translateY(-1px);
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 3rem;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    input[type="file"] {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+    }
+
+    input[type="file"]::file-selector-button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    input[type="file"]::file-selector-button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.875rem 1.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+      font-family: inherit;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-light {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-light:hover {
+      border-color: var(--primary);
+      background: var(--bg-main);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-header h2 {
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 1.75rem;
+      border: 1px solid var(--border);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--secondary), var(--accent));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+      border-color: transparent;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card h3 {
+      margin: 0 0 1rem;
+      color: var(--secondary);
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card p {
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .card strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .card a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .card a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text-primary);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-xl);
+      z-index: 1000;
+      font-weight: 500;
+      min-width: 250px;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: white;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+
+    @media (max-width: 768px) {
+      .header-container {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 1.25rem;
+      }
+
+      main {
+        padding: 1.5rem 1rem;
+      }
+
+      form {
+        padding: 1.5rem;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .form-actions .btn {
+        width: 100%;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<header>
-  <div class="header-container">
-    <h1>My Follow-ups</h1>
-    <button class="btn-secondary" onclick="window.location.href='officer_dashboard.html'">Back</button>
-  </div>
-</header>
-
-<main>
-  <form id="followupForm">
-    <h2 style="color:#2563eb;">Log a Follow-up</h2>
-    <label>Related Record Type</label>
-    <select id="recordType" required>
-      <option value="">Select Type</option>
-      <option value="Inspection">Inspection</option>
-      <option value="Complaint">Complaint</option>
-      <option value="Enforcement">Enforcement</option>
-    </select>
-
-    <label>Record ID (if applicable)</label>
-    <input type="text" id="recordId" placeholder="Record UUID or Reference" />
-
-    <label>Follow-up Date</label>
-    <input type="date" id="followupDate" required />
-
-    <label>Findings</label>
-    <textarea id="findings" rows="3" placeholder="Summary of findings..." required></textarea>
-
-    <label>Status</label>
-    <select id="status" required>
-      <option value="Ongoing">Ongoing</option>
-      <option value="Resolved">Resolved</option>
-      <option value="Referred">Referred</option>
-    </select>
-
-    <label>Attachment (optional)</label>
-    <input type="file" id="fileUpload" accept="image/*,application/pdf" />
-
-    <div style="margin-top:1rem;">
-      <button class="btn-primary" type="submit">Save Follow-up</button>
+  <header>
+    <div class="header-container">
+      <div class="header-left">
+        <div class="logo-icon">🔄</div>
+        <h1>My Follow-ups</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-light" onclick="window.location.href='officer_dashboard.html'">← Back</button>
+        <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'">Main Dashboard</button>
+      </div>
     </div>
-  </form>
+  </header>
 
-  <h2 style="color:#2563eb;">My Logged Follow-ups</h2>
-  <div class="grid" id="followupGrid"></div>
-</main>
+  <main>
+    <form id="followupForm">
+      <h2>📝 Log a Follow-up</h2>
+      <div class="form-grid">
+        <div>
+          <label>Related Record Type *</label>
+          <select id="recordType" required>
+            <option value="">Select Type</option>
+            <option value="Inspection">Inspection</option>
+            <option value="Complaint">Complaint</option>
+            <option value="Enforcement">Enforcement</option>
+          </select>
+        </div>
 
-<footer>County Government of Elgeyo Marakwet • EPHIS © <span id="year"></span></footer>
-<div id="toast" class="toast"></div>
+        <div>
+          <label>Record ID (if applicable)</label>
+          <input type="text" id="recordId" placeholder="Record UUID or Reference" />
+        </div>
 
-<script type="module">
-import { supabase } from "./main.js";
-const toast=document.getElementById("toast");
-function showToast(m){toast.textContent=m;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
-document.getElementById("year").textContent=new Date().getFullYear();
+        <div>
+          <label>Follow-up Date *</label>
+          <input type="date" id="followupDate" required />
+        </div>
 
-let officerId=null;
+        <div>
+          <label>Findings *</label>
+          <textarea id="findings" rows="3" placeholder="Summary of findings..." required></textarea>
+        </div>
 
-async function checkSession(){
-  const {data}=await supabase.auth.getSession();
-  if(!data.session) window.location.href="login.html";
-  else {officerId=data.session.user.id;loadFollowups();}
-}
-checkSession();
+        <div>
+          <label>Status *</label>
+          <select id="status" required>
+            <option value="">Select status</option>
+            <option value="Ongoing">Ongoing</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Referred">Referred</option>
+          </select>
+        </div>
 
-document.getElementById("followupForm").addEventListener("submit",async(e)=>{
-  e.preventDefault();
-  const recordType=document.getElementById("recordType").value;
-  const recordId=document.getElementById("recordId").value.trim();
-  const followupDate=document.getElementById("followupDate").value;
-  const findings=document.getElementById("findings").value.trim();
-  const status=document.getElementById("status").value;
+        <div>
+          <label>Attachment (optional)</label>
+          <input type="file" id="fileUpload" accept="image/*,application/pdf" />
+        </div>
+      </div>
 
-  let fileUrl=null;
-  const file=document.getElementById("fileUpload").files[0];
-  if(file){
-    const { data: upload, error: upErr } = await supabase.storage.from("evidence").upload(`followups/${Date.now()}_${file.name}`,file,{upsert:true});
-    if(!upErr) fileUrl=supabase.storage.from("evidence").getPublicUrl(upload.path).data.publicUrl;
-  }
+      <div class="form-actions">
+        <button class="btn btn-light" type="reset">Clear Form</button>
+        <button class="btn btn-primary" type="submit">💾 Save Follow-up</button>
+      </div>
+    </form>
 
-  const { error } = await supabase.from("building_followups").insert([{
-    record_type:recordType,
-    record_id:recordId||null,
-    followup_date:followupDate,
-    findings,
-    status,
-    attachment_url:fileUrl,
-    created_by:officerId
-  }]);
-  if(error){console.error(error);showToast("Error saving follow-up");}
-  else{showToast("Follow-up saved");loadFollowups();e.target.reset();}
-});
+    <div class="section-header">
+      <h2>📋 My Logged Follow-ups</h2>
+    </div>
+    <div class="grid" id="followupGrid"></div>
+  </main>
 
-async function loadFollowups(){
-  const {data,error}=await supabase.from("building_followups")
-    .select("*").eq("created_by",officerId).order("followup_date",{ascending:false});
-  if(error){console.error(error);showToast("Error loading follow-ups");return;}
-  renderFollowups(data);
-}
+  <footer>
+    County Government of Elgeyo Marakwet • EPHIS © <span id="year"></span>
+  </footer>
 
-function renderFollowups(list){
-  const grid=document.getElementById("followupGrid");
-  if(!list.length){grid.innerHTML="<p>No follow-ups logged yet.</p>";return;}
-  grid.innerHTML=list.map(f=>`
-  <div class="card">
-    <h3>${f.record_type||'Follow-up'}</h3>
-    <p><b>Date:</b> ${f.followup_date||'-'}</p>
-    <p><b>Status:</b> ${f.status||'-'}</p>
-    <p>${f.findings||''}</p>
-    ${f.attachment_url?`<a href="${f.attachment_url}" target="_blank" style="color:#2563eb;">View Attachment</a>`:''}
-  </div>`).join("");
-}
-</script>
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { supabase } from "./main.js";
+    
+    const toast = document.getElementById("toast");
+    
+    function showToast(msg, type = "info") {
+      toast.textContent = msg;
+      toast.style.background = type === "error" ? "#dc2626" : "#2563eb";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+    
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    let officerId = null;
+
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        window.location.href = "login.html";
+      } else {
+        officerId = data.session.user.id;
+        loadFollowups();
+      }
+    }
+    checkSession();
+
+    document.getElementById("followupForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const recordType = document.getElementById("recordType").value;
+      const recordId = document.getElementById("recordId").value.trim();
+      const followupDate = document.getElementById("followupDate").value;
+      const findings = document.getElementById("findings").value.trim();
+      const status = document.getElementById("status").value;
+
+      let fileUrl = null;
+      const file = document.getElementById("fileUpload").files[0];
+      
+      if (file) {
+        showToast("Uploading attachment...");
+        const { data: upload, error: upErr } = await supabase.storage
+          .from("evidence")
+          .upload(`followups/${Date.now()}_${file.name}`, file, { upsert: true });
+          
+        if (upErr) {
+          showToast("Failed to upload attachment", "error");
+          return;
+        }
+        
+        fileUrl = supabase.storage.from("evidence").getPublicUrl(upload.path).data.publicUrl;
+      }
+
+      const { error } = await supabase.from("building_followups").insert([{
+        record_type: recordType,
+        record_id: recordId || null,
+        followup_date: followupDate,
+        findings,
+        status,
+        attachment_url: fileUrl,
+        created_by: officerId
+      }]);
+      
+      if (error) {
+        console.error(error);
+        showToast("Error saving follow-up", "error");
+      } else {
+        showToast("Follow-up saved successfully");
+        loadFollowups();
+        e.target.reset();
+      }
+    });
+
+    async function loadFollowups() {
+      const grid = document.getElementById("followupGrid");
+      grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><p>Loading follow-ups...</p></div>';
+      
+      const { data, error } = await supabase
+        .from("building_followups")
+        .select("*")
+        .eq("created_by", officerId)
+        .order("followup_date", { ascending: false });
+        
+      if (error) {
+        console.error(error);
+        showToast("Error loading follow-ups", "error");
+        return;
+      }
+      
+      renderFollowups(data);
+    }
+
+    function renderFollowups(list) {
+      const grid = document.getElementById("followupGrid");
+      
+      if (!list.length) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🔄</div>
+            <h3>No follow-ups logged yet</h3>
+            <p>Start by logging your first follow-up above</p>
+          </div>
+        `;
+        return;
+      }
+      
+      grid.innerHTML = list.map(f => `
+        <div class="card">
+          <h3>🔄 ${f.record_type || 'Follow-up'}</h3>
+          <p><strong>Date:</strong> ${f.followup_date || '—'}</p>
+          <p><strong>Status:</strong> ${f.status || '—'}</p>
+          <p><strong>Findings:</strong> ${f.findings || 'No findings recorded'}</p>
+          ${f.attachment_url ? `<a href="${f.attachment_url}" target="_blank">🔗 View Attachment</a>` : ''}
+        </div>
+      `).join("");
+    }
+  </script>
 </body>
 </html>

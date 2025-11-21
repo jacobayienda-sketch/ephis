@@ -1,132 +1,600 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>EPHIS | My Performance</title>
-<link rel="manifest" href="manifest.json" />
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/recharts/umd/Recharts.min.js"></script>
-<script type="module" src="main.js"></script>
-<style>
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;
-background:linear-gradient(135deg,#f8fafc 0%,#fef3c7 100%);margin:0;color:#1e293b;}
-header{background:white;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
-.header-container{max-width:1400px;margin:0 auto;padding:1rem 1.5rem;
-display:flex;justify-content:space-between;align-items:center;}
-h1{font-size:1.2rem;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);
--webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-main{max-width:1400px;margin:0 auto;padding:1.5rem;}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:2rem;}
-.card{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);padding:1rem;text-align:center;}
-.card h2{margin:0;color:#2563eb;font-size:1.05rem;}
-.card p{margin:0.2rem 0;font-size:1.5rem;font-weight:700;}
-.chart-section{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);
-padding:1.5rem;margin-top:1.5rem;}
-.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
-background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);
-color:white;padding:1rem 1.5rem;border-radius:12px;opacity:0;transition:opacity 0.3s;}
-.toast.show{opacity:1;}
-footer{text-align:center;background:white;color:#64748b;font-size:0.85rem;padding:1rem;}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Performance | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/recharts@2.5.0/dist/Recharts.js"></script>
+  <script type="module" src="main.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --primary-light: #3b82f6;
+      --secondary: #10b981;
+      --secondary-dark: #059669;
+      --accent: #8b5cf6;
+      --warning: #f59e0b;
+      --bg-main: #f8fafc;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-main);
+      margin: 0;
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 500px;
+      background: linear-gradient(135deg, 
+        rgba(37, 99, 235, 0.08) 0%, 
+        rgba(245, 158, 11, 0.08) 50%, 
+        rgba(16, 185, 129, 0.08) 100%);
+      z-index: -1;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--warning) 0%, var(--accent) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-icon::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: rotate(45deg);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--warning), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.875rem 1.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+      font-family: inherit;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-light {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-light:hover {
+      border-color: var(--primary);
+      background: var(--bg-main);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 2rem;
+      text-align: center;
+      border: 1px solid var(--border);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--card-color);
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-xl);
+      border-color: var(--card-color);
+    }
+
+    .card:hover::before {
+      transform: scaleY(1);
+    }
+
+    .card:nth-child(1) { --card-color: #3b82f6; }
+    .card:nth-child(2) { --card-color: #f59e0b; }
+    .card:nth-child(3) { --card-color: #dc2626; }
+    .card:nth-child(4) { --card-color: #10b981; }
+
+    .card-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 1rem;
+      background: var(--card-color);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover .card-icon {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .card h2 {
+      margin: 0 0 0.5rem;
+      color: var(--text-secondary);
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--card-color);
+      line-height: 1;
+    }
+
+    .chart-section {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 2rem;
+      margin-top: 2rem;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chart-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--warning), var(--secondary));
+      background-size: 200% 100%;
+      animation: gradientMove 3s ease infinite;
+    }
+
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .chart-section h2 {
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text-primary);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-xl);
+      z-index: 1000;
+      font-weight: 500;
+      min-width: 250px;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: white;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+
+    @media (max-width: 768px) {
+      .header-container {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 1.25rem;
+      }
+
+      main {
+        padding: 1.5rem 1rem;
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+      }
+
+      .card {
+        padding: 1.25rem;
+      }
+
+      .card p {
+        font-size: 2rem;
+      }
+
+      .chart-section {
+        padding: 1.5rem;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<header>
-  <div class="header-container">
-    <h1>My Performance</h1>
-    <button class="btn-secondary" onclick="window.location.href='officer_dashboard.html'"
-    style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:white;border:none;border-radius:10px;padding:0.5rem 1rem;font-weight:600;cursor:pointer;">
-    Back</button>
-  </div>
-</header>
+  <header>
+    <div class="header-container">
+      <div class="header-left">
+        <div class="logo-icon">📊</div>
+        <h1>My Performance</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-light" onclick="window.location.href='officer_dashboard.html'">← Back</button>
+        <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'">Main Dashboard</button>
+      </div>
+    </div>
+  </header>
 
-<main>
-  <div class="kpi-grid" id="kpiGrid">
-    <div class="card"><h2>Inspections</h2><p id="inspCount">0</p></div>
-    <div class="card"><h2>Follow-ups</h2><p id="fupCount">0</p></div>
-    <div class="card"><h2>Enforcements</h2><p id="enfCount">0</p></div>
-    <div class="card"><h2>Compliance Rate</h2><p id="compRate">0%</p></div>
-  </div>
+  <main>
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="card">
+        <div class="card-icon">🔍</div>
+        <h2>Inspections</h2>
+        <p id="inspCount">0</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔄</div>
+        <h2>Follow-ups</h2>
+        <p id="fupCount">0</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚖️</div>
+        <h2>Enforcements</h2>
+        <p id="enfCount">0</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">✅</div>
+        <h2>Compliance Rate</h2>
+        <p id="compRate">0%</p>
+      </div>
+    </div>
 
-  <section class="chart-section">
-    <h2 style="color:#2563eb;">Workload Mix (Tasks by Type)</h2>
-    <div id="pieChart" style="width:100%;height:320px;"></div>
-  </section>
+    <section class="chart-section">
+      <h2>📊 Workload Mix (Tasks by Type)</h2>
+      <div id="pieChart" style="width:100%;height:320px;"></div>
+    </section>
 
-  <section class="chart-section">
-    <h2 style="color:#2563eb;">Compliance Trend</h2>
-    <div id="lineChart" style="width:100%;height:320px;"></div>
-  </section>
-</main>
+    <section class="chart-section">
+      <h2>📈 Compliance Trend</h2>
+      <div id="lineChart" style="width:100%;height:320px;"></div>
+    </section>
+  </main>
 
-<footer>County Government of Elgeyo Marakwet • EPHIS © <span id="year"></span></footer>
-<div id="toast" class="toast"></div>
+  <footer>
+    County Government of Elgeyo Marakwet • EPHIS © <span id="year"></span>
+  </footer>
 
-<script type="module">
-import { supabase } from "./main.js";
-const toast=document.getElementById("toast");
-function showToast(m){toast.textContent=m;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
-document.getElementById("year").textContent=new Date().getFullYear();
+  <div id="toast" class="toast"></div>
 
-async function checkSession(){
-  const {data}=await supabase.auth.getSession();
-  if(!data.session) window.location.href="login.html";
-  else loadPerformance(data.session.user.id);
-}
-checkSession();
+  <script type="module">
+    import { supabase } from "./main.js";
+    
+    const toast = document.getElementById("toast");
+    
+    function showToast(msg, type = "info") {
+      toast.textContent = msg;
+      toast.style.background = type === "error" ? "#dc2626" : "#2563eb";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+    
+    document.getElementById("year").textContent = new Date().getFullYear();
 
-async function loadPerformance(userId){
-  const {data,error}=await supabase.from("vw_officer_performance").select("*").eq("officer_id",userId).single();
-  if(error){console.error(error);showToast("Failed to load performance");return;}
-  if(!data){showToast("No performance data available");return;}
-  document.getElementById("inspCount").textContent=data.total_inspections||0;
-  document.getElementById("fupCount").textContent=data.total_followups||0;
-  document.getElementById("enfCount").textContent=data.total_enforcements||0;
-  document.getElementById("compRate").textContent=(data.compliance_rate||0)+"%";
-  renderCharts(data);
-}
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        window.location.href = "login.html";
+      } else {
+        loadPerformance(data.session.user.id);
+      }
+    }
+    checkSession();
 
-function renderCharts(data){
-  const total=(data.total_inspections||0)+(data.total_followups||0)+(data.total_enforcements||0);
-  const pieData=[
-    {name:"Inspections",value:data.total_inspections||0},
-    {name:"Follow-ups",value:data.total_followups||0},
-    {name:"Enforcements",value:data.total_enforcements||0}
-  ];
+    async function loadPerformance(userId) {
+      const { data, error } = await supabase
+        .from("vw_officer_performance")
+        .select("*")
+        .eq("officer_id", userId)
+        .single();
+        
+      if (error) {
+        console.error(error);
+        showToast("Failed to load performance", "error");
+        return;
+      }
+      
+      if (!data) {
+        showToast("No performance data available", "error");
+        return;
+      }
+      
+      // Animate counters
+      animateValue("inspCount", 0, data.total_inspections || 0, 1000);
+      animateValue("fupCount", 0, data.total_followups || 0, 1000);
+      animateValue("enfCount", 0, data.total_enforcements || 0, 1000);
+      animateValue("compRate", 0, data.compliance_rate || 0, 1000, "%");
+      
+      renderCharts(data);
+    }
 
-  const lineData=[
-    {month:"Jan",compliance:data.compliance_rate||0},
-    {month:"Feb",compliance:data.compliance_rate||0},
-    {month:"Mar",compliance:data.compliance_rate||0},
-    {month:"Apr",compliance:data.compliance_rate||0}
-  ];
+    function animateValue(id, start, end, duration, suffix = "") {
+      const element = document.getElementById(id);
+      const range = end - start;
+      const increment = range / (duration / 16);
+      let current = start;
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+          current = end;
+          clearInterval(timer);
+        }
+        element.textContent = Math.floor(current) + suffix;
+      }, 16);
+    }
 
-  // Pie Chart
-  ReactDOM.render(
-    React.createElement(Recharts.ResponsiveContainer,{width:"100%",height:300},
-      React.createElement(Recharts.PieChart,null,
-        React.createElement(Recharts.Pie,{data:pieData,dataKey:"value",nameKey:"name",outerRadius:120,fill:"#2563eb",label:true}),
-        React.createElement(Recharts.Tooltip,null)
-      )
-    ), document.getElementById("pieChart")
-  );
+    function renderCharts(data) {
+      const total = (data.total_inspections || 0) + (data.total_followups || 0) + (data.total_enforcements || 0);
+      
+      const pieData = [
+        { name: "Inspections", value: data.total_inspections || 0 },
+        { name: "Follow-ups", value: data.total_followups || 0 },
+        { name: "Enforcements", value: data.total_enforcements || 0 }
+      ];
 
-  // Line Chart
-  ReactDOM.render(
-    React.createElement(Recharts.ResponsiveContainer,{width:"100%",height:300},
-      React.createElement(Recharts.LineChart,{data:lineData},
-        React.createElement(Recharts.CartesianGrid,{strokeDasharray:"3 3"}),
-        React.createElement(Recharts.XAxis,{dataKey:"month"}),
-        React.createElement(Recharts.YAxis,{domain:[0,100]}),
-        React.createElement(Recharts.Tooltip,null),
-        React.createElement(Recharts.Line,{type:"monotone",dataKey:"compliance",stroke:"#f59e0b",strokeWidth:3,dot:true})
-      )
-    ), document.getElementById("lineChart")
-  );
-}
-</script>
+      const lineData = [
+        { month: "Jan", compliance: data.compliance_rate || 0 },
+        { month: "Feb", compliance: data.compliance_rate || 0 },
+        { month: "Mar", compliance: data.compliance_rate || 0 },
+        { month: "Apr", compliance: data.compliance_rate || 0 }
+      ];
+
+      // Pie Chart
+      try {
+        ReactDOM.render(
+          React.createElement(Recharts.ResponsiveContainer, { width: "100%", height: 300 },
+            React.createElement(Recharts.PieChart, null,
+              React.createElement(Recharts.Pie, {
+                data: pieData,
+                dataKey: "value",
+                nameKey: "name",
+                cx: "50%",
+                cy: "50%",
+                outerRadius: 100,
+                fill: "#2563eb",
+                label: true
+              }),
+              React.createElement(Recharts.Tooltip, null),
+              React.createElement(Recharts.Legend, null)
+            )
+          ), document.getElementById("pieChart")
+        );
+      } catch (e) {
+        console.error("Chart render error:", e);
+      }
+
+      // Line Chart
+      try {
+        ReactDOM.render(
+          React.createElement(Recharts.ResponsiveContainer, { width: "100%", height: 300 },
+            React.createElement(Recharts.LineChart, { data: lineData },
+              React.createElement(Recharts.CartesianGrid, { strokeDasharray: "3 3" }),
+              React.createElement(Recharts.XAxis, { dataKey: "month" }),
+              React.createElement(Recharts.YAxis, { domain: [0, 100] }),
+              React.createElement(Recharts.Tooltip, null),
+              React.createElement(Recharts.Legend, null),
+              React.createElement(Recharts.Line, {
+                type: "monotone",
+                dataKey: "compliance",
+                stroke: "#f59e0b",
+                strokeWidth: 3,
+                dot: true
+              })
+            )
+          ), document.getElementById("lineChart")
+        );
+      } catch (e) {
+        console.error("Chart render error:", e);
+      }
+    }
+  </script>
 </body>
 </html>

@@ -1,154 +1,663 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>EPHIS | My Tasks</title>
-<link rel="manifest" href="manifest.json" />
-<script type="module" src="main.js"></script>
-<style>
-/* Themed after food_control.html */
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;
-background:linear-gradient(135deg,#f8fafc 0%,#fef3c7 100%);margin:0;color:#1e293b;}
-header{background:white;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
-.header-container{max-width:1400px;margin:0 auto;padding:1rem 1.5rem;
-display:flex;justify-content:space-between;align-items:center;}
-h1{font-size:1.2rem;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);
--webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-main{max-width:1400px;margin:0 auto;padding:1.5rem;}
-.search-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;}
-.search-bar input, .search-bar select{padding:0.6rem;border-radius:10px;
-border:1px solid #cbd5e1;flex:1;}
-.btn{border:none;border-radius:10px;padding:0.625rem 1.25rem;font-weight:600;cursor:pointer;}
-.btn-primary{background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);color:white;}
-.btn-secondary{background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:white;}
-.card{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);
-padding:1rem;margin-bottom:1rem;transition:transform 0.15s;}
-.card:hover{transform:translateY(-2px);}
-.card-header{display:flex;justify-content:space-between;align-items:center;color:#2563eb;
-font-weight:600;margin-bottom:0.4rem;}
-.status{padding:0.25rem 0.5rem;border-radius:6px;font-size:0.8rem;color:white;}
-.status.Pending{background:#f59e0b;}
-.status.Ongoing{background:#3b82f6;}
-.status.Completed{background:#16a34a;}
-.status.Overdue{background:#dc2626;}
-.actions{margin-top:0.6rem;display:flex;gap:0.4rem;flex-wrap:wrap;}
-.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
-background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);
-color:white;padding:1rem 1.5rem;border-radius:12px;opacity:0;transition:opacity 0.3s;}
-.toast.show{opacity:1;}
-footer{text-align:center;background:white;color:#64748b;font-size:0.85rem;padding:1rem;}
-@media(max-width:700px){.card-header{flex-direction:column;align-items:flex-start;}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Tasks | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <script type="module" src="main.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --primary-light: #3b82f6;
+      --secondary: #10b981;
+      --secondary-dark: #059669;
+      --accent: #8b5cf6;
+      --warning: #f59e0b;
+      --danger: #dc2626;
+      --bg-main: #f8fafc;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-main);
+      margin: 0;
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 500px;
+      background: linear-gradient(135deg, 
+        rgba(37, 99, 235, 0.08) 0%, 
+        rgba(139, 92, 246, 0.08) 50%, 
+        rgba(16, 185, 129, 0.08) 100%);
+      z-index: -1;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .logo-icon::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: rotate(45deg);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .search-bar {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+    }
+
+    .search-bar h2 {
+      font-size: 1.3rem;
+      color: var(--text-primary);
+      margin-bottom: 1.25rem;
+      font-weight: 700;
+    }
+
+    .search-grid {
+      display: grid;
+      grid-template-columns: 1fr 200px auto;
+      gap: 1rem;
+      align-items: end;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      background: white;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+      transform: translateY(-1px);
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 3rem;
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.875rem 1.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+      font-family: inherit;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-light {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-light:hover {
+      border-color: var(--primary);
+      background: var(--bg-main);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    #taskContainer {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 1.75rem;
+      border: 1px solid var(--border);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--card-color);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+      border-color: transparent;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-primary);
+      font-weight: 700;
+      margin-bottom: 1rem;
+      font-size: 1.15rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .status {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .status.Pending {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      color: #92400e;
+    }
+
+    .status.Ongoing {
+      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+      color: #1e40af;
+    }
+
+    .status.Completed {
+      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+      color: #065f46;
+    }
+
+    .status.Overdue {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      color: #991b1b;
+    }
+
+    .card p {
+      color: var(--text-secondary);
+      margin-bottom: 0.625rem;
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    .card strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .actions {
+      margin-top: 1.25rem;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .load-more-section {
+      text-align: center;
+      margin-top: 2.5rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text-primary);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-xl);
+      z-index: 1000;
+      font-weight: 500;
+      min-width: 250px;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: white;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+
+    @media (max-width: 768px) {
+      .header-container {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 1.25rem;
+      }
+
+      main {
+        padding: 1.5rem 1rem;
+      }
+
+      .search-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<header>
-  <div class="header-container">
-    <h1>My Tasks</h1>
-    <button class="btn btn-secondary" onclick="window.location.href='officer_dashboard.html'">Back</button>
-  </div>
-</header>
-
-<main>
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search by record type or notes..." />
-    <select id="statusFilter">
-      <option value="">All Status</option>
-      <option value="Pending">Pending</option>
-      <option value="Ongoing">Ongoing</option>
-      <option value="Completed">Completed</option>
-      <option value="Overdue">Overdue</option>
-    </select>
-    <button class="btn btn-primary" id="filterBtn">Filter</button>
-  </div>
-
-  <div id="taskContainer"></div>
-
-  <div style="text-align:center;margin-top:1.5rem;">
-    <button class="btn btn-secondary" id="loadMoreBtn">Load More</button>
-  </div>
-</main>
-
-<footer>County Government of Elgeyo Marakwet • EPHIS © <span id="year"></span></footer>
-<div id="toast" class="toast"></div>
-
-<script type="module">
-import { supabase } from "./main.js";
-const toast=document.getElementById("toast");
-function showToast(m){toast.textContent=m;toast.classList.add("show");
-setTimeout(()=>toast.classList.remove("show"),3000);}
-document.getElementById("year").textContent=new Date().getFullYear();
-
-let userId=null;
-let page=0,limit=5,filterStatus="",searchTerm="";
-
-async function checkSession(){
-  const {data}=await supabase.auth.getSession();
-  if(!data.session) window.location.href="login.html";
-  else {userId=data.session.user.id;loadTasks();}
-}
-checkSession();
-
-async function loadTasks(loadMore=false){
-  if(!loadMore) page=0;
-  const from=page*limit, to=(page+1)*limit-1;
-  let query=supabase.from("officer_assignments").select("*")
-      .eq("officer_id",userId)
-      .order("assigned_date",{ascending:false})
-      .range(from,to);
-  if(filterStatus) query=query.eq("status",filterStatus);
-  if(searchTerm) query=query.ilike("record_type",`%${searchTerm}%`);
-  const {data,error}=await query;
-  if(error){console.error(error);showToast("Error loading tasks");return;}
-  renderTasks(data,loadMore);
-  if(data.length===limit) page++;
-}
-
-function renderTasks(data,append=false){
-  const c=document.getElementById("taskContainer");
-  if(!append) c.innerHTML="";
-  if(!data.length && !append){c.innerHTML="<p>No tasks found.</p>";return;}
-  c.innerHTML+=data.map(t=>`
-  <div class="card">
-    <div class="card-header">
-      <span>${t.record_type||'Task'}</span>
-      <span class="status ${t.status}">${t.status}</span>
+  <header>
+    <div class="header-container">
+      <div class="header-left">
+        <div class="logo-icon">📋</div>
+        <h1>My Tasks</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-light" onclick="window.location.href='officer_dashboard.html'">← Back</button>
+        <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'">Main Dashboard</button>
+      </div>
     </div>
-    <p><b>Assigned:</b> ${t.assigned_date||'-'} | <b>Priority:</b> ${t.priority||'-'}</p>
-    <p>${t.remarks||''}</p>
-    <div class="actions">
-      <button class="btn btn-primary" onclick="openRecord('${t.record_type}','${t.record_id}')">View</button>
-      ${t.status!=='Completed'?
-        `<button class="btn btn-secondary" onclick="markComplete('${t.id}')">Mark Complete</button>`:''}
+  </header>
+
+  <main>
+    <div class="search-bar">
+      <h2>🔍 Filter Tasks</h2>
+      <div class="search-grid">
+        <input type="text" id="searchInput" placeholder="Search by record type or notes..." />
+        <select id="statusFilter">
+          <option value="">All Status</option>
+          <option value="Pending">Pending</option>
+          <option value="Ongoing">Ongoing</option>
+          <option value="Completed">Completed</option>
+          <option value="Overdue">Overdue</option>
+        </select>
+        <button class="btn btn-primary" id="filterBtn">🔍 Filter</button>
+      </div>
     </div>
-  </div>`).join("");
-}
 
-window.openRecord=(type,id)=>{
-  let page=""; 
-  switch(type){
-    case "Building Inspection":page=`building_inspection_form.html?id=${id}`;break;
-    case "IPC Follow-up":page=`ipc_followup_form.html?id=${id}`;break;
-    case "Complaint":page=`complaints_public.html?id=${id}`;break;
-    default:page=`dashboard.html`;
-  }
-  window.location.href=page;
-};
+    <div id="taskContainer"></div>
 
-window.markComplete=async(id)=>{
-  const{error}=await supabase.from("officer_assignments")
-      .update({status:"Completed"}).eq("id",id);
-  if(error){console.error(error);showToast("Update failed");}
-  else{showToast("Task marked as completed");loadTasks();}
-};
+    <div class="load-more-section">
+      <button class="btn btn-secondary" id="loadMoreBtn">Load More Tasks</button>
+    </div>
+  </main>
 
-document.getElementById("filterBtn").onclick=()=>{
-  filterStatus=document.getElementById("statusFilter").value;
-  searchTerm=document.getElementById("searchInput").value.trim();
-  loadTasks();
-};
-document.getElementById("loadMoreBtn").onclick=()=>loadTasks(true);
-</script>
+  <footer>
+    County Government of Elgeyo Marakwet • EPHIS © <span id="year"></span>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { supabase } from "./main.js";
+    
+    const toast = document.getElementById("toast");
+    
+    function showToast(msg, type = "info") {
+      toast.textContent = msg;
+      toast.style.background = type === "error" ? "#dc2626" : "#2563eb";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+    
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    let userId = null;
+    let page = 0, limit = 5, filterStatus = "", searchTerm = "";
+
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        window.location.href = "login.html";
+      } else {
+        userId = data.session.user.id;
+        loadTasks();
+      }
+    }
+    checkSession();
+
+    async function loadTasks(loadMore = false) {
+      const container = document.getElementById("taskContainer");
+      
+      if (!loadMore) {
+        page = 0;
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><p>Loading tasks...</p></div>';
+      }
+      
+      const from = page * limit, to = (page + 1) * limit - 1;
+      
+      let query = supabase
+        .from("officer_assignments")
+        .select("*")
+        .eq("officer_id", userId)
+        .order("assigned_date", { ascending: false })
+        .range(from, to);
+        
+      if (filterStatus) query = query.eq("status", filterStatus);
+      if (searchTerm) query = query.ilike("record_type", `%${searchTerm}%`);
+      
+      const { data, error } = await query;
+      
+      if (error) {
+        console.error(error);
+        showToast("Error loading tasks", "error");
+        return;
+      }
+      
+      renderTasks(data, loadMore);
+      if (data.length === limit) page++;
+    }
+
+    function renderTasks(data, append = false) {
+      const c = document.getElementById("taskContainer");
+      
+      if (!append) c.innerHTML = "";
+      
+      if (!data.length && !append) {
+        c.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <h3>No tasks found</h3>
+            <p>No tasks match your filter criteria</p>
+          </div>
+        `;
+        return;
+      }
+      
+      c.innerHTML += data.map(t => `
+        <div class="card" style="--card-color: ${getStatusColor(t.status)}">
+          <div class="card-header">
+            <span>📋 ${t.record_type || 'Task'}</span>
+            <span class="status ${t.status}">${t.status}</span>
+          </div>
+          <p><strong>Assigned:</strong> ${t.assigned_date || '—'} | <strong>Priority:</strong> ${t.priority || '—'}</p>
+          <p>${t.remarks || 'No additional details provided'}</p>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="openRecord('${t.record_type}','${t.record_id}')">
+              👁️ View Record
+            </button>
+            ${t.status !== 'Completed' ? 
+              `<button class="btn btn-secondary" onclick="markComplete('${t.id}')">
+                ✅ Mark Complete
+              </button>` : ''}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function getStatusColor(status) {
+      const colors = {
+        'Pending': '#f59e0b',
+        'Ongoing': '#3b82f6',
+        'Completed': '#10b981',
+        'Overdue': '#dc2626'
+      };
+      return colors[status] || '#64748b';
+    }
+
+    window.openRecord = (type, id) => {
+      let page = "";
+      switch (type) {
+        case "Building Inspection":
+          page = `building_inspection_form.html?id=${id}`;
+          break;
+        case "IPC Follow-up":
+          page = `ipc_followup_form.html?id=${id}`;
+          break;
+        case "Complaint":
+          page = `complaints_public.html?id=${id}`;
+          break;
+        default:
+          page = `dashboard.html`;
+      }
+      window.location.href = page;
+    };
+
+    window.markComplete = async (id) => {
+      if (!confirm("Mark this task as completed?")) return;
+      
+      const { error } = await supabase
+        .from("officer_assignments")
+        .update({ status: "Completed" })
+        .eq("id", id);
+        
+      if (error) {
+        console.error(error);
+        showToast("Update failed", "error");
+      } else {
+        showToast("Task marked as completed");
+        loadTasks();
+      }
+    };
+
+    document.getElementById("filterBtn").onclick = () => {
+      filterStatus = document.getElementById("statusFilter").value;
+      searchTerm = document.getElementById("searchInput").value.trim();
+      loadTasks();
+    };
+    
+    document.getElementById("loadMoreBtn").onclick = () => loadTasks(true);
+  </script>
 </body>
 </html>
