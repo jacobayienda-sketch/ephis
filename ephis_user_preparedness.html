@@ -14,33 +14,11 @@
       box-sizing: border-box;
     }
 
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1e40af;
-      --primary-light: #3b82f6;
-      --secondary: #10b981;
-      --secondary-dark: #059669;
-      --accent: #8b5cf6;
-      --bg-main: #f8fafc;
-      --bg-card: #ffffff;
-      --text-primary: #0f172a;
-      --text-secondary: #475569;
-      --text-muted: #94a3b8;
-      --border: #e2e8f0;
-      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-      --radius: 12px;
-      --radius-lg: 16px;
-    }
-
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg-main);
-      color: var(--text-primary);
-      line-height: 1.6;
+      background: #f8fafc;
       min-height: 100vh;
+      color: #0f172a;
       display: flex;
       flex-direction: column;
     }
@@ -51,332 +29,172 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 500px;
-      background: linear-gradient(135deg, 
-        rgba(37, 99, 235, 0.1) 0%, 
-        rgba(139, 92, 246, 0.1) 50%, 
-        rgba(16, 185, 129, 0.1) 100%);
+      height: 400px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
       z-index: -1;
-      animation: gradientShift 15s ease infinite;
-    }
-
-    @keyframes gradientShift {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.05); }
+      opacity: 0.05;
     }
 
     header {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      padding: 1rem 2rem;
-      border-bottom: 1px solid var(--border);
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 1.2rem 2rem;
+      border-bottom: 1px solid #e2e8f0;
       position: sticky;
       top: 0;
       z-index: 100;
-      animation: slideDown 0.4s ease;
-    }
-
-    @keyframes slideDown {
-      from { transform: translateY(-100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
     }
 
     .header-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .header-left {
       display: flex;
       align-items: center;
       gap: 1rem;
     }
 
     .logo {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      border-radius: 12px;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      font-weight: bold;
       color: white;
-      font-size: 1.5rem;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
+      font-size: 1.2rem;
     }
 
-    .logo::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
-      transform: rotate(45deg);
-      animation: shine 3s infinite;
-    }
-
-    @keyframes shine {
-      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-    }
-
-    .logo:hover {
-      transform: scale(1.05) rotate(-5deg);
-      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-    }
-
-    .header-info h1 {
-      font-size: 1.5rem;
+    header h1 {
+      font-size: 1.4rem;
+      color: #0f172a;
       font-weight: 700;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
       letter-spacing: -0.02em;
     }
 
-    .header-info p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
+    .subtitle {
+      font-size: 0.85rem;
+      color: #64748b;
+      font-weight: 400;
       margin-top: 0.125rem;
     }
 
     main {
-      flex: 1;
-      padding: 2.5rem 2rem;
       max-width: 900px;
       margin: 0 auto;
+      padding: 2rem 1rem;
+      flex: 1;
       width: 100%;
-      animation: fadeInUp 0.5s ease;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
     form {
       background: white;
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-lg);
-      padding: 2.5rem;
-      margin-top: 1.5rem;
-      border: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
     }
 
-    form::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
-      background-size: 200% 100%;
-      animation: gradientMove 3s ease infinite;
+    .form-section {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid #f1f5f9;
     }
 
-    @keyframes gradientMove {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
+    .form-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
     }
 
-    form h2 {
-      font-size: 1.75rem;
-      margin-bottom: 0.5rem;
-      color: var(--text-primary);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-
-    form h3 {
-      font-size: 1.1rem;
-      color: var(--primary);
-      font-weight: 600;
-      margin-top: 2rem;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px solid var(--bg-main);
-    }
-
-    form h3:first-of-type {
-      margin-top: 1.5rem;
-    }
-
-    form label {
-      display: block;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 0.625rem;
-      margin-top: 1.5rem;
-      font-size: 0.95rem;
-      letter-spacing: 0.01em;
-      transition: color 0.3s ease;
-    }
-
-    form input,
-    form select,
-    form textarea {
-      width: 100%;
-      padding: 0.875rem 1rem;
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      font-family: inherit;
-      background: white;
-      color: var(--text-primary);
-    }
-
-    form input:focus,
-    form select:focus,
-    form textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-      transform: translateY(-1px);
-      animation: inputFocus 0.3s ease;
-    }
-
-    @keyframes inputFocus {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.01); }
-      100% { transform: scale(1); }
-    }
-
-    form textarea {
-      min-height: 120px;
-      resize: vertical;
-      line-height: 1.6;
-    }
-
-    form select {
-      cursor: pointer;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-      padding-right: 3rem;
-    }
-
-    .form-group-inline {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      margin-top: 1.5rem;
-    }
-
-    .form-group-inline label {
-      margin-top: 0;
-    }
-
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border-radius: var(--radius);
-      font-weight: 600;
-      font-size: 0.95rem;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      display: inline-flex;
+    .form-section h2 {
+      font-size: 1.2rem;
+      color: #1f2937;
+      margin-bottom: 1.5rem;
+      display: flex;
       align-items: center;
       gap: 0.5rem;
-      position: relative;
-      overflow: hidden;
-      letter-spacing: 0.01em;
     }
 
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.3);
-      transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
     }
 
-    .btn:hover::before {
-      width: 300px;
-      height: 300px;
+    .form-group {
+      margin-bottom: 1.5rem;
     }
 
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #374151;
+      font-size: 0.9rem;
     }
 
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    label .required {
+      color: #dc2626;
+      margin-left: 0.25rem;
     }
 
-    .btn-light {
+    .field-description {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+      font-weight: normal;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
       background: white;
-      color: var(--primary);
-      border: 2px solid var(--border);
-      box-shadow: var(--shadow-sm);
+      font-family: inherit;
     }
 
-    .btn-light:hover {
-      border-color: var(--primary);
-      background: var(--bg-main);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
 
-    .form-actions {
-      margin-top: 2.5rem;
-      display: flex;
-      gap: 1rem;
-      justify-content: flex-end;
-      padding-top: 2rem;
-      border-top: 1px solid var(--border);
+    textarea {
+      resize: vertical;
+      min-height: 120px;
     }
 
-    .toast {
-      position: fixed;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: var(--text-primary);
-      color: white;
-      padding: 1rem 1.5rem;
-      border-radius: var(--radius);
-      opacity: 0;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: var(--shadow-xl);
-      z-index: 1000;
-      font-weight: 500;
-      min-width: 250px;
-      text-align: center;
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      background-size: 1.5em 1.5em;
+      padding-right: 2.5rem;
     }
 
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .toast.success {
-      background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
-    }
-
-    .toast.error {
-      background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    .char-count {
+      display: block;
+      text-align: right;
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
     }
 
     .error-message {
@@ -387,17 +205,55 @@
       min-height: 1.2rem;
     }
 
-    .required {
-      color: #dc2626;
-      font-weight: 700;
+    input.error, select.error, textarea.error {
+      border-color: #dc2626;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
     }
 
-    .char-count {
-      display: block;
-      text-align: right;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-top: 0.25rem;
+    .btn {
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0.85rem 1.5rem;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #4b5563;
+      border: 2px solid #d1d5db;
+    }
+
+    .btn-secondary:hover {
+      background: #f9fafb;
+      border-color: #9ca3af;
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
     }
 
     .spinner {
@@ -414,388 +270,582 @@
       to { transform: rotate(360deg); }
     }
 
-    input.error,
-    select.error,
-    textarea.error {
+    .actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 2px solid #f1f5f9;
+    }
+
+    .actions .btn-primary {
+      flex: 1;
+    }
+
+    .alert {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+      border: 2px solid #10b981;
+      color: #0f172a;
+      padding: 2rem;
+      border-radius: 12px;
+      margin-top: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      animation: slideInDown 0.4s ease;
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .alert.error {
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(153, 27, 27, 0.1));
       border-color: #dc2626;
-      box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
     }
 
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
-      z-index: 2000;
-      align-items: center;
-      justify-content: center;
-      animation: fadeIn 0.3s ease;
+    .alert.warning {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1));
+      border-color: #f59e0b;
     }
 
-    .modal.show {
-      display: flex;
+    .alert strong {
+      font-size: 1.1rem;
+      display: block;
+      margin-bottom: 0.75rem;
     }
 
-    .modal-content {
-      background: white;
-      border-radius: var(--radius-lg);
-      padding: 3rem;
-      max-width: 500px;
-      margin: 2rem;
-      text-align: center;
-      box-shadow: var(--shadow-xl);
-      animation: slideUp 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(50px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    .success-icon {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 1.5rem;
-      background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-      font-weight: 700;
-      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
-    }
-
-    .modal-content h2 {
-      color: var(--text-primary);
-      font-size: 1.75rem;
-      margin-bottom: 1rem;
-    }
-
-    .modal-content p {
-      color: var(--text-secondary);
-      margin-bottom: 2rem;
+    .alert p {
       line-height: 1.6;
+      color: #475569;
+      margin: 0.75rem 0;
+    }
+
+    .confirmation-box {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      border: 1px solid #e2e8f0;
+    }
+
+    .confirmation-box strong {
+      color: #1f2937;
+      font-size: 0.95rem;
     }
 
     .form-disabled {
       pointer-events: none;
-      opacity: 0.6;
+      opacity: 0.5;
       position: relative;
     }
 
-    .form-disabled::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.7);
-      z-index: 10;
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      color: #64748b;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 3rem;
     }
 
     @media (max-width: 768px) {
+      main {
+        padding: 1rem 0.75rem;
+      }
+
       header {
         padding: 1rem;
       }
 
-      .header-info h1 {
-        font-size: 1.25rem;
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
       }
 
-      .logo {
-        width: 40px;
-        height: 40px;
-        font-size: 1.25rem;
-      }
-
-      main {
-        padding: 1.5rem 1rem;
+      header h1 {
+        font-size: 1.2rem;
       }
 
       form {
-        padding: 1.75rem;
+        padding: 1.5rem;
       }
 
-      form h2 {
-        font-size: 1.5rem;
-      }
-
-      .form-actions {
-        flex-direction: column-reverse;
-      }
-
-      .form-actions .btn {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .form-group-inline {
+      .form-row {
         grid-template-columns: 1fr;
-        gap: 0;
+      }
+
+      .actions {
+        flex-direction: column;
       }
 
       .alert {
         padding: 1.5rem;
       }
     }
-
-    @media (max-width: 480px) {
-      .btn {
-        padding: 0.625rem 1rem;
-        font-size: 0.875rem;
-      }
-
-      form h2 {
-        font-size: 1.35rem;
-      }
-    }
   </style>
 </head>
 
 <body>
-<header>
-  <div class="header-content">
-    <div class="logo">E</div>
-    <div class="header-info">
-      <h1>User Preparedness Survey</h1>
-      <p>Help improve deployment and system planning</p>
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo">E</div>
+        <div>
+          <h1>📋 User Preparedness Survey</h1>
+          <div class="subtitle">Help improve deployment and system planning</div>
+        </div>
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 
-<main>
-<form id="surveyForm">
-  <h2>📋 Survey Form</h2>
+  <main>
+    <form id="surveyForm">
+      <div class="form-section">
+        <h2>📍 Location Details</h2>
 
-  <h3>Location Details</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="county">County</label>
+            <select id="county">
+              <option value="">Select county</option>
+            </select>
+          </div>
 
-  <div class="form-group-inline">
-    <div>
-      <label>County</label>
-      <select id="county">
-        <option value="">Select county</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Sub-county</label>
-      <select id="sub_county">
-        <option value="">Select sub-county</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="form-group-inline">
-    <div>
-      <label>Ward</label>
-      <select id="ward">
-        <option value="">Select ward</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Work station</label>
-      <input id="work_station" type="text" placeholder="Optional">
-    </div>
-  </div>
-
-  <h3>Personal Information</h3>
-
-  <label>Name (optional)</label>
-  <input id="full_name" type="text" placeholder="Your full name" maxlength="100">
-
-  <label>Email (optional)</label>
-  <input id="email" type="email" placeholder="your.email@example.com" maxlength="100">
-  <span id="emailError" class="error-message"></span>
-
-  <label>Role <span class="required">*</span></label>
-  <select id="role" required>
-    <option value="">Select role</option>
-    <option>County PHO</option>
-    <option>County Program Coord.</option>
-    <option>Sub County PHO</option>
-    <option>Sub County Program Coord</option>
-    <option>Ward PHO</option>
-    <option>Locational PHO</option>
-    <option>Institutional PHO</option>
-    <option>Facility PHO</option>
-    <option>Port PHO</option>
-    <option>National Program Coord.</option>
-    <option>ICT/Data Officer</option>
-    <option>Student/Intern</option>
-    <option>Devt. Partner/NGO</option>
-    <option>Other</option>
-  </select>
-
-  <label>Department/Section <span class="required">*</span></label>
-  <input id="department" type="text" placeholder="Your department or section" required maxlength="100">
-
-  <h3>Technical Readiness</h3>
-
-  <label>Internet reliability <span class="required">*</span></label>
-  <select id="internet_reliability" required>
-    <option value="">Select</option>
-    <option>Reliable most of the time</option>
-    <option>Available but unstable</option>
-    <option>Available only in some locations</option>
-    <option>Rarely available</option>
-    <option>No internet</option>
-  </select>
-
-  <label>Digital skill level <span class="required">*</span></label>
-  <select id="digital_skill_level" required>
-    <option value="">Select</option>
-    <option value="1">1 - Low</option>
-    <option value="2">2 - Basic</option>
-    <option value="3">3 - Moderate</option>
-    <option value="4">4 - Advanced</option>
-    <option value="5">5 - Expert</option>
-  </select>
-
-  <label>Main barriers to using digital health systems</label>
-  <textarea id="main_barriers" placeholder="Describe any challenges you face..." maxlength="500"></textarea>
-  <span class="char-count"><span id="barriersCount">0</span>/500</span>
-
-  <label>Support needed for successful system adoption</label>
-  <textarea id="support_needed" placeholder="What would help you use the system effectively?" maxlength="500"></textarea>
-  <span class="char-count"><span id="supportCount">0</span>/500</span>
-
-  <div class="form-actions">
-    <button type="reset" class="btn btn-light">Clear Form</button>
-    <button type="submit" class="btn btn-primary" id="submitBtn">
-      <span id="submitText">💾 Submit Survey</span>
-      <span id="submitSpinner" class="spinner" style="display:none;"></span>
-    </button>
-  </div>
-</form>
-
-<div id="confirmation"></div>
-
-</main>
-
-<div id="toast" class="toast"></div>
-
-<script type="module">
-  import { supabase } from "./main.js";
-
-  let wardsData = [];
-  let submissionInProgress = false;
-  let formSubmitted = false;
-  
-  const confirmation = document.getElementById('confirmation');
-
-  async function loadWards() {
-    try {
-      const res = await fetch("./kenya_wards.json");
-      wardsData = await res.json();
-      populateCounties();
-    } catch (error) {
-      console.error("Error loading wards:", error);
-      toast("Error loading location data");
-    }
-  }
-
-  function populateCounties() {
-    const counties = [...new Set(wardsData.map(x => x.county))].sort();
-    counties.forEach(c => {
-      county.innerHTML += `<option value="${c}">${c}</option>`;
-    });
-  }
-
-  county.addEventListener("change", () => {
-    sub_county.innerHTML = `<option value="">Select sub-county</option>`;
-    ward.innerHTML = `<option value="">Select ward</option>`;
-
-    if (!county.value) return;
-
-    const subCounties = [...new Set(
-      wardsData
-        .filter(x => x.county === county.value)
-        .map(x => x.sub_county)
-    )].sort();
-
-    subCounties.forEach(sc => {
-      sub_county.innerHTML += `<option value="${sc}">${sc}</option>`;
-    });
-  });
-
-  sub_county.addEventListener("change", () => {
-    ward.innerHTML = `<option value="">Select ward</option>`;
-
-    if (!sub_county.value) return;
-
-    const wards = wardsData
-      .filter(x => x.county === county.value && x.sub_county === sub_county.value)
-      .map(x => x.ward)
-      .sort();
-
-    wards.forEach(w => {
-      ward.innerHTML += `<option value="${w}">${w}</option>`;
-    });
-  });
-
-  function toast(msg) {
-    const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 3000);
-  }
-
-  document.getElementById("surveyForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const payload = {
-      county: county.value || null,
-      sub_county: sub_county.value || null,
-      ward: ward.value || null,
-      work_station: work_station.value || null,
-      full_name: full_name.value || null,
-      email: email.value || null,
-      role: role.value || null,
-      department: department.value || null,
-      internet_reliability: internet_reliability.value || null,
-      digital_skill_level: digital_skill_level.value ? Number(digital_skill_level.value) : null,
-      main_barriers: main_barriers.value || null,
-      support_needed: support_needed.value || null
-    };
-
-    const { error } = await supabase.from("user_preparedness_surveys").insert(payload);
-
-    if (error) {
-      console.error(error);
-      return toast("Submission failed");
-    }
-    // NEW UPDATED CONFIRMATION PANEL (NO TRACKING CODE)
-    confirmation.innerHTML = `
-      <div class="alert">
-        <div style="font-size: 1.2rem; font-weight: 600; color: #065f46;">
-          ✅ Survey submitted successfully!
+          <div class="form-group">
+            <label for="sub_county">Sub-county</label>
+            <select id="sub_county">
+              <option value="">Select sub-county</option>
+            </select>
+          </div>
         </div>
 
-        <p style="margin-top: 0.75rem; color: #475569;">
-          Thank you for completing the preparedness survey.  
-          Your response has been received and recorded.
-        </p>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ward">Ward</label>
+            <select id="ward">
+              <option value="">Select ward</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="work_station">Work Station</label>
+            <input id="work_station" type="text" placeholder="Optional">
+            <div class="field-description">Specify your facility or work location</div>
+          </div>
+        </div>
       </div>
-    `;
-    e.target.reset();
-    toast("Submitted successfully");
-  });
 
-  loadWards();
-</script>
+      <div class="form-section">
+        <h2>👤 Personal Information</h2>
 
+        <div class="form-group">
+          <label for="full_name">Full Name (optional)</label>
+          <input id="full_name" type="text" placeholder="Your full name" maxlength="100">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address (optional)</label>
+          <input id="email" type="email" placeholder="your.email@example.com" maxlength="100">
+          <span id="emailError" class="error-message"></span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="role">
+              Role<span class="required">*</span>
+            </label>
+            <select id="role" required>
+              <option value="">Select role</option>
+              <option>County Public Health Officer</option>
+              <option>County Program Coordinator</option>
+              <option>Sub County Public Health Officer</option>
+              <option>Sub County Program Coordinator</option>
+              <option>Ward Public Health Officer</option>
+              <option>Locational Public Health Officer</option>
+              <option>Institutional Public Health Officer</option>
+              <option>Facility Public Health Officer</option>
+              <option>Port Public Health Officer</option>
+              <option>National Program Coordinator</option>
+              <option>ICT / Data Officer</option>
+              <option>Student / Intern</option>
+              <option>Development Partner / NGO</option>
+              <option>Other</option>
+            </select>
+            <div class="field-description">Your current position or role</div>
+          </div>
+
+          <div class="form-group">
+            <label for="department">
+              Department/Section<span class="required">*</span>
+            </label>
+            <input id="department" type="text" placeholder="Your department or section" required maxlength="100">
+            <div class="field-description">The department you work in</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2>💻 Technical Readiness</h2>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="internet_reliability">
+              Internet Reliability<span class="required">*</span>
+            </label>
+            <select id="internet_reliability" required>
+              <option value="">Select reliability</option>
+              <option>Reliable most of the time</option>
+              <option>Available but unstable</option>
+              <option>Available only in some locations</option>
+              <option>Rarely available</option>
+              <option>No internet</option>
+            </select>
+            <div class="field-description">Internet connectivity at your work location</div>
+          </div>
+
+          <div class="form-group">
+            <label for="digital_skill_level">
+              Digital Skill Level<span class="required">*</span>
+            </label>
+            <select id="digital_skill_level" required>
+              <option value="">Select skill level</option>
+              <option value="1">1 - Low (Basic computer use)</option>
+              <option value="2">2 - Basic (Email, simple data entry)</option>
+              <option value="3">3 - Moderate (Multiple applications)</option>
+              <option value="4">4 - Advanced (Complex systems)</option>
+              <option value="5">5 - Expert (Technical proficiency)</option>
+            </select>
+            <div class="field-description">Your comfort level with digital systems</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="main_barriers">Main Barriers to Using Digital Health Systems</label>
+          <textarea id="main_barriers" placeholder="Describe any challenges you face (e.g., connectivity, training, equipment)..." maxlength="500"></textarea>
+          <span class="char-count"><span id="barriersCount">0</span>/500</span>
+        </div>
+
+        <div class="form-group">
+          <label for="support_needed">Support Needed for Successful System Adoption</label>
+          <textarea id="support_needed" placeholder="What would help you use the system effectively? (e.g., training, better internet, equipment)..." maxlength="500"></textarea>
+          <span class="char-count"><span id="supportCount">0</span>/500</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+          <span id="submitText">💾 Submit Survey</span>
+          <span id="submitSpinner" class="spinner" style="display:none;"></span>
+        </button>
+        <button type="reset" class="btn btn-secondary">🔄 Clear Form</button>
+      </div>
+    </form>
+
+    <div id="confirmation"></div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 EPHIS - County Health Services</p>
+  </footer>
+
+  <script type="module">
+    import { supabase } from "./main.js";
+
+    let wardsData = [];
+    let submissionInProgress = false;
+    let formSubmitted = false;
+    
+    const confirmation = document.getElementById('confirmation');
+
+    async function loadWards() {
+      try {
+        const res = await fetch("./kenya_wards.json");
+        wardsData = await res.json();
+        populateCounties();
+      } catch (error) {
+        console.error("Error loading wards:", error);
+      }
+    }
+
+    function populateCounties() {
+      const counties = [...new Set(wardsData.map(x => x.county))].sort();
+      counties.forEach(c => {
+        county.innerHTML += `<option value="${c}">${c}</option>`;
+      });
+    }
+
+    county.addEventListener("change", () => {
+      sub_county.innerHTML = `<option value="">Select sub-county</option>`;
+      ward.innerHTML = `<option value="">Select ward</option>`;
+
+      if (!county.value) return;
+
+      const subCounties = [...new Set(
+        wardsData
+          .filter(x => x.county === county.value)
+          .map(x => x.sub_county)
+      )].sort();
+
+      subCounties.forEach(sc => {
+        sub_county.innerHTML += `<option value="${sc}">${sc}</option>`;
+      });
+    });
+
+    sub_county.addEventListener("change", () => {
+      ward.innerHTML = `<option value="">Select ward</option>`;
+
+      if (!sub_county.value) return;
+
+      const wards = wardsData
+        .filter(x => x.county === county.value && x.sub_county === sub_county.value)
+        .map(x => x.ward)
+        .sort();
+
+      wards.forEach(w => {
+        ward.innerHTML += `<option value="${w}">${w}</option>`;
+      });
+    });
+
+    // Email validation
+    function validateEmail(email) {
+      if (!email) return true;
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+
+    // Character counters
+    main_barriers.addEventListener('input', () => {
+      document.getElementById('barriersCount').textContent = main_barriers.value.length;
+    });
+
+    support_needed.addEventListener('input', () => {
+      document.getElementById('supportCount').textContent = support_needed.value.length;
+    });
+
+    // Email validation on blur
+    email.addEventListener('blur', () => {
+      const errorSpan = document.getElementById('emailError');
+      if (email.value && !validateEmail(email.value)) {
+        errorSpan.textContent = 'Please enter a valid email address';
+        email.classList.add('error');
+      } else {
+        errorSpan.textContent = '';
+        email.classList.remove('error');
+      }
+    });
+
+    email.addEventListener('input', () => {
+      email.classList.remove('error');
+      document.getElementById('emailError').textContent = '';
+    });
+
+    // Clear error styling on change
+    [role, department, internet_reliability, digital_skill_level].forEach(field => {
+      field.addEventListener('change', () => {
+        field.classList.remove('error');
+      });
+    });
+
+    // Submit handler
+    document.getElementById("surveyForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (submissionInProgress) {
+        return;
+      }
+
+      if (formSubmitted) {
+        confirmation.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      }
+
+      // Validate email
+      if (email.value && !validateEmail(email.value)) {
+        email.focus();
+        email.classList.add('error');
+        document.getElementById('emailError').textContent = 'Please enter a valid email address';
+        return;
+      }
+
+      // Check required fields
+      const requiredFields = [
+        { field: role, name: 'Role' },
+        { field: department, name: 'Department' },
+        { field: internet_reliability, name: 'Internet reliability' },
+        { field: digital_skill_level, name: 'Digital skill level' }
+      ];
+
+      for (const { field, name } of requiredFields) {
+        if (!field.value.trim()) {
+          field.focus();
+          field.classList.add('error');
+          confirmation.innerHTML = `
+            <div class="alert error">
+              <strong>❌ Required Field Missing</strong>
+              <p>${name} is required. Please complete this field.</p>
+            </div>`;
+          confirmation.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          return;
+        }
+      }
+
+      submissionInProgress = true;
+
+      const submitBtn = document.getElementById('submitBtn');
+      const submitText = document.getElementById('submitText');
+      const submitSpinner = document.getElementById('submitSpinner');
+      
+      submitBtn.disabled = true;
+      submitText.style.display = 'none';
+      submitSpinner.style.display = 'inline-block';
+
+      const payload = {
+        county: county.value || null,
+        sub_county: sub_county.value || null,
+        ward: ward.value || null,
+        work_station: work_station.value || null,
+        full_name: full_name.value || null,
+        email: email.value || null,
+        role: role.value || null,
+        department: department.value || null,
+        internet_reliability: internet_reliability.value || null,
+        digital_skill_level: digital_skill_level.value ? Number(digital_skill_level.value) : null,
+        main_barriers: main_barriers.value || null,
+        support_needed: support_needed.value || null
+      };
+
+      try {
+        const { error } = await supabase.from("user_preparedness_surveys").insert(payload);
+
+        if (error) {
+          console.error(error);
+          
+          confirmation.innerHTML = `
+            <div class="alert error">
+              <strong>❌ Submission Failed</strong>
+              <p>Unable to submit your survey. Please check your internet connection and try again.</p>
+            </div>`;
+          
+          confirmation.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          
+          submissionInProgress = false;
+          submitBtn.disabled = false;
+          submitText.style.display = 'inline';
+          submitSpinner.style.display = 'none';
+          return;
+        }
+
+        formSubmitted = true;
+        submissionInProgress = false;
+
+        const formElement = document.getElementById('surveyForm');
+        formElement.classList.add('form-disabled');
+        
+        const submissionDate = new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        
+        confirmation.innerHTML = `
+          <div class="alert">
+            <strong>✅ Survey Submitted Successfully!</strong>
+            
+            <div class="confirmation-box">
+              <p style="margin-bottom: 0.5rem;"><strong>Submission Details</strong></p>
+              <p style="margin: 0.25rem 0; color: #6b7280;"><small>📅 Submitted: ${submissionDate}</small></p>
+              <p style="margin: 0.25rem 0; color: #6b7280;"><small>👤 Role: ${role.value}</small></p>
+              <p style="margin: 0.25rem 0; color: #6b7280;"><small>📍 County: ${county.value || 'Not specified'}</small></p>
+            </div>
+            
+            <p>Thank you for completing the EPHIS User Preparedness Survey. Your response has been recorded and will help us improve system deployment and planning.</p>
+            
+            <button class="btn btn-primary" onclick="window.location.reload()" style="margin-top: 1rem;">
+              📝 Submit Another Response
+            </button>
+          </div>`;
+        
+        confirmation.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        submitBtn.disabled = false;
+        submitText.style.display = 'inline';
+        submitSpinner.style.display = 'none';
+
+        const submissionData = {
+          timestamp: new Date().toISOString(),
+          email: email.value || 'anonymous'
+        };
+        localStorage.setItem('ephisSurveySubmitted', JSON.stringify(submissionData));
+
+      } catch (err) {
+        console.error('Unexpected error:', err);
+        
+        confirmation.innerHTML = `
+          <div class="alert error">
+            <strong>❌ An Unexpected Error Occurred</strong>
+            <p>We couldn't submit your survey. Please try again or contact support if the problem persists.</p>
+          </div>`;
+        
+        confirmation.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        
+        submissionInProgress = false;
+        submitBtn.disabled = false;
+        submitText.style.display = 'inline';
+        submitSpinner.style.display = 'none';
+      }
+    });
+
+    // Check previous submission
+    function checkPreviousSubmission() {
+      const submitted = localStorage.getItem('ephisSurveySubmitted');
+      if (submitted) {
+        const data = JSON.parse(submitted);
+        const submittedTime = new Date(data.timestamp);
+        const now = new Date();
+        const hoursSinceSubmission = (now - submittedTime) / (1000 * 60 * 60);
+
+        if (hoursSinceSubmission < 24) {
+          formSubmitted = true;
+          document.getElementById('surveyForm').classList.add('form-disabled');
+          
+          const timeRemaining = Math.ceil(24 - hoursSinceSubmission);
+          const submissionDate = submittedTime.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          
+          confirmation.innerHTML = `
+            <div class="alert warning">
+              <strong>⚠️ Survey Already Submitted</strong>
+              <div class="confirmation-box">
+                <p>You submitted this survey on:<br><strong>${submissionDate}</strong></p>
+                <p style="margin-top: 1rem;">You can submit again in <strong>${timeRemaining} hour(s)</strong>.</p>
+              </div>
+              <p>This helps us prevent duplicate submissions and maintain data quality.</p>
+              <button class="btn btn-primary" onclick="localStorage.removeItem('ephisSurveySubmitted'); window.location.reload();" style="margin-top: 1rem;">
+                🔄 Clear and Submit New Response
+              </button>
+            </div>`;
+        } else {
+          localStorage.removeItem('ephisSurveySubmitted');
+        }
+      }
+    }
+
+    loadWards();
+    checkPreviousSubmission();
+  </script>
 </body>
 </html>
