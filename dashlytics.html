@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>EPHIS Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Icons -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+
+    .sidebar {
+      width: 270px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      z-index: 40;
+      transition: transform 0.25s ease;
+    }
+
+    .sidebar-closed {
+      transform: translateX(-100%);
+    }
+
+    .main-content {
+      margin-left: 270px;
+      transition: margin-left 0.25s ease;
+    }
+
+    @media (max-width: 1024px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar-open {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+    }
+
+    .module-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .module-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .status-badge {
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-ok {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-watch {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-alert {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: #ffffff;
+      border-radius: 0.75rem;
+      max-width: 960px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(15, 23, 42, 0.35);
+      transform: scale(0.95);
+      transition: transform 0.2s ease;
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1);
+    }
+
+    .tab-btn-active {
+      border-color: #2563eb;
+      color: #2563eb;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: #e5e7eb;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: #cbd5f5;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50">
+  <!-- Mobile top bar -->
+  <header class="lg:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-slate-200">
+    <div class="flex items-center justify-between px-4 py-3">
+      <button id="mobileMenuButton"
+              class="text-slate-600">
+        <i class="fas fa-bars text-xl"></i>
+      </button>
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+          <i class="fas fa-leaf text-emerald-600 text-lg"></i>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-slate-900">EPHIS</p>
+          <p class="text-[11px] text-slate-500">County Environmental Public Health</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="text-slate-500">
+          <i class="fas fa-bell text-lg"></i>
+        </button>
+        <button class="text-slate-500">
+          <i class="fas fa-user-circle text-2xl"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside id="sidebar"
+         class="sidebar lg:block sidebar-closed lg:transform-none overflow-y-auto scrollbar-thin">
+    <div class="px-5 py-4 border-b border-slate-200 flex items-center gap-3">
+      <div class="w-9 h-9 bg-emerald-100 rounded-full flex items-center justify-center">
+        <i class="fas fa-leaf text-emerald-600"></i>
+      </div>
+      <div class="truncate">
+        <p class="text-sm font-semibold text-slate-900 truncate">
+          Environmental Public Health
+        </p>
+        <p class="text-[11px] text-slate-500 truncate">
+          Information System (EPHIS)
+        </p>
+      </div>
+    </div>
+
+    <nav class="py-4 text-sm">
+      <p class="px-5 mb-1 text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
+        Core modules
+      </p>
+
+      <button data-module="water"
+              class="w-full flex items-center gap-3 px-5 py-2.5 text-slate-700 hover:bg-slate-100 text-left">
+        <i class="fas fa-faucet text-sky-600 w-5"></i>
+        <span>Water Quality Monitoring</span>
+      </button>
+
+      <button data-module="food"
+              class="w-full flex items-center gap-3 px-5 py-2.5 text-slate-700 hover:bg-slate-100 text-left">
+        <i class="fas fa-utensils text-amber-600 w-5"></i>
+        <span>Food Control</span>
+      </button>
+
+      <button data-module="waste"
+              class="w-full flex items-center gap-3 px-5 py-2.5 text-slate-700 hover:bg-slate-100 text-left">
+        <i class="fas fa-dumpster-fire text-rose-600 w-5"></i>
+        <span>Waste Management</span>
+      </button>
+
+      <button data-module="premises"
+              class="w-full flex items-center gap-3 px-5 py-2.5 text-slate-700 hover:bg-slate-100 text-left">
+        <i class="fas fa-building text-emerald-600 w-5"></i>
+        <span>Premises Management</span>
+      </button>
+
+      <button data-module="inspections"
+              class="w-full flex items-center gap-3 px-5 py-2.5 text-slate-700 hover:bg-slate-100 text-left">
+        <i class="fas fa-clipboard-check text-indigo-600 w-5"></i>
+        <span>Inspection Management</span>
+      </button>
+
+      <button data-module="vector"
+              class="w-full flex items-center gap-3 px-5 py-2.5 text-slate-700 hover:bg-slate-100 text-left">
+        <i class="fas fa-bug text-red-600 w-5"></i>
+        <span>Vector and Vermin Control</span>
+      </button>
+
+      <button data-module="air"
+              class="w-full flex items-center gap-3 px-5 py-2.5 text-slate-700 hover:bg-slate-100 text-left">
+        <i class="fas fa-wind text-sky-700 w-5"></i>
+        <span>Air Quality and Household Energy</span>
+      </button>
+
+      <button data-module="complaints"
+              class="w-full flex items-center gap-3 px-5 py-2.5 text-slate-700 hover:bg-slate-100 text-left">
+        <i class="fas fa-exclamation-circle text-rose-500 w-5"></i>
+        <span>Complaints and Incidents</span>
+      </button>
+
+      <button data-module="frontier"
+              class="w-full flex items-center gap-3 px-5 py-2.5 text-slate-700 hover:bg-slate-100 text-left">
+        <i class="fas fa-plane-departure text-orange-500 w-5"></i>
+        <span>Frontier and Migration Health</span>
+      </button>
+
+      <p class="px-5 mt-4 mb-1 text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
+        Support modules
+      </p>
+
+      <button data-module="documents"
+              class="w-full flex items-center gap-3 px-5 py-2.5 text-slate-700 hover:bg-slate-100 text-left">
+        <i class="fas fa-folder-open text-slate-600 w-5"></i>
+        <span>Document Management</span>
+      </button>
+
+      <button data-module="payments"
+              class="w-full flex items-center gap-3 px-5 py-2.5 text-slate-700 hover:bg-slate-100 text-left">
+        <i class="fas fa-receipt text-emerald-700 w-5"></i>
+        <span>Payments and Revenue</span>
+      </button>
+
+      <button data-module="analytics"
+              class="w-full flex items-center gap-3 px-5 py-2.5 text-slate-700 hover:bg-slate-100 text-left">
+        <i class="fas fa-chart-line text-indigo-600 w-5"></i>
+        <span>Analytics and Dashboards</span>
+      </button>
+    </nav>
+
+    <div class="mt-auto border-t border-slate-200 px-5 py-4 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-full bg-sky-600 text-white flex items-center justify-center text-sm font-semibold"
+           id="userAvatar">
+        U
+      </div>
+      <div class="truncate">
+        <p class="text-sm font-semibold text-slate-900 truncate" id="userName">
+          User
+        </p>
+        <p class="text-[11px] text-slate-500 truncate" id="userRole">
+          Officer
+        </p>
+      </div>
+      <button id="logoutButton"
+              class="ml-auto text-slate-400 hover:text-slate-700">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content min-h-screen px-4 pt-20 pb-8 lg:px-8 lg:pt-8">
+    <div class="h-0 lg:h-0"></div>
+
+    <!-- Header row -->
+    <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+      <div>
+        <p class="text-xs uppercase tracking-wide text-slate-500 font-semibold">
+          County Environmental Public Health
+        </p>
+        <h1 class="mt-1 text-2xl font-bold text-slate-900">
+          EPHIS Integrated Dashboard
+        </h1>
+        <p class="mt-1 text-sm text-slate-500">
+          Live overview of core functions under Schedule 4
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <div class="relative">
+          <input id="globalSearch"
+                 type="text"
+                 class="w-full sm:w-64 pl-9 pr-3 py-2 rounded-md border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                 placeholder="Search premises, complaints, inspections">
+          <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 text-xs">
+            <i class="fas fa-search"></i>
+          </span>
+        </div>
+        <button id="newRecordButton"
+                class="inline-flex items-center justify-center rounded-md bg-sky-600 text-white px-3 py-2 text-sm font-medium hover:bg-sky-700">
+          <i class="fas fa-plus mr-2 text-xs"></i>
+          <span>Quick data entry</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- KPIs -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+      <!-- Registered premises -->
+      <article class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">
+              Registered premises
+            </p>
+            <p id="kpiPremisesCount"
+               class="mt-1 text-2xl font-bold text-slate-900">
+              0
+            </p>
+          </div>
+          <div class="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center">
+            <i class="fas fa-building text-emerald-600 text-lg"></i>
+          </div>
+        </div>
+        <p class="text-xs text-slate-500" id="kpiPremisesMeta">
+          Loading
+        </p>
+      </article>
+
+      <!-- Active inspections -->
+      <article class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">
+              Active inspections
+            </p>
+            <p id="kpiInspectionCount"
+               class="mt-1 text-2xl font-bold text-slate-900">
+              0
+            </p>
+          </div>
+          <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center">
+            <i class="fas fa-clipboard-check text-indigo-600 text-lg"></i>
+          </div>
+        </div>
+        <p class="text-xs text-slate-500" id="kpiInspectionMeta">
+          Loading
+        </p>
+      </article>
+
+      <!-- Open complaints -->
+      <article class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">
+              Open complaints
+            </p>
+            <p id="kpiComplaintsOpen"
+               class="mt-1 text-2xl font-bold text-slate-900">
+              0
+            </p>
+          </div>
+          <div class="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center">
+            <i class="fas fa-exclamation-triangle text-rose-600 text-lg"></i>
+          </div>
+        </div>
+        <p class="text-xs text-slate-500" id="kpiComplaintsMeta">
+          Loading
+        </p>
+      </article>
+
+      <!-- Unsafe water sources -->
+      <article class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">
+              Unsafe water sources
+            </p>
+            <p id="kpiUnsafeWater"
+               class="mt-1 text-2xl font-bold text-slate-900">
+              0
+            </p>
+          </div>
+          <div class="w-9 h-9 rounded-full bg-sky-100 flex items-center justify-center">
+            <i class="fas fa-tint-slash text-sky-600 text-lg"></i>
+          </div>
+        </div>
+        <p class="text-xs text-slate-500" id="kpiWaterMeta">
+          Loading
+        </p>
+      </article>
+    </section>
+
+    <!-- Modules grid -->
+    <section class="mb-8">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-semibold text-slate-800 uppercase tracking-wide">
+          Core modules
+        </h2>
+        <p class="text-xs text-slate-500">
+          Click a module to open its workspace
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <!-- Water -->
+        <article class="module-card bg-white rounded-lg border border-slate-100 p-4 flex flex-col justify-between"
+                 data-module-card="water">
+          <div>
+            <div class="flex items-center justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center">
+                  <i class="fas fa-faucet text-sky-600"></i>
+                </span>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  Water Quality Monitoring
+                </h3>
+              </div>
+              <span class="status-badge status-watch">
+                <i class="fas fa-circle text-[7px]"></i>
+                Mixed
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">
+              Registration of sources, sampling, lab results and alerts
+            </p>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <p class="text-slate-500">Sources registered</p>
+                <p id="waterSourcesCount"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+              <div>
+                <p class="text-slate-500">Alerts this quarter</p>
+                <p id="waterAlertsCount"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-xs">
+            <button class="text-sky-600 hover:text-sky-800 font-medium"
+                    data-open-modal="water-modal">
+              Open module
+            </button>
+            <p class="text-slate-400"
+               id="waterUpdatedMeta">
+              Sync pending
+            </p>
+          </div>
+        </article>
+
+        <!-- Food -->
+        <article class="module-card bg-white rounded-lg border border-slate-100 p-4 flex flex-col justify-between"
+                 data-module-card="food">
+          <div>
+            <div class="flex items-center justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                  <i class="fas fa-utensils text-amber-600"></i>
+                </span>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  Food Control
+                </h3>
+              </div>
+              <span class="status-badge status-ok">
+                <i class="fas fa-circle text-[7px]"></i>
+                Stable
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">
+              Licensing, inspections and enforcement for food premises
+            </p>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <p class="text-slate-500">Licensed premises</p>
+                <p id="foodLicensedCount"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+              <div>
+                <p class="text-slate-500">Non compliant this month</p>
+                <p id="foodNonCompliantCount"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-xs">
+            <button class="text-amber-600 hover:text-amber-800 font-medium">
+              Open module
+            </button>
+            <p class="text-slate-400">
+              Linked to food_control tables
+            </p>
+          </div>
+        </article>
+
+        <!-- Waste -->
+        <article class="module-card bg-white rounded-lg border border-slate-100 p-4 flex flex-col justify-between"
+                 data-module-card="waste">
+          <div>
+            <div class="flex items-center justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center">
+                  <i class="fas fa-dumpster-fire text-rose-600"></i>
+                </span>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  Waste Management
+                </h3>
+              </div>
+              <span class="status-badge status-watch">
+                <i class="fas fa-circle text-[7px]"></i>
+                Watch
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">
+              Waste facilities, routes, illegal dumping and compliance
+            </p>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <p class="text-slate-500">Active sites</p>
+                <p id="wasteSitesCount"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+              <div>
+                <p class="text-slate-500">Illegal dumping cases</p>
+                <p id="wasteIllegalCount"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-xs">
+            <button class="text-rose-600 hover:text-rose-800 font-medium">
+              Open module
+            </button>
+            <p class="text-slate-400">
+              Linked to waste tables
+            </p>
+          </div>
+        </article>
+
+        <!-- Premises -->
+        <article class="module-card bg-white rounded-lg border border-slate-100 p-4 flex flex-col justify-between"
+                 data-module-card="premises">
+          <div>
+            <div class="flex items-center justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
+                  <i class="fas fa-store text-emerald-600"></i>
+                </span>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  Premises Management
+                </h3>
+              </div>
+              <span class="status-badge status-ok">
+                <i class="fas fa-circle text-[7px]"></i>
+                Stable
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">
+              Registry for schools, businesses, funeral homes and others
+            </p>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <p class="text-slate-500">Premises with record</p>
+                <p id="premisesWithRecord"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+              <div>
+                <p class="text-slate-500">Formal category share</p>
+                <p id="premisesFormalShare"
+                   class="text-base font-semibold text-slate-900">
+                  0%
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-xs">
+            <button class="text-emerald-600 hover:text-emerald-800 font-medium">
+              Open module
+            </button>
+            <p class="text-slate-400">
+              Linked to premises table
+            </p>
+          </div>
+        </article>
+
+        <!-- Inspections -->
+        <article class="module-card bg-white rounded-lg border border-slate-100 p-4 flex flex-col justify-between"
+                 data-module-card="inspections">
+          <div>
+            <div class="flex items-center justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                  <i class="fas fa-clipboard-check text-indigo-600"></i>
+                </span>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  Inspection Management
+                </h3>
+              </div>
+              <span class="status-badge status-ok">
+                <i class="fas fa-circle text-[7px]"></i>
+                On track
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">
+              Scheduling, field findings, scores and follow up actions
+            </p>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <p class="text-slate-500">Inspections this month</p>
+                <p id="inspectionsThisMonth"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+              <div>
+                <p class="text-slate-500">Pass rate</p>
+                <p id="inspectionPassRate"
+                   class="text-base font-semibold text-slate-900">
+                  0%
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-xs">
+            <button class="text-indigo-600 hover:text-indigo-800 font-medium">
+              Open module
+            </button>
+            <p class="text-slate-400">
+              Linked to inspections table
+            </p>
+          </div>
+        </article>
+
+        <!-- Vector -->
+        <article class="module-card bg-white rounded-lg border border-slate-100 p-4 flex flex-col justify-between"
+                 data-module-card="vector">
+          <div>
+            <div class="flex items-center justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                  <i class="fas fa-bug text-red-600"></i>
+                </span>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  Vector and Vermin Control
+                </h3>
+              </div>
+              <span class="status-badge status-watch">
+                <i class="fas fa-circle text-[7px]"></i>
+                High risk pockets
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">
+              Hotspot mapping, surveillance and interventions
+            </p>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <p class="text-slate-500">High risk zones</p>
+                <p id="vectorHighRiskZones"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+              <div>
+                <p class="text-slate-500">Interventions this month</p>
+                <p id="vectorInterventions"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-xs">
+            <button class="text-red-600 hover:text-red-800 font-medium">
+              Open module
+            </button>
+            <p class="text-slate-400">
+              Linked to vector tables
+            </p>
+          </div>
+        </article>
+
+        <!-- Air and household energy -->
+        <article class="module-card bg-white rounded-lg border border-slate-100 p-4 flex flex-col justify-between"
+                 data-module-card="air">
+          <div>
+            <div class="flex items-center justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center">
+                  <i class="fas fa-wind text-sky-700"></i>
+                </span>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  Air Quality and Household Energy
+                </h3>
+              </div>
+              <span class="status-badge status-watch">
+                <i class="fas fa-circle text-[7px]"></i>
+                Mixed
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">
+              Outdoor stations, household energy profiles and alerts
+            </p>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <p class="text-slate-500">Stations online</p>
+                <p id="airStationsOnline"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+              <div>
+                <p class="text-slate-500">Household surveys</p>
+                <p id="airHouseholdSurveys"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-xs">
+            <button class="text-sky-700 hover:text-sky-900 font-medium"
+                    data-open-modal="air-modal">
+              Open module
+            </button>
+            <p class="text-slate-400">
+              Linked to air_monitoring_network
+            </p>
+          </div>
+        </article>
+
+        <!-- Complaints -->
+        <article class="module-card bg-white rounded-lg border border-slate-100 p-4 flex flex-col justify-between"
+                 data-module-card="complaints">
+          <div>
+            <div class="flex items-center justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center">
+                  <i class="fas fa-exclamation-circle text-rose-500"></i>
+                </span>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  Complaints and Incidents
+                </h3>
+              </div>
+              <span class="status-badge status-alert">
+                <i class="fas fa-circle text-[7px]"></i>
+                Priority
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">
+              Citizen reports, follow up actions and feedback
+            </p>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <p class="text-slate-500">Open records</p>
+                <p id="complaintsOpen"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+              <div>
+                <p class="text-slate-500">Average response (days)</p>
+                <p id="complaintsResponseTime"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-xs">
+            <button class="text-rose-600 hover:text-rose-800 font-medium">
+              Open module
+            </button>
+            <p class="text-slate-400">
+              Linked to complaints table
+            </p>
+          </div>
+        </article>
+
+        <!-- Frontier -->
+        <article class="module-card bg-white rounded-lg border border-slate-100 p-4 flex flex-col justify-between"
+                 data-module-card="frontier">
+          <div>
+            <div class="flex items-center justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                  <i class="fas fa-plane-departure text-orange-500"></i>
+                </span>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  Frontier and Migration Health
+                </h3>
+              </div>
+              <span class="status-badge status-ok">
+                <i class="fas fa-circle text-[7px]"></i>
+                Stable
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">
+              Port health points, screenings and quarantine records
+            </p>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <p class="text-slate-500">Active points</p>
+                <p id="frontierPoints"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+              <div>
+                <p class="text-slate-500">Travellers screened today</p>
+                <p id="frontierTravellersToday"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-xs">
+            <button class="text-orange-600 hover:text-orange-800 font-medium">
+              Open module
+            </button>
+            <p class="text-slate-400">
+              Linked to port_health_points
+            </p>
+          </div>
+        </article>
+
+        <!-- Documents -->
+        <article class="module-card bg-white rounded-lg border border-slate-100 p-4 flex flex-col justify-between"
+                 data-module-card="documents">
+          <div>
+            <div class="flex items-center justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                  <i class="fas fa-folder-open text-slate-600"></i>
+                </span>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  Document Management
+                </h3>
+              </div>
+              <span class="status-badge status-ok">
+                <i class="fas fa-circle text-[7px]"></i>
+                Stable
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">
+              Inspection reports, photos, orders and reference files
+            </p>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <p class="text-slate-500">Files stored</p>
+                <p id="documentsStored"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+              <div>
+                <p class="text-slate-500">Linked to cases</p>
+                <p id="documentsLinked"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-xs">
+            <button class="text-slate-700 hover:text-slate-900 font-medium">
+              Open module
+            </button>
+            <p class="text-slate-400">
+              Linked to storage
+            </p>
+          </div>
+        </article>
+
+        <!-- Payments -->
+        <article class="module-card bg-white rounded-lg border border-slate-100 p-4 flex flex-col justify-between"
+                 data-module-card="payments">
+          <div>
+            <div class="flex items-center justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
+                  <i class="fas fa-receipt text-emerald-700"></i>
+                </span>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  Payments and Revenue
+                </h3>
+              </div>
+              <span class="status-badge status-ok">
+                <i class="fas fa-circle text-[7px]"></i>
+                On track
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">
+              Fees from licenses, penalties and service charges
+            </p>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <p class="text-slate-500">Revenue this year (KES)</p>
+                <p id="paymentsYearRevenue"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+              <div>
+                <p class="text-slate-500">Pending invoices</p>
+                <p id="paymentsPendingInvoices"
+                   class="text-base font-semibold text-slate-900">
+                  0
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-xs">
+            <button class="text-emerald-700 hover:text-emerald-900 font-medium">
+              Open module
+            </button>
+            <p class="text-slate-400">
+              Linked to payments records
+            </p>
+          </div>
+        </article>
+
+        <!-- Analytics -->
+        <article class="module-card bg-white rounded-lg border border-slate-100 p-4 flex flex-col justify-between"
+                 data-module-card="analytics">
+          <div>
+            <div class="flex items-center justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                  <i class="fas fa-chart-line text-indigo-600"></i>
+                </span>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  Analytics and Dashboards
+                </h3>
+              </div>
+              <span class="status-badge status-ok">
+                <i class="fas fa-circle text-[7px]"></i>
+                Live
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">
+              KPI overview, hot spots and trend analysis
+            </p>
+            <div class="h-20">
+              <canvas id="analyticsSparkline"></canvas>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-xs">
+            <button class="text-indigo-600 hover:text-indigo-800 font-medium">
+              Open module
+            </button>
+            <p class="text-slate-400">
+              Linked to Superset or Looker
+            </p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Recent activity -->
+    <section class="mb-8">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-semibold text-slate-800 uppercase tracking-wide">
+          Recent activity
+        </h2>
+        <button class="text-xs text-sky-600 hover:text-sky-800 font-medium">
+          View full log
+        </button>
+      </div>
+
+      <div class="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto scrollbar-thin">
+          <table class="min-w-full text-sm">
+            <thead class="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-2 text-left font-semibold text-slate-500 text-xs uppercase tracking-wide">
+                  Module
+                </th>
+                <th class="px-4 py-2 text-left font-semibold text-slate-500 text-xs uppercase tracking-wide">
+                  Event
+                </th>
+                <th class="px-4 py-2 text-left font-semibold text-slate-500 text-xs uppercase tracking-wide">
+                  Location
+                </th>
+                <th class="px-4 py-2 text-left font-semibold text-slate-500 text-xs uppercase tracking-wide">
+                  Status
+                </th>
+                <th class="px-4 py-2 text-left font-semibold text-slate-500 text-xs uppercase tracking-wide">
+                  Date
+                </th>
+                <th class="px-4 py-2 text-left font-semibold text-slate-500 text-xs uppercase tracking-wide">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody id="recentActivityBody"
+                   class="divide-y divide-slate-100 bg-white">
+              <tr>
+                <td class="px-4 py-3 text-slate-700">
+                  Loading
+                </td>
+                <td class="px-4 py-3 text-slate-500" colspan="5">
+                  Recent activity will load from Supabase
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Water modal -->
+  <div id="water-modal"
+       class="modal-overlay">
+    <div class="modal">
+      <header class="flex items-center justify-between px-5 py-4 border-b border-slate-200 bg-slate-50">
+        <div class="flex items-center gap-3">
+          <span class="w-9 h-9 rounded-full bg-sky-100 flex items-center justify-center">
+            <i class="fas fa-faucet text-sky-600"></i>
+          </span>
+          <div>
+            <p class="text-sm font-semibold text-slate-900">
+              Water Quality Monitoring
+            </p>
+            <p class="text-xs text-slate-500">
+              Based on water_sources and water_samples tables
+            </p>
+          </div>
+        </div>
+        <button class="text-slate-400 hover:text-slate-700"
+                data-close-modal>
+          <i class="fas fa-times text-lg"></i>
+        </button>
+      </header>
+
+      <div class="px-5 border-b border-slate-200 flex gap-6 text-sm">
+        <button class="py-3 border-b-2 tab-btn-active"
+                data-tab-target="water-overview">
+          Overview
+        </button>
+        <button class="py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700"
+                data-tab-target="water-entry">
+          Data entry
+        </button>
+      </div>
+
+      <section class="px-5 py-4 text-sm space-y-5">
+        <!-- Overview tab -->
+        <div id="water-overview"
+             class="tab-panel active">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div class="bg-white border border-slate-100 rounded-lg p-3">
+              <p class="text-xs text-slate-500">
+                Sources classified safe
+              </p>
+              <p id="waterSafeSources"
+                 class="mt-1 text-2xl font-bold text-slate-900">
+                0
+              </p>
+            </div>
+            <div class="bg-white border border-slate-100 rounded-lg p-3">
+              <p class="text-xs text-slate-500">
+                Samples this quarter
+              </p>
+              <p id="waterSamplesQuarter"
+                 class="mt-1 text-2xl font-bold text-slate-900">
+                0
+              </p>
+            </div>
+            <div class="bg-white border border-slate-100 rounded-lg p-3">
+              <p class="text-xs text-slate-500">
+                Average turnaround (days)
+              </p>
+              <p id="waterTurnaround"
+                 class="mt-1 text-2xl font-bold text-slate-900">
+                0
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-white border border-slate-100 rounded-lg p-3 mb-4">
+            <p class="text-xs font-semibold text-slate-700 mb-2">
+              Safety trend for last 6 months
+            </p>
+            <div class="h-56">
+              <canvas id="waterTrendChart"></canvas>
+            </div>
+          </div>
+
+          <div class="bg-white border border-slate-100 rounded-lg overflow-hidden">
+            <header class="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
+              <p class="text-xs font-semibold text-slate-700">
+                Recent sample results
+              </p>
+              <button class="text-xs text-sky-600 hover:text-sky-800 font-medium">
+                View all
+              </button>
+            </header>
+            <div class="overflow-x-auto scrollbar-thin">
+              <table class="min-w-full text-xs">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th class="px-3 py-2 text-left font-semibold text-slate-500 uppercase tracking-wide">
+                      Source
+                    </th>
+                    <th class="px-3 py-2 text-left font-semibold text-slate-500 uppercase tracking-wide">
+                      Sample ID
+                    </th>
+                    <th class="px-3 py-2 text-left font-semibold text-slate-500 uppercase tracking-wide">
+                      Date
+                    </th>
+                    <th class="px-3 py-2 text-left font-semibold text-slate-500 uppercase tracking-wide">
+                      Classification
+                    </th>
+                    <th class="px-3 py-2 text-left font-semibold text-slate-500 uppercase tracking-wide">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="waterSamplesTableBody"
+                       class="divide-y divide-slate-100 bg-white">
+                  <tr>
+                    <td class="px-3 py-2 text-slate-700">
+                      Loading
+                    </td>
+                    <td class="px-3 py-2 text-slate-500" colspan="4">
+                      Sample records will load from Supabase
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data entry tab -->
+        <div id="water-entry"
+             class="tab-panel">
+          <form id="waterSampleForm"
+                class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">
+                  Sampling date
+                </label>
+                <input type="date"
+                       name="sampling_date"
+                       required
+                       class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">
+                  Water source
+                </label>
+                <select name="source_id"
+                        id="waterSourceSelect"
+                        required
+                        class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                  <option value="">Select from registry</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">
+                  Sampling type
+                </label>
+                <select name="sampling_type"
+                        required
+                        class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                  <option value="">Select</option>
+                  <option value="Routine">Routine</option>
+                  <option value="Emergency">Emergency</option>
+                  <option value="Complaint-based">Complaint-based</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">
+                  Sample volume (ml)
+                </label>
+                <input type="number"
+                       name="volume"
+                       min="0"
+                       step="1"
+                       class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">
+                  E. coli (CFU/100 ml)
+                </label>
+                <input type="number"
+                       name="ecoli"
+                       min="0"
+                       step="1"
+                       class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">
+                  Turbidity (NTU)
+                </label>
+                <input type="number"
+                       name="turbidity"
+                       min="0"
+                       step="0.1"
+                       class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">
+                  Classification
+                </label>
+                <select name="classification"
+                        required
+                        class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                  <option value="">Select</option>
+                  <option value="Safe">Safe</option>
+                  <option value="Moderate risk">Moderate risk</option>
+                  <option value="Unsafe">Unsafe</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-slate-700 mb-1">
+                Notes
+              </label>
+              <textarea name="notes"
+                        rows="3"
+                        class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"></textarea>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-2">
+              <button type="button"
+                      class="px-3 py-1.5 border border-slate-300 rounded-md text-xs text-slate-700 hover:bg-slate-50"
+                      data-close-modal>
+                Close
+              </button>
+              <button type="submit"
+                      class="px-4 py-1.5 rounded-md bg-sky-600 text-white text-xs font-semibold hover:bg-sky-700">
+                Save sample
+              </button>
+            </div>
+
+            <p id="waterFormFeedback"
+               class="text-xs text-slate-500 mt-1">
+            </p>
+          </form>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Air module modal (summary only) -->
+  <div id="air-modal"
+       class="modal-overlay">
+    <div class="modal">
+      <header class="flex items-center justify-between px-5 py-4 border-b border-slate-200 bg-slate-50">
+        <div class="flex items-center gap-3">
+          <span class="w-9 h-9 rounded-full bg-sky-100 flex items-center justify-center">
+            <i class="fas fa-wind text-sky-700"></i>
+          </span>
+          <div>
+            <p class="text-sm font-semibold text-slate-900">
+              Air Quality and Household Energy
+            </p>
+            <p class="text-xs text-slate-500">
+              Based on air_monitoring_network and household_energy_profiles
+            </p>
+          </div>
+        </div>
+        <button class="text-slate-400 hover:text-slate-700"
+                data-close-modal>
+          <i class="fas fa-times text-lg"></i>
+        </button>
+      </header>
+
+      <section class="px-5 py-4 text-sm space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-white border border-slate-100 rounded-lg p-3">
+            <p class="text-xs text-slate-500">
+              Stations online
+            </p>
+            <p id="airModalStations"
+               class="mt-1 text-2xl font-bold text-slate-900">
+              0
+            </p>
+          </div>
+          <div class="bg-white border border-slate-100 rounded-lg p-3">
+            <p class="text-xs text-slate-500">
+              Household surveys
+            </p>
+            <p id="airModalHouseholds"
+               class="mt-1 text-2xl font-bold text-slate-900">
+              0
+            </p>
+          </div>
+          <div class="bg-white border border-slate-100 rounded-lg p-3">
+            <p class="text-xs text-slate-500">
+              Alerts this month
+            </p>
+            <p id="airModalAlerts"
+               class="mt-1 text-2xl font-bold text-slate-900">
+              0
+            </p>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-100 rounded-lg p-3">
+          <p class="text-xs font-semibold text-slate-700 mb-2">
+            PM2.5 trend (7 days)
+          </p>
+          <div class="h-56">
+            <canvas id="airTrendChart"></canvas>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // Supabase client setup
+    const supabaseUrl =
+      window.EPHIS_SUPABASE_URL || "https://your-project.supabase.co";
+    const supabaseKey =
+      window.EPHIS_SUPABASE_ANON_KEY || "public-anon-key";
+    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    const qs = (selector) => document.querySelector(selector);
+    const qsa = (selector) => Array.from(document.querySelectorAll(selector));
+
+    async function loadUserProfile() {
+      try {
+        const { data, error } = await supabaseClient.auth.getUser();
+        if (error || !data || !data.user) {
+          return;
+        }
+        const profileEmail = data.user.email || "";
+        const avatarText = profileEmail.charAt(0).toUpperCase();
+        const userAvatar = qs("#userAvatar");
+        const userName = qs("#userName");
+        if (userAvatar) {
+          userAvatar.textContent = avatarText || "U";
+        }
+        if (userName) {
+          userName.textContent = profileEmail;
+        }
+      } catch (e) {
+        console.error("Profile load error", e);
+      }
+    }
+
+    async function loadKpis() {
+      try {
+        // Premises
+        const { data: premisesData } = await supabaseClient
+          .from("premises")
+          .select("id, premises_category");
+
+        const premisesCount = premisesData ? premisesData.length : 0;
+        const formalCount = premisesData
+          ? premisesData.filter((p) => p.premises_category === "Formal").length
+          : 0;
+
+        qs("#kpiPremisesCount").textContent = premisesCount;
+        qs("#premisesWithRecord").textContent = premisesCount;
+        qs("#premisesFormalShare").textContent =
+          premisesCount > 0
+            ? Math.round((formalCount / premisesCount) * 100) + "%"
+            : "0%";
+        qs("#kpiPremisesMeta").textContent =
+          premisesCount + " premises in registry";
+
+        // Inspections
+        const { data: inspectionsData } = await supabaseClient
+          .from("inspections")
+          .select("id, outcome, inspection_date");
+
+        const today = new Date();
+        const thisMonth = today.getMonth();
+        const thisYear = today.getFullYear();
+
+        const activeInspections = inspectionsData
+          ? inspectionsData.filter(
+              (i) => i.outcome === null || i.outcome === "" || i.outcome === "Pending"
+            ).length
+          : 0;
+
+        const monthlyInspections = inspectionsData
+          ? inspectionsData.filter((i) => {
+              if (!i.inspection_date) return false;
+              const d = new Date(i.inspection_date);
+              return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+            })
+          : [];
+
+        const passCount = monthlyInspections.filter(
+          (i) => i.outcome === "Pass" || i.outcome === "Full Compliance"
+        ).length;
+
+        qs("#kpiInspectionCount").textContent = activeInspections;
+        qs("#inspectionsThisMonth").textContent = monthlyInspections.length;
+        qs("#inspectionPassRate").textContent =
+          monthlyInspections.length > 0
+            ? Math.round((passCount / monthlyInspections.length) * 100) + "%"
+            : "0%";
+        qs("#kpiInspectionMeta").textContent =
+          monthlyInspections.length + " inspections this month";
+
+        // Complaints
+        const { data: complaintsData } = await supabaseClient
+          .from("complaints")
+          .select("id, resolution_status, incident_date, resolution_date");
+
+        const openComplaints = complaintsData
+          ? complaintsData.filter(
+              (c) =>
+                c.resolution_status === "Pending" ||
+                c.resolution_status === "In-progress"
+            )
+          : [];
+
+        const resolvedComplaints = complaintsData
+          ? complaintsData.filter(
+              (c) => c.resolution_status === "Resolved" && c.resolution_date
+            )
+          : [];
+
+        let avgResolutionDays = 0;
+        if (resolvedComplaints.length > 0) {
+          const sum = resolvedComplaints.reduce((acc, c) => {
+            const start = new Date(c.incident_date);
+            const end = new Date(c.resolution_date);
+            const diffDays = (end - start) / (1000 * 60 * 60 * 24);
+            return acc + diffDays;
+          }, 0);
+          avgResolutionDays = Math.round(sum / resolvedComplaints.length);
+        }
+
+        qs("#kpiComplaintsOpen").textContent = openComplaints.length;
+        qs("#complaintsOpen").textContent = openComplaints.length;
+        qs("#complaintsResponseTime").textContent = avgResolutionDays || 0;
+        qs("#kpiComplaintsMeta").textContent =
+          openComplaints.length + " complaints require action";
+
+        // Water unsafe count (classification field)
+        const { data: waterData } = await supabaseClient
+          .from("water_samples")
+          .select("id, classification");
+
+        const unsafeSources = waterData
+          ? waterData.filter((s) => s.classification === "Unsafe").length
+          : 0;
+        qs("#kpiUnsafeWater").textContent = unsafeSources;
+        qs("#waterSafeSources").textContent =
+          waterData && waterData.length > 0
+            ? waterData.filter((s) => s.classification === "Safe").length
+            : 0;
+        qs("#waterSamplesQuarter").textContent = waterData
+          ? waterData.length
+          : 0;
+        qs("#kpiWaterMeta").textContent =
+          waterData && waterData.length > 0
+            ? waterData.length + " samples recorded"
+            : "No samples yet";
+
+        // Water alerts sample stub
+        qs("#waterAlertsCount").textContent = unsafeSources;
+        qs("#waterUpdatedMeta").textContent = "Synced from water_samples";
+
+        // Food licensed stub (from food_premises or premises subset)
+        qs("#foodLicensedCount").textContent = premisesCount;
+        qs("#foodNonCompliantCount").textContent = 0;
+
+        // Waste stub
+        qs("#wasteSitesCount").textContent = 0;
+        qs("#wasteIllegalCount").textContent = 0;
+
+        // Vector stub
+        qs("#vectorHighRiskZones").textContent = 0;
+        qs("#vectorInterventions").textContent = 0;
+
+        // Air and household energy counts
+        const { data: stations } = await supabaseClient
+          .from("air_monitoring_network")
+          .select("id, status");
+
+        const { data: households } = await supabaseClient
+          .from("household_energy_profiles")
+          .select("id");
+
+        const onlineStations = stations
+          ? stations.filter((s) => s.status === "Active").length
+          : 0;
+
+        qs("#airStationsOnline").textContent = onlineStations;
+        qs("#airHouseholdSurveys").textContent = households
+          ? households.length
+          : 0;
+        qs("#airModalStations").textContent = onlineStations;
+        qs("#airModalHouseholds").textContent = households
+          ? households.length
+          : 0;
+        qs("#airModalAlerts").textContent = 0;
+
+        // Frontier
+        const { data: ports } = await supabaseClient
+          .from("port_health_points")
+          .select("id");
+
+        const { data: screenings } = await supabaseClient
+          .from("traveler_screenings")
+          .select("traveler_count, date");
+
+        qs("#frontierPoints").textContent = ports ? ports.length : 0;
+
+        const todayScreenings = screenings
+          ? screenings
+              .filter((r) => {
+                const d = new Date(r.date);
+                return (
+                  d.getFullYear() === thisYear &&
+                  d.getMonth() === thisMonth &&
+                  d.getDate() === today.getDate()
+                );
+              })
+              .reduce((acc, r) => acc + (r.traveler_count || 0), 0)
+          : 0;
+
+        qs("#frontierTravellersToday").textContent = todayScreenings;
+
+        // Documents and payments simple stubs
+        qs("#documentsStored").textContent = 0;
+        qs("#documentsLinked").textContent = 0;
+        qs("#paymentsYearRevenue").textContent = 0;
+        qs("#paymentsPendingInvoices").textContent = 0;
+      } catch (e) {
+        console.error("KPI load error", e);
+      }
+    }
+
+    async function loadWaterSourcesForForm() {
+      try {
+        const { data, error } = await supabaseClient
+          .from("water_sources")
+          .select("id, name, ward, sub_county")
+          .limit(100);
+
+        if (error) {
+          console.error("Water sources error", error);
+          return;
+        }
+
+        const selectEl = qs("#waterSourceSelect");
+        if (!selectEl) return;
+
+        selectEl.innerHTML =
+          '<option value="">Select from registry</option>';
+        data.forEach((s) => {
+          const opt = document.createElement("option");
+          opt.value = s.id;
+          opt.textContent =
+            s.name +
+            " (" +
+            (s.ward || "Ward") +
+            ", " +
+            (s.sub_county || "Sub-county") +
+            ")";
+          selectEl.appendChild(opt);
+        });
+      } catch (e) {
+        console.error("Water sources load exception", e);
+      }
+    }
+
+    async function loadRecentActivity() {
+      const tbody = qs("#recentActivityBody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      try {
+        // Example using a view if available, fallback to simple composite
+        const rows = [];
+
+        const { data: inspectionRows } = await supabaseClient
+          .from("inspections")
+          .select("id, premises_id, inspection_date, outcome")
+          .order("inspection_date", { ascending: false })
+          .limit(5);
+
+        if (inspectionRows) {
+          inspectionRows.forEach((r) =>
+            rows.push({
+              module: "Inspection Management",
+              icon: "clipboard-check",
+              iconColor: "text-indigo-600 bg-indigo-100",
+              event: "Inspection " + r.id + " recorded",
+              location: "Premises " + (r.premises_id || ""),
+              status: r.outcome || "Pending",
+              statusColor:
+                r.outcome === "Pass" || r.outcome === "Full Compliance"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : r.outcome
+                  ? "bg-amber-100 text-amber-800"
+                  : "bg-slate-100 text-slate-700",
+              date: r.inspection_date || "",
+            })
+          );
+        }
+
+        const { data: complaintRows } = await supabaseClient
+          .from("complaints")
+          .select("id, category, incident_date, resolution_status")
+          .order("incident_date", { ascending: false })
+          .limit(5);
+
+        if (complaintRows) {
+          complaintRows.forEach((r) =>
+            rows.push({
+              module: "Complaints and Incidents",
+              icon: "exclamation-circle",
+              iconColor: "text-rose-600 bg-rose-100",
+              event: r.category || "Complaint",
+              location: "Reported location",
+              status: r.resolution_status || "Pending",
+              statusColor:
+                r.resolution_status === "Resolved"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : "bg-rose-100 text-rose-700",
+              date: r.incident_date || "",
+            })
+          );
+        }
+
+        // Sort combined rows by date desc
+        rows.sort((a, b) => {
+          const da = new Date(a.date).getTime();
+          const db = new Date(b.date).getTime();
+          return db - da;
+        });
+
+        const limited = rows.slice(0, 10);
+
+        if (limited.length === 0) {
+          tbody.innerHTML =
+            '<tr><td class="px-4 py-3 text-slate-500" colspan="6">No recent activity yet</td></tr>';
+          return;
+        }
+
+        limited.forEach((r) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full ${r.iconColor} flex items-center justify-center">
+                  <i class="fas fa-${r.icon}"></i>
+                </span>
+                <span class="text-slate-800 text-sm">${r.module}</span>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-slate-700 text-sm">
+              ${r.event}
+            </td>
+            <td class="px-4 py-3 text-slate-500 text-sm">
+              ${r.location}
+            </td>
+            <td class="px-4 py-3">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold ${r.statusColor}">
+                ${r.status}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-slate-500 text-xs">
+              ${r.date ? new Date(r.date).toLocaleDateString() : ""}
+            </td>
+            <td class="px-4 py-3 text-sky-600 text-xs font-medium">
+              <button>View record</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (e) {
+        console.error("Recent activity error", e);
+        tbody.innerHTML =
+          '<tr><td class="px-4 py-3 text-slate-500" colspan="6">Unable to load recent activity</td></tr>';
+      }
+    }
+
+    function initCharts() {
+      const analyticsCtx = document.getElementById("analyticsSparkline");
+      if (analyticsCtx) {
+        new Chart(analyticsCtx.getContext("2d"), {
+          type: "line",
+          data: {
+            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+            datasets: [
+              {
+                data: [10, 14, 13, 18, 21, 20],
+                borderWidth: 2,
+                fill: false,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            elements: {
+              point: { radius: 0 },
+              line: { tension: 0.3 },
+            },
+            scales: {
+              x: { display: false },
+              y: { display: false },
+            },
+          },
+        });
+      }
+
+      const waterTrendCtx = document.getElementById("waterTrendChart");
+      if (waterTrendCtx) {
+        new Chart(waterTrendCtx.getContext("2d"), {
+          type: "line",
+          data: {
+            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+            datasets: [
+              {
+                label: "Safe",
+                data: [70, 72, 75, 73, 78, 80],
+                borderWidth: 2,
+                fill: false,
+              },
+              {
+                label: "Unsafe",
+                data: [30, 28, 25, 27, 22, 20],
+                borderWidth: 2,
+                fill: false,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { position: "bottom" } },
+            elements: {
+              point: { radius: 2 },
+              line: { tension: 0.2 },
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+              },
+              y: {
+                beginAtZero: true,
+                grid: { color: "#e5e7eb" },
+              },
+            },
+          },
+        });
+      }
+
+      const airTrendCtx = document.getElementById("airTrendChart");
+      if (airTrendCtx) {
+        new Chart(airTrendCtx.getContext("2d"), {
+          type: "line",
+          data: {
+            labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"],
+            datasets: [
+              {
+                label: "PM2.5 (µg/m³)",
+                data: [32, 28, 35, 30, 29, 31, 33],
+                borderWidth: 2,
+                fill: false,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { position: "bottom" } },
+            elements: {
+              point: { radius: 2 },
+              line: { tension: 0.25 },
+            },
+            scales: {
+              x: { grid: { display: false } },
+              y: { grid: { color: "#e5e7eb" } },
+            },
+          },
+        });
+      }
+    }
+
+    function initLayoutEvents() {
+      const sidebar = qs("#sidebar");
+      const mobileBtn = qs("#mobileMenuButton");
+      if (mobileBtn && sidebar) {
+        mobileBtn.addEventListener("click", () => {
+          sidebar.classList.toggle("sidebar-open");
+        });
+      }
+
+      qsa("[data-open-modal]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.getAttribute("data-open-modal");
+          const el = qs("#" + target);
+          if (el) {
+            el.classList.add("active");
+            if (target === "water-modal") {
+              loadWaterSourcesForForm();
+            }
+          }
+        });
+      });
+
+      qsa("[data-close-modal]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const overlay = btn.closest(".modal-overlay");
+          if (overlay) {
+            overlay.classList.remove("active");
+          }
+        });
+      });
+
+      qsa(".modal-overlay").forEach((overlay) => {
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) {
+            overlay.classList.remove("active");
+          }
+        });
+      });
+
+      qsa("[data-tab-target]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const targetId = btn.getAttribute("data-tab-target");
+          const overlay = btn.closest(".modal-overlay");
+          if (!overlay) return;
+          const panels = overlay.querySelectorAll(".tab-panel");
+          panels.forEach((p) => p.classList.remove("active"));
+          const targetPanel = overlay.querySelector("#" + targetId);
+          if (targetPanel) {
+            targetPanel.classList.add("active");
+          }
+
+          const tabButtons = overlay.querySelectorAll("[data-tab-target]");
+          tabButtons.forEach((b) =>
+            b.classList.remove("tab-btn-active", "text-sky-600")
+          );
+          btn.classList.add("tab-btn-active", "text-sky-600");
+        });
+      });
+
+      const form = qs("#waterSampleForm");
+      if (form) {
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const feedback = qs("#waterFormFeedback");
+          feedback.textContent = "Saving sample record...";
+          feedback.classList.remove("text-red-600");
+          feedback.classList.add("text-slate-500");
+
+          const formData = new FormData(form);
+          const payload = {
+            sampling_date: formData.get("sampling_date"),
+            water_source_id: formData.get("source_id"),
+            sampling_type: formData.get("sampling_type"),
+            volume_ml: formData.get("volume") || null,
+            ecoli: formData.get("ecoli") || null,
+            turbidity: formData.get("turbidity") || null,
+            classification: formData.get("classification"),
+            notes: formData.get("notes") || null,
+          };
+
+          try {
+            const { data: authData } = await supabaseClient.auth.getUser();
+            if (authData && authData.user && authData.user.id) {
+              payload.recorded_by = authData.user.id;
+            }
+
+            const { error } = await supabaseClient
+              .from("water_samples")
+              .insert(payload);
+
+            if (error) {
+              feedback.textContent =
+                "Save failed. Check fields and network.";
+              feedback.classList.remove("text-slate-500");
+              feedback.classList.add("text-red-600");
+              return;
+            }
+
+            feedback.textContent = "Sample saved successfully.";
+            feedback.classList.remove("text-red-600");
+            feedback.classList.add("text-emerald-600");
+            form.reset();
+            loadKpis();
+            loadRecentActivity();
+          } catch (err) {
+            console.error("Save sample error", err);
+            feedback.textContent =
+              "Unexpected error during save.";
+            feedback.classList.remove("text-slate-500");
+            feedback.classList.add("text-red-600");
+          }
+        });
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      initLayoutEvents();
+      initCharts();
+      loadUserProfile();
+      loadKpis();
+      loadRecentActivity();
+    });
+  </script>
+</body>
+</html>

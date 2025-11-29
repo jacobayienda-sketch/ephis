@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Survey Analysis | EPHIS</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script type="module" src="main.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --primary-light: #3b82f6;
+  --secondary: #10b981;
+  --secondary-dark: #059669;
+  --accent: #8b5cf6;
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border: #e2e8f0;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+  --radius: 12px;
+  --radius-lg: 16px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 500px;
+  background: linear-gradient(135deg, 
+    rgba(37, 99, 235, 0.1) 0%, 
+    rgba(139, 92, 246, 0.1) 50%, 
+    rgba(16, 185, 129, 0.1) 100%);
+  z-index: -1;
+  animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  animation: slideDown 0.4s ease;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: white;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: rotate(45deg);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.logo:hover {
+  transform: scale(1.05) rotate(-5deg);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+main {
+  flex: 1;
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-2px);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+  background-size: 200% 100%;
+  animation: gradientMove 3s ease infinite;
+}
+
+@keyframes gradientMove {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.card h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.01em;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+select, input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  background: white;
+}
+
+select:focus, input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
+}
+
+.btn {
+  padding: 0.7rem 1.25rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.btn:not(.btn-primary) {
+  background: white;
+  color: var(--primary);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn:not(.btn-primary):hover {
+  border-color: var(--primary);
+  background: var(--bg-main);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.btn-row {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.metric-card {
+  padding: 1rem;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(139, 92, 246, 0.05));
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  margin-bottom: 1rem;
+}
+
+.metric-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.metric-card strong {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th, td {
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+th {
+  background: var(--bg-main);
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+tbody tr {
+  transition: background 0.2s ease;
+}
+
+tbody tr:hover {
+  background: rgba(37, 99, 235, 0.03);
+}
+
+#map {
+  width: 100%;
+  height: 360px;
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+}
+
+.table-wrapper {
+  max-height: 400px;
+  overflow: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 900px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+  header { padding: 1rem; }
+  .header-content h1 { font-size: 1.25rem; }
+  main { padding: 1.5rem 1rem; }
+}
+
+@media (max-width: 640px) {
+  .grid-4 { grid-template-columns: 1fr; }
+  .logo { width: 40px; height: 40px; font-size: 1.25rem; }
+  .btn-row { flex-direction: column; }
+  .btn { width: 100%; justify-content: center; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="header-content">
+    <div class="logo">E</div>
+    <h1>📊 Preparedness Survey Analysis</h1>
+  </div>
+</header>
+
+<main id="reportRoot">
+
+<section class="card">
+<h3>🔍 Filters</h3>
+
+<div class="grid-4">
+<div>
+<label>County</label>
+<select id="filterCounty"><option value="">All counties</option></select>
+</div>
+<div>
+<label>Sub-county</label>
+<select id="filterSubCounty"><option value="">All sub-counties</option></select>
+</div>
+<div>
+<label>Ward</label>
+<select id="filterWard"><option value="">All wards</option></select>
+</div>
+<div>
+<label>Role</label>
+<select id="filterRole"><option value="">All roles</option></select>
+</div>
+</div>
+
+<div class="grid-4" style="margin-top:1rem">
+<div>
+<label>From date</label>
+<input type="date" id="filterFrom">
+</div>
+<div>
+<label>To date</label>
+<input type="date" id="filterTo">
+</div>
+</div>
+
+<div class="btn-row">
+<button id="applyFilters" class="btn btn-primary">Apply Filters</button>
+<button id="resetFilters" class="btn">Reset</button>
+<button id="exportCsv" class="btn">📄 Export CSV</button>
+<button id="exportXlsx" class="btn">📊 Export Excel</button>
+<button id="exportPdf" class="btn">📑 Export PDF</button>
+</div>
+</section>
+
+<section class="grid-2">
+<div class="card">
+<h3>📈 Summary Metrics</h3>
+<div class="metric-card">
+<p>Total responses</p>
+<strong id="metricTotal">0</strong>
+</div>
+<div class="metric-card">
+<p>Avg digital skill</p>
+<strong id="metricSkill">0</strong>
+</div>
+<div class="metric-card">
+<p>Used EPHIS</p>
+<strong id="metricUsed">0%</strong>
+</div>
+<div class="metric-card">
+<p>Received training</p>
+<strong id="metricTrained">0%</strong>
+</div>
+</div>
+<div class="card">
+<h3>🗺️ Geographic Distribution</h3>
+<div id="map"></div>
+</div>
+</section>
+
+<section class="grid-2">
+<div class="card"><h3>👥 Role Distribution</h3><canvas id="roleChart"></canvas></div>
+<div class="card"><h3>💻 Digital Skill Levels</h3><canvas id="skillChart"></canvas></div>
+</section>
+
+<section class="grid-2">
+<div class="card"><h3>📡 Internet Connectivity</h3><canvas id="connectivityChart"></canvas></div>
+<div class="card"><h3>📱 Device Access</h3><canvas id="deviceChart"></canvas></div>
+</section>
+
+<section class="card">
+<h3>📋 Response Details</h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr>
+<th>Name</th><th>Role</th><th>County</th><th>Sub-county</th><th>Ward</th>
+<th>Skill</th><th>Used</th><th>Training</th><th>Date</th>
+</tr>
+</thead>
+<tbody id="dataTable"></tbody>
+</table>
+</div>
+</section>
+
+</main>
+
+<script type="module">
+
+import { supabase } from "./main.js"
+
+let wardsData = []
+let allData = []
+let filtered = []
+
+let roleChart, skillChart, connectivityChart, deviceChart
+
+const filterCounty = document.getElementById("filterCounty")
+const filterSubCounty = document.getElementById("filterSubCounty")
+const filterWard = document.getElementById("filterWard")
+const filterRole = document.getElementById("filterRole")
+const filterFrom = document.getElementById("filterFrom")
+const filterTo = document.getElementById("filterTo")
+
+async function loadWardJson() {
+  const res = await fetch("./kenya_wards.json")
+  wardsData = await res.json()
+}
+
+function populateCountyDropdown() {
+  filterCounty.innerHTML = `<option value="">All counties</option>`
+  const counties = [...new Set(wardsData.map(x => x.county))].sort()
+  counties.forEach(c => {
+    filterCounty.innerHTML += `<option value="${c}">${c}</option>`
+  })
+}
+
+filterCounty.addEventListener("change", () => {
+  filterSubCounty.innerHTML = `<option value="">All sub-counties</option>`
+  filterWard.innerHTML = `<option value="">All wards</option>`
+  const c = filterCounty.value
+  if (!c) return
+  const subs = [...new Set(
+    wardsData.filter(x => x.county === c).map(x => x.sub_county)
+  )].sort()
+  subs.forEach(sc => {
+    filterSubCounty.innerHTML += `<option value="${sc}">${sc}</option>`
+  })
+})
+
+filterSubCounty.addEventListener("change", () => {
+  filterWard.innerHTML = `<option value="">All wards</option>`
+  const c = filterCounty.value
+  const sc = filterSubCounty.value
+  if (!sc) return
+  const wards = wardsData
+    .filter(x => x.county === c && x.sub_county === sc)
+    .map(x => x.ward)
+    .sort()
+  wards.forEach(w => filterWard.innerHTML += `<option value="${w}">${w}</option>`)
+})
+
+async function loadSurveyData() {
+  const { data } = await supabase.from("user_preparedness_surveys").select("*")
+  allData = data || []
+  filtered = [...allData]
+}
+
+function populateRoleDropdown() {
+  const roles = [...new Set(allData.map(r => r.role).filter(Boolean))].sort()
+  roles.forEach(r => {
+    filterRole.innerHTML += `<option value="${r}">${r}</option>`
+  })
+}
+
+function applyFilters() {
+  const C = filterCounty.value.trim()
+  const SC = filterSubCounty.value.trim()
+  const W = filterWard.value.trim()
+  const R = filterRole.value.trim()
+  const F = filterFrom.value
+  const T = filterTo.value
+
+  filtered = allData.filter(row => {
+    if (C && row.county !== C) return false
+    if (SC && row.sub_county !== SC) return false
+    if (W && row.ward !== W) return false
+    if (R && row.role !== R) return false
+
+    if (F) {
+      const rd = new Date(row.created_at)
+      const fd = new Date(F + "T00:00:00")
+      if (rd < fd) return false
+    }
+
+    if (T) {
+      const rd = new Date(row.created_at)
+      const td = new Date(T + "T23:59:59")
+      if (rd > td) return false
+    }
+
+    return true
+  })
+
+  updateView()
+}
+
+document.getElementById("applyFilters").onclick = applyFilters
+
+document.getElementById("resetFilters").onclick = () => {
+  filterCounty.value = ""
+  filterSubCounty.value = ""
+  filterWard.value = ""
+  filterRole.value = ""
+  filterFrom.value = ""
+  filterTo.value = ""
+  filtered = [...allData]
+  updateView()
+}
+
+function safeDiv(n, d) { return d ? n / d : 0 }
+
+function updateMetrics() {
+  const tot = filtered.length
+  document.getElementById("metricTotal").textContent = tot
+  const avg = safeDiv(filtered.reduce((s, r) => s + (r.digital_skill_level || 0), 0), tot).toFixed(1)
+  document.getElementById("metricSkill").textContent = avg
+  const used = Math.round(100 * safeDiv(filtered.filter(r => r.has_used_ephis).length, tot))
+  document.getElementById("metricUsed").textContent = used + "%"
+  const trained = Math.round(100 * safeDiv(filtered.filter(r => r.has_received_training).length, tot))
+  document.getElementById("metricTrained").textContent = trained + "%"
+}
+
+function drawTable() {
+  const tbody = document.getElementById("dataTable")
+  tbody.innerHTML = filtered.map(r => `
+    <tr>
+      <td>${r.full_name || "-"}</td>
+      <td>${r.role || "-"}</td>
+      <td>${r.county || "-"}</td>
+      <td>${r.sub_county || "-"}</td>
+      <td>${r.ward || "-"}</td>
+      <td>${r.digital_skill_level || "-"}</td>
+      <td>${r.has_used_ephis ? "✓ Yes" : "✗ No"}</td>
+      <td>${r.has_received_training ? "✓ Yes" : "✗ No"}</td>
+      <td>${new Date(r.created_at).toLocaleDateString()}</td>
+    </tr>
+  `).join("")
+}
+
+function destroy(c) { if (c) c.destroy() }
+
+function countField(arr, field) {
+  const out = {}
+  arr.forEach(r => {
+    const v = r[field] || "Not specified"
+    out[v] = (out[v] || 0) + 1
+  })
+  return out
+}
+
+function drawCharts() {
+  destroy(roleChart)
+  destroy(skillChart)
+  destroy(connectivityChart)
+  destroy(deviceChart)
+
+  const chartConfig = {
+    backgroundColor: [
+      'rgba(37, 99, 235, 0.8)',
+      'rgba(139, 92, 246, 0.8)',
+      'rgba(16, 185, 129, 0.8)',
+      'rgba(245, 158, 11, 0.8)',
+      'rgba(239, 68, 68, 0.8)',
+      'rgba(99, 102, 241, 0.8)'
+    ],
+    borderColor: [
+      'rgb(37, 99, 235)',
+      'rgb(139, 92, 246)',
+      'rgb(16, 185, 129)',
+      'rgb(245, 158, 11)',
+      'rgb(239, 68, 68)',
+      'rgb(99, 102, 241)'
+    ],
+    borderWidth: 2
+  }
+
+  const roles = countField(filtered, "role")
+  roleChart = new Chart(document.getElementById("roleChart"), {
+    type: "bar",
+    data: { 
+      labels: Object.keys(roles), 
+      datasets: [{ 
+        data: Object.values(roles),
+        ...chartConfig
+      }] 
+    },
+    options: { 
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
+    }
+  })
+
+  const skills = countField(filtered, "digital_skill_level")
+  skillChart = new Chart(document.getElementById("skillChart"), {
+    type: "bar",
+    data: { 
+      labels: Object.keys(skills), 
+      datasets: [{ 
+        data: Object.values(skills),
+        ...chartConfig
+      }] 
+    },
+    options: { 
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
+    }
+  })
+
+  const conn = countField(filtered, "internet_reliability")
+  connectivityChart = new Chart(document.getElementById("connectivityChart"), {
+    type: "bar",
+    indexAxis: "y",
+    data: { 
+      labels: Object.keys(conn), 
+      datasets: [{ 
+        data: Object.values(conn),
+        ...chartConfig
+      }] 
+    },
+    options: { 
+      plugins: { legend: { display: false } },
+      scales: { x: { beginAtZero: true } }
+    }
+  })
+
+  const dev = {}
+  filtered.forEach(r => (r.device_access || []).forEach(d => dev[d] = (dev[d] || 0) + 1))
+  deviceChart = new Chart(document.getElementById("deviceChart"), {
+    type: "bar",
+    indexAxis: "y",
+    data: { 
+      labels: Object.keys(dev), 
+      datasets: [{ 
+        data: Object.values(dev),
+        ...chartConfig
+      }] 
+    },
+    options: { 
+      plugins: { legend: { display: false } },
+      scales: { x: { beginAtZero: true } }
+    }
+  })
+}
+
+let map, markerLayer
+
+function initMap() {
+  map = L.map("map").setView([0.5, 37], 7)
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map)
+  markerLayer = L.layerGroup().addTo(map)
+}
+
+function updateMap() {
+  markerLayer.clearLayers()
+  const subs = {}
+  filtered.forEach(r => {
+    const key = r.sub_county
+    if (!key) return
+    subs[key] = (subs[key] || 0) + 1
+  })
+
+  Object.keys(subs).forEach(sc => {
+    const row = wardsData.find(w => w.sub_county === sc)
+    if (!row || !row.lat || !row.lng) return
+    L.circleMarker([row.lat, row.lng], {
+      radius: 6 + Math.min(subs[sc] * 2, 20),
+      color: "#2563eb",
+      fillColor: "#2563eb",
+      fillOpacity: 0.6,
+      weight: 2
+    }).addTo(markerLayer).bindPopup(`<strong>${sc}</strong><br>Responses: ${subs[sc]}`)
+  })
+}
+
+document.getElementById("exportCsv").onclick = () => {
+  if (!filtered.length) return
+  const headers = Object.keys(filtered[0])
+  const csv = [
+    headers.join(","),
+    ...filtered.map(r => headers.map(h => JSON.stringify(r[h] || "")).join(","))
+  ].join("\n")
+  const a = document.createElement("a")
+  a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }))
+  a.download = "ephis_preparedness_analysis.csv"
+  a.click()
+}
+
+document.getElementById("exportXlsx").onclick = () => {
+  const ws = XLSX.utils.json_to_sheet(filtered)
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, "Survey Data")
+  XLSX.writeFile(wb, "ephis_preparedness_analysis.xlsx")
+}
+
+document.getElementById("exportPdf").onclick = async () => {
+  const { jsPDF } = window.jspdf
+  const pdf = new jsPDF("p", "mm", "a4")
+  const node = document.getElementById("reportRoot")
+  const canvas = await html2canvas(node, { scale: 0.6 })
+  const img = canvas.toDataURL("image/jpeg")
+  pdf.addImage(img, "JPEG", 5, 5, 200, 0)
+  pdf.save("ephis_preparedness_analysis.pdf")
+}
+
+function updateView() {
+  updateMetrics()
+  drawTable()
+  drawCharts()
+  updateMap()
+}
+
+;(async function init() {
+  await loadWardJson()
+  await loadSurveyData()
+  populateCountyDropdown()
+  populateRoleDropdown()
+  initMap()
+  updateView()
+})()
+
+</script>
+
+</body>
+</html>
