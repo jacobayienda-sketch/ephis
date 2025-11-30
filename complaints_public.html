@@ -8,8 +8,6 @@
   <meta name="theme-color" content="#2563eb" />
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <script type="module" src="main.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     * {
       margin: 0;
@@ -26,7 +24,6 @@
       flex-direction: column;
     }
 
-    /* Animated gradient background */
     body::before {
       content: '';
       position: fixed;
@@ -140,6 +137,13 @@
       margin-top: 0;
     }
 
+    .field-description {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+      font-weight: normal;
+    }
+
     input, select, textarea {
       width: 100%;
       padding: 0.75rem;
@@ -162,12 +166,14 @@
       font-family: inherit;
     }
 
-    #map {
-      height: 280px;
-      border-radius: 12px;
-      margin-top: 0.5rem;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      background-size: 1.5em 1.5em;
+      padding-right: 2.5rem;
     }
 
     .btn {
@@ -185,13 +191,35 @@
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
     }
 
-    .btn:hover {
+    .btn:hover:not(:disabled) {
       transform: translateY(-1px);
       box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
     }
 
     .btn:active {
       transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+    }
+
+    .location-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
     }
 
     .card {
@@ -253,14 +281,14 @@
       text-decoration: underline;
     }
 
-    #coordsLabel {
-      color: #6b7280;
-      font-size: 0.9rem;
+    #locationStatus {
       margin-top: 0.5rem;
-      display: block;
+      font-size: 0.9rem;
+      color: #6b7280;
+      text-align: center;
+      min-height: 1.5rem;
     }
 
-    /* Results section improvements */
     #results {
       margin-top: 1rem;
     }
@@ -283,7 +311,6 @@
       line-height: 1.5;
     }
 
-    /* Mobile responsiveness */
     @media (max-width: 640px) {
       .container {
         padding: 1rem 0.75rem;
@@ -300,9 +327,12 @@
       .header-content h1 {
         font-size: 1.2rem;
       }
+
+      .location-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
-    /* Loading states */
     .loading {
       text-align: center;
       color: #6b7280;
@@ -352,9 +382,38 @@
       <label>Description</label>
       <textarea id="description" required></textarea>
 
-      <label>Pick Complaint Location</label>
-      <div id="map"></div>
-      <small id="coordsLabel" style="color:#444;"></small>
+      <label>Location Details</label>
+      <div class="field-description">Select the administrative location of the complaint</div>
+      
+      <label style="margin-top: 1rem;">County</label>
+      <select id="county">
+        <option value="">Select county</option>
+      </select>
+
+      <label>Sub-county</label>
+      <select id="sub_county">
+        <option value="">Select sub-county</option>
+      </select>
+
+      <label>Ward</label>
+      <select id="ward">
+        <option value="">Select ward</option>
+      </select>
+
+      <label>Specific Location (Optional)</label>
+      <input type="text" id="specific_location" placeholder="e.g., Village name, landmark, street name" />
+      <div class="field-description">Provide additional location details if needed</div>
+
+      <label>GPS Coordinates (Optional)</label>
+      <div class="field-description">Provide precise location coordinates</div>
+      <div class="location-grid">
+        <input type="number" step="0.000001" id="latitude" placeholder="Latitude" />
+        <input type="number" step="0.000001" id="longitude" placeholder="Longitude" />
+      </div>
+      <button type="button" class="btn btn-secondary" id="getLocationBtn" style="margin-top: 1rem;">
+        📍 Get My Current Location
+      </button>
+      <div id="locationStatus"></div>
 
       <label>Attach Evidence (photo/pdf)</label>
       <input type="file" id="evidence" accept="image/*,application/pdf" multiple />
@@ -404,38 +463,126 @@
   const trackForm=document.getElementById('trackForm');
   const results=document.getElementById('results');
   const evidenceInput=document.getElementById('evidence');
-  const coordsLabel=document.getElementById('coordsLabel');
   const confirmation=document.getElementById('confirmation');
-  let coords=null, marker=null;
+  const county=document.getElementById('county');
+  const sub_county=document.getElementById('sub_county');
+  const ward=document.getElementById('ward');
+  const specific_location=document.getElementById('specific_location');
+  const getLocationBtn=document.getElementById('getLocationBtn');
+  const locationStatus=document.getElementById('locationStatus');
+  const latitudeInput=document.getElementById('latitude');
+  const longitudeInput=document.getElementById('longitude');
+
+  let wardsData = [];
 
   // Tabs
   tabReport.onclick=()=>{tabReport.classList.add('active');tabTrack.classList.remove('active');reportView.style.display='block';trackView.style.display='none';confirmation.innerHTML='';};
   tabTrack.onclick=()=>{tabTrack.classList.add('active');tabReport.classList.remove('active');trackView.style.display='block';reportView.style.display='none';};
 
-  // Map setup with reverse geocoding
-  document.addEventListener('DOMContentLoaded',()=>{
-    const map=L.map('map').setView([0.3,35.4],7);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      attribution:'© OpenStreetMap',
-      maxZoom: 18
-    }).addTo(map);
-    
-    map.on('click',async e=>{
-      coords={lat:e.latlng.lat,lng:e.latlng.lng};
-      if(marker) map.removeLayer(marker);
-      marker=L.marker([coords.lat,coords.lng]).addTo(map);
-      coordsLabel.innerHTML='📍 <em>Fetching address...</em>';
-      
-      try {
-        const resp=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json`);
-        const data=await resp.json();
-        const address=data.display_name||'Unnamed location';
-        coordsLabel.innerHTML=`📍 <strong>${address}</strong><br><small>Coordinates: ${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}</small>`;
-        coordsLabel.dataset.address=address;
-      } catch(error) {
-        coordsLabel.innerHTML=`📍 <strong>Location selected</strong><br><small>Coordinates: ${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}</small>`;
-        console.warn('Address lookup failed:', error);
+  // Get current location
+  getLocationBtn.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      locationStatus.textContent = "❌ Geolocation is not supported by your browser";
+      locationStatus.style.color = "#dc2626";
+      return;
+    }
+
+    locationStatus.textContent = "📡 Getting your location...";
+    locationStatus.style.color = "#2563eb";
+    getLocationBtn.disabled = true;
+    getLocationBtn.innerHTML = "📡 Getting Location...";
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        
+        latitudeInput.value = lat.toFixed(6);
+        longitudeInput.value = lng.toFixed(6);
+        
+        locationStatus.textContent = `✅ Location captured: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        locationStatus.style.color = "#10b981";
+        
+        getLocationBtn.disabled = false;
+        getLocationBtn.innerHTML = "📍 Get My Current Location";
+      },
+      (error) => {
+        let errorMsg = "❌ ";
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMsg += "Location access denied. Please enable location permissions.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMsg += "Location information unavailable.";
+            break;
+          case error.TIMEOUT:
+            errorMsg += "Location request timed out.";
+            break;
+          default:
+            errorMsg += "An unknown error occurred.";
+        }
+        
+        locationStatus.textContent = errorMsg;
+        locationStatus.style.color = "#dc2626";
+        
+        getLocationBtn.disabled = false;
+        getLocationBtn.innerHTML = "📍 Get My Current Location";
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
       }
+    );
+  });
+
+  // Load wards data
+  async function loadWards() {
+    try {
+      const res = await fetch("./kenya_wards.json");
+      wardsData = await res.json();
+      populateCounties();
+    } catch (error) {
+      console.error("Error loading wards:", error);
+    }
+  }
+
+  function populateCounties() {
+    const counties = [...new Set(wardsData.map(x => x.county))].sort();
+    counties.forEach(c => {
+      county.innerHTML += `<option value="${c}">${c}</option>`;
+    });
+  }
+
+  county.addEventListener("change", () => {
+    sub_county.innerHTML = `<option value="">Select sub-county</option>`;
+    ward.innerHTML = `<option value="">Select ward</option>`;
+
+    if (!county.value) return;
+
+    const subCounties = [...new Set(
+      wardsData
+        .filter(x => x.county === county.value)
+        .map(x => x.sub_county)
+    )].sort();
+
+    subCounties.forEach(sc => {
+      sub_county.innerHTML += `<option value="${sc}">${sc}</option>`;
+    });
+  });
+
+  sub_county.addEventListener("change", () => {
+    ward.innerHTML = `<option value="">Select ward</option>`;
+
+    if (!sub_county.value) return;
+
+    const wards = wardsData
+      .filter(x => x.county === county.value && x.sub_county === sub_county.value)
+      .map(x => x.ward)
+      .sort();
+
+    wards.forEach(w => {
+      ward.innerHTML += `<option value="${w}">${w}</option>`;
     });
   });
 
@@ -450,11 +597,6 @@
   // Submit Complaint
   reportForm.onsubmit=async e=>{
     e.preventDefault();
-    
-    if(!coords){
-      alert('⚠️ Please click on the map to select a location before submitting');
-      return;
-    }
 
     const submitBtn = e.target.querySelector('.btn');
     const originalText = submitBtn.textContent;
@@ -462,62 +604,76 @@
     submitBtn.disabled = true;
 
     try {
-      const address=coordsLabel.dataset.address||'';
+      // Build location string
+      let locationParts = [];
+      if (ward.value) locationParts.push(ward.value);
+      if (sub_county.value) locationParts.push(sub_county.value);
+      if (county.value) locationParts.push(county.value);
+      if (specific_location.value) locationParts.push(specific_location.value);
+      
+      // Add GPS coordinates if provided
+      if (latitudeInput.value && longitudeInput.value) {
+        locationParts.push(`GPS: ${latitudeInput.value}, ${longitudeInput.value}`);
+      }
+      
+      const location = locationParts.join(', ') || 'Location not specified';
       const trackingCode=generateTrackingCode();
 
-    const payload={
-      complaint_type:document.getElementById('complaint_type').value,
-      description:document.getElementById('description').value,
-      location:`${address} (Lat: ${coords.lat.toFixed(5)}, Lng: ${coords.lng.toFixed(5)})`,
-      reporter_name:document.getElementById('reporter_name').value,
-      reporter_contact:document.getElementById('reporter_contact').value,
-      urgency:document.getElementById('urgency').value,
-      submission_date:new Date().toISOString().split('T')[0],
-      submission_time:new Date().toLocaleTimeString(),
-      submission_method:'Public Web',
-      resolution_status:'Pending',
-      tracking_code:trackingCode
-    };
+      const payload={
+        complaint_type:document.getElementById('complaint_type').value,
+        description:document.getElementById('description').value,
+        location: location,
+        reporter_name:document.getElementById('reporter_name').value,
+        reporter_contact:document.getElementById('reporter_contact').value,
+        urgency:document.getElementById('urgency').value,
+        submission_date:new Date().toISOString().split('T')[0],
+        submission_time:new Date().toLocaleTimeString(),
+        submission_method:'Public Web',
+        resolution_status:'Pending',
+        tracking_code:trackingCode,
+        latitude: parseFloat(latitudeInput.value) || null,
+        longitude: parseFloat(longitudeInput.value) || null
+      };
 
-    const {data,error}=await supabase.from('complaints').insert([payload]).select('id').single();
-    if(error){alert('Error submitting complaint');console.error(error);return;}
-    const complaintId=data.id;
+      const {data,error}=await supabase.from('complaints').insert([payload]).select('id').single();
+      if(error){alert('Error submitting complaint');console.error(error);return;}
+      const complaintId=data.id;
 
-    // Upload Evidence Files
-    const files=Array.from(evidenceInput.files);
-    if(files.length){
-      await ensureBucket();
-      for(const f of files){
-        const ext=f.name.split('.').pop();
-        const path=`${complaintId}/${Date.now()}.${ext}`;
-        const {error:upErr}=await supabase.storage.from('complaint_evidence').upload(path,f);
-        if(upErr){console.error(upErr);continue;}
-        const {data:urlData}=supabase.storage.from('complaint_evidence').getPublicUrl(path);
-        const url=urlData.publicUrl;
-        await supabase.from('complaint_docs').insert([{complaint_id:complaintId,
-          evidence_url:f.type.startsWith('image/')?url:null,
-          supporting_docs_url:f.type==='application/pdf'?url:null
-        }]);
+      // Upload Evidence Files
+      const files=Array.from(evidenceInput.files);
+      if(files.length){
+        await ensureBucket();
+        for(const f of files){
+          const ext=f.name.split('.').pop();
+          const path=`${complaintId}/${Date.now()}.${ext}`;
+          const {error:upErr}=await supabase.storage.from('complaint_evidence').upload(path,f);
+          if(upErr){console.error(upErr);continue;}
+          const {data:urlData}=supabase.storage.from('complaint_evidence').getPublicUrl(path);
+          const url=urlData.publicUrl;
+          await supabase.from('complaint_docs').insert([{complaint_id:complaintId,
+            evidence_url:f.type.startsWith('image/')?url:null,
+            supporting_docs_url:f.type==='application/pdf'?url:null
+          }]);
+        }
       }
-    }
 
-    confirmation.innerHTML = `
-  <div class="alert">
-    ✅ <strong>Complaint submitted successfully!</strong><br><br>
-    <div style="background: white; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-      <strong>Your tracking code:</strong><br>
-      <code style="font-size: 1.1rem; color: #1d4ed8; background: #f3f4f6; padding: 0.5rem; border-radius: 4px; display: inline-block; margin-top: 0.5rem;">${trackingCode}</code>
-    </div>
-    <p style="margin: 1rem 0;"><small>💡 Save this tracking code to check the status of your complaint later.</small></p>
-    <a href="complaint_confirmation.html?code=${trackingCode}" target="_blank" 
-       style="display: inline-block; background: #1d4ed8; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; margin-top: 0.5rem; font-weight: 600;">
-      📄 View Confirmation Details
-    </a>
-  </div>`;
+      confirmation.innerHTML = `
+        <div class="alert">
+          ✅ <strong>Complaint submitted successfully!</strong><br><br>
+          <div style="background: white; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+            <strong>Your tracking code:</strong><br>
+            <code style="font-size: 1.1rem; color: #1d4ed8; background: #f3f4f6; padding: 0.5rem; border-radius: 4px; display: inline-block; margin-top: 0.5rem;">${trackingCode}</code>
+          </div>
+          <p style="margin: 1rem 0;"><small>💡 Save this tracking code to check the status of your complaint later.</small></p>
+          <a href="complaint_confirmation.html?code=${trackingCode}" target="_blank" 
+             style="display: inline-block; background: #1d4ed8; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; margin-top: 0.5rem; font-weight: 600;">
+            📄 View Confirmation Details
+          </a>
+        </div>`;
 
-    reportForm.reset();
-    coords=null;coordsLabel.textContent='';
-    
+      reportForm.reset();
+      locationStatus.textContent = '';
+      
     } catch(error) {
       console.error('Submission error:', error);
       confirmation.innerHTML = `
@@ -579,6 +735,9 @@
       results.innerHTML='<div class="error">❌ Error loading data. Please try again.</div>';
     }
   };
+
+  // Initialize
+  loadWards();
 </script>
 </body>
 </html>

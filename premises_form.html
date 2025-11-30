@@ -292,6 +292,13 @@
       margin-top: 0;
     }
 
+    .field-description {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+      font-weight: normal;
+    }
+
     form input,
     form select,
     form textarea {
@@ -339,6 +346,28 @@
 
     .form-group-inline label {
       margin-top: 0;
+    }
+
+    .form-section {
+      margin-top: 2.5rem;
+      padding-top: 2.5rem;
+      border-top: 2px solid var(--border);
+    }
+
+    .form-section:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .form-section h3 {
+      font-size: 1.25rem;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .form-actions {
@@ -486,12 +515,6 @@
         <option>Community</option>
       </select>
 
-      <label>Address / Location</label>
-      <input type="text" id="address" placeholder="Physical location or address" />
-
-      <label>Sub-County Office</label>
-      <input type="text" id="sub_county_office" placeholder="Enter sub-county office" />
-
       <label>Registration Status</label>
       <select id="registration_status">
         <option value="">Select status</option>
@@ -501,15 +524,50 @@
         <option>Closed</option>
       </select>
 
-      <div class="form-group-inline">
-        <div>
-          <label>Latitude</label>
-          <input type="number" step="0.000001" id="latitude" placeholder="Optional" />
+      <div class="form-section">
+        <h3>📍 Location Information</h3>
+
+        <label>County</label>
+        <select id="county">
+          <option value="">Select county</option>
+        </select>
+        <div class="field-description">Select the county where the premise is located</div>
+
+        <label>Sub-county</label>
+        <select id="sub_county">
+          <option value="">Select sub-county</option>
+        </select>
+        <div class="field-description">Select the sub-county</div>
+
+        <label>Ward</label>
+        <select id="ward">
+          <option value="">Select ward</option>
+        </select>
+        <div class="field-description">Select the ward</div>
+
+        <label>Specific Address / Location</label>
+        <input type="text" id="address" placeholder="Building name, street, landmark, etc." />
+        <div class="field-description">Provide specific address or location details</div>
+
+        <label>Sub-County Office</label>
+        <input type="text" id="sub_county_office" placeholder="Enter sub-county office name" />
+        <div class="field-description">The sub-county office responsible for this premise</div>
+
+        <div class="form-group-inline">
+          <div>
+            <label>Latitude</label>
+            <input type="number" step="0.000001" id="latitude" placeholder="Optional" />
+          </div>
+          <div>
+            <label>Longitude</label>
+            <input type="number" step="0.000001" id="longitude" placeholder="Optional" />
+          </div>
         </div>
-        <div>
-          <label>Longitude</label>
-          <input type="number" step="0.000001" id="longitude" placeholder="Optional" />
-        </div>
+        
+        <button type="button" class="btn btn-secondary" id="getLocationBtn" style="margin-top: 1rem; width: 100%;">
+          📍 Get My Current Location
+        </button>
+        <div id="locationStatus" style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-muted); text-align: center;"></div>
       </div>
 
       <label>Remarks</label>
@@ -534,9 +592,18 @@
     const toast = document.getElementById("toast");
     const logoutBtn = document.getElementById("logoutBtn");
     const form = document.getElementById("premiseForm");
+    const county = document.getElementById("county");
+    const sub_county = document.getElementById("sub_county");
+    const ward = document.getElementById("ward");
+    const getLocationBtn = document.getElementById("getLocationBtn");
+    const locationStatus = document.getElementById("locationStatus");
+    const latitudeInput = document.getElementById("latitude");
+    const longitudeInput = document.getElementById("longitude");
 
     const params = new URLSearchParams(window.location.search);
     const premiseId = params.get("id");
+
+    let wardsData = [];
 
     function showToast(msg, type = "info") {
       toast.textContent = msg;
@@ -551,13 +618,129 @@
     }
     checkSession();
 
+    // Get current location
+    getLocationBtn.addEventListener("click", () => {
+      if (!navigator.geolocation) {
+        locationStatus.textContent = "❌ Geolocation is not supported by your browser";
+        locationStatus.style.color = "#dc2626";
+        return;
+      }
+
+      locationStatus.textContent = "📡 Getting your location...";
+      locationStatus.style.color = "#2563eb";
+      getLocationBtn.disabled = true;
+      getLocationBtn.innerHTML = "📡 Getting Location...";
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          
+          latitudeInput.value = lat.toFixed(6);
+          longitudeInput.value = lng.toFixed(6);
+          
+          locationStatus.textContent = `✅ Location captured: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+          locationStatus.style.color = "#10b981";
+          
+          getLocationBtn.disabled = false;
+          getLocationBtn.innerHTML = "📍 Get My Current Location";
+          
+          showToast("✅ Location captured successfully");
+        },
+        (error) => {
+          let errorMsg = "❌ ";
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMsg += "Location access denied. Please enable location permissions.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMsg += "Location information unavailable.";
+              break;
+            case error.TIMEOUT:
+              errorMsg += "Location request timed out.";
+              break;
+            default:
+              errorMsg += "An unknown error occurred.";
+          }
+          
+          locationStatus.textContent = errorMsg;
+          locationStatus.style.color = "#dc2626";
+          
+          getLocationBtn.disabled = false;
+          getLocationBtn.innerHTML = "📍 Get My Current Location";
+          
+          showToast(errorMsg, "error");
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    });
+
+    // Load wards data
+    async function loadWards() {
+      try {
+        const res = await fetch("./kenya_wards.json");
+        wardsData = await res.json();
+        populateCounties();
+      } catch (error) {
+        console.error("Error loading wards:", error);
+        showToast("Error loading location data", "error");
+      }
+    }
+
+    function populateCounties() {
+      const counties = [...new Set(wardsData.map(x => x.county))].sort();
+      counties.forEach(c => {
+        county.innerHTML += `<option value="${c}">${c}</option>`;
+      });
+    }
+
+    county.addEventListener("change", () => {
+      sub_county.innerHTML = `<option value="">Select sub-county</option>`;
+      ward.innerHTML = `<option value="">Select ward</option>`;
+
+      if (!county.value) return;
+
+      const subCounties = [...new Set(
+        wardsData
+          .filter(x => x.county === county.value)
+          .map(x => x.sub_county)
+      )].sort();
+
+      subCounties.forEach(sc => {
+        sub_county.innerHTML += `<option value="${sc}">${sc}</option>`;
+      });
+    });
+
+    sub_county.addEventListener("change", () => {
+      ward.innerHTML = `<option value="">Select ward</option>`;
+
+      if (!sub_county.value) return;
+
+      const wards = wardsData
+        .filter(x => x.county === county.value && x.sub_county === sub_county.value)
+        .map(x => x.ward)
+        .sort();
+
+      wards.forEach(w => {
+        ward.innerHTML += `<option value="${w}">${w}</option>`;
+      });
+    });
+
     async function loadPremise() {
       if (!premiseId) return;
+      
       const { data, error } = await supabase.from("premises").select("*").eq("id", premiseId).single();
       if (error) {
         console.error(error);
+        showToast("Error loading premise", "error");
         return;
       }
+
+      // Populate basic fields
       document.getElementById("name").value = data.name || "";
       document.getElementById("type").value = data.type || "";
       document.getElementById("category").value = data.category || "";
@@ -568,15 +751,38 @@
       document.getElementById("latitude").value = data.latitude || "";
       document.getElementById("longitude").value = data.longitude || "";
       document.getElementById("remarks").value = data.remarks || "";
+
+      // Populate location dropdowns
+      if (data.county) {
+        county.value = data.county;
+        county.dispatchEvent(new Event('change'));
+        
+        setTimeout(() => {
+          if (data.sub_county) {
+            sub_county.value = data.sub_county;
+            sub_county.dispatchEvent(new Event('change'));
+            
+            setTimeout(() => {
+              if (data.ward) {
+                ward.value = data.ward;
+              }
+            }, 100);
+          }
+        }, 100);
+      }
     }
 
     form.addEventListener("submit", async e => {
       e.preventDefault();
+      
       const payload = {
         name: document.getElementById("name").value.trim(),
         type: document.getElementById("type").value.trim(),
         category: document.getElementById("category").value.trim(),
         ownership: document.getElementById("ownership").value || null,
+        county: county.value || null,
+        sub_county: sub_county.value || null,
+        ward: ward.value || null,
         address: document.getElementById("address").value.trim(),
         sub_county_office: document.getElementById("sub_county_office").value.trim(),
         registration_status: document.getElementById("registration_status").value || null,
@@ -609,7 +815,13 @@
     });
 
     document.getElementById("year").textContent = new Date().getFullYear();
-    loadPremise();
+    
+    // Initialize
+    loadWards().then(() => {
+      if (premiseId) {
+        loadPremise();
+      }
+    });
   </script>
 </body>
 </html>

@@ -240,14 +240,14 @@
     }
 
     .btn-secondary {
-      background: white;
-      color: #4b5563;
-      border: 2px solid #d1d5db;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
     }
 
-    .btn-secondary:hover {
-      background: #f9fafb;
-      border-color: #9ca3af;
+    .btn-secondary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
     }
 
     .btn:active {
@@ -377,20 +377,70 @@
         </div>
 
         <div class="form-group">
-          <label for="location">
-            Location<span class="required">*</span>
-          </label>
-          <input type="text" name="location" id="location" placeholder="Enter the specific location or address" required>
-          <div class="field-description">Provide the exact location where the incident occurred</div>
-        </div>
-
-        <div class="form-group">
           <label for="description">
             Description
           </label>
           <textarea name="description" id="description" rows="4" placeholder="Provide detailed information about the complaint..."></textarea>
           <div class="field-description">Include all relevant details about the incident or issue</div>
         </div>
+      </div>
+
+      <div class="form-section">
+        <h2>📍 Location Details</h2>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="county">County</label>
+            <select name="county" id="county">
+              <option value="">Select county</option>
+            </select>
+            <div class="field-description">Select the county where the incident occurred</div>
+          </div>
+
+          <div class="form-group">
+            <label for="sub_county">Sub-county</label>
+            <select name="sub_county" id="sub_county">
+              <option value="">Select sub-county</option>
+            </select>
+            <div class="field-description">Select the sub-county</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ward">Ward</label>
+            <select name="ward" id="ward">
+              <option value="">Select ward</option>
+            </select>
+            <div class="field-description">Select the ward</div>
+          </div>
+
+          <div class="form-group">
+            <label for="location">
+              Specific Location
+            </label>
+            <input type="text" name="location" id="location" placeholder="e.g., Village name, landmark, street">
+            <div class="field-description">Provide additional location details</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>GPS Coordinates (Optional)</label>
+          <div class="field-description">Provide precise location coordinates</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <input type="number" step="0.000001" name="latitude" id="latitude" placeholder="Latitude">
+          </div>
+          <div class="form-group">
+            <input type="number" step="0.000001" name="longitude" id="longitude" placeholder="Longitude">
+          </div>
+        </div>
+        
+        <button type="button" class="btn btn-secondary" id="getLocationBtn" style="width: 100%;">
+          📍 Get My Current Location
+        </button>
+        <div id="locationStatus" style="margin-top: 0.5rem; font-size: 0.9rem; color: #6b7280; text-align: center; min-height: 1.5rem;"></div>
       </div>
 
       <div class="form-section">
@@ -465,11 +515,132 @@
     const deleteBtn = document.getElementById("delete-btn");
     const saveBtn = document.getElementById("save-btn");
     const title = document.getElementById("form-title");
+    const county = document.getElementById("county");
+    const sub_county = document.getElementById("sub_county");
+    const ward = document.getElementById("ward");
+    const getLocationBtn = document.getElementById("getLocationBtn");
+    const locationStatus = document.getElementById("locationStatus");
+    const latitudeInput = document.getElementById("latitude");
+    const longitudeInput = document.getElementById("longitude");
     const params = new URLSearchParams(window.location.search);
     const complaintId = params.get("id");
 
+    let wardsData = [];
+
     // Require login
     await requireLogin();
+
+    // Get current location
+    getLocationBtn.addEventListener("click", () => {
+      if (!navigator.geolocation) {
+        locationStatus.textContent = "❌ Geolocation is not supported by your browser";
+        locationStatus.style.color = "#dc2626";
+        return;
+      }
+
+      locationStatus.textContent = "📡 Getting your location...";
+      locationStatus.style.color = "#2563eb";
+      getLocationBtn.disabled = true;
+      getLocationBtn.innerHTML = "📡 Getting Location...";
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          
+          latitudeInput.value = lat.toFixed(6);
+          longitudeInput.value = lng.toFixed(6);
+          
+          locationStatus.textContent = `✅ Location captured: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+          locationStatus.style.color = "#10b981";
+          
+          getLocationBtn.disabled = false;
+          getLocationBtn.innerHTML = "📍 Get My Current Location";
+          
+          showToast("✅ Location captured successfully");
+        },
+        (error) => {
+          let errorMsg = "❌ ";
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMsg += "Location access denied. Please enable location permissions.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMsg += "Location information unavailable.";
+              break;
+            case error.TIMEOUT:
+              errorMsg += "Location request timed out.";
+              break;
+            default:
+              errorMsg += "An unknown error occurred.";
+          }
+          
+          locationStatus.textContent = errorMsg;
+          locationStatus.style.color = "#dc2626";
+          
+          getLocationBtn.disabled = false;
+          getLocationBtn.innerHTML = "📍 Get My Current Location";
+          
+          showToast(errorMsg, "error");
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    });
+
+    // Load wards data
+    async function loadWards() {
+      try {
+        const res = await fetch("./kenya_wards.json");
+        wardsData = await res.json();
+        populateCounties();
+      } catch (error) {
+        console.error("Error loading wards:", error);
+        showToast("⚠️ Error loading location data", "warning");
+      }
+    }
+
+    function populateCounties() {
+      const counties = [...new Set(wardsData.map(x => x.county))].sort();
+      counties.forEach(c => {
+        county.innerHTML += `<option value="${c}">${c}</option>`;
+      });
+    }
+
+    county.addEventListener("change", () => {
+      sub_county.innerHTML = `<option value="">Select sub-county</option>`;
+      ward.innerHTML = `<option value="">Select ward</option>`;
+
+      if (!county.value) return;
+
+      const subCounties = [...new Set(
+        wardsData
+          .filter(x => x.county === county.value)
+          .map(x => x.sub_county)
+      )].sort();
+
+      subCounties.forEach(sc => {
+        sub_county.innerHTML += `<option value="${sc}">${sc}</option>`;
+      });
+    });
+
+    sub_county.addEventListener("change", () => {
+      ward.innerHTML = `<option value="">Select ward</option>`;
+
+      if (!sub_county.value) return;
+
+      const wards = wardsData
+        .filter(x => x.county === county.value && x.sub_county === sub_county.value)
+        .map(x => x.ward)
+        .sort();
+
+      wards.forEach(w => {
+        ward.innerHTML += `<option value="${w}">${w}</option>`;
+      });
+    });
 
     // Cancel -> go back
     cancelBtn.onclick = () => window.location.href = "complaints.html";
@@ -483,12 +654,41 @@
     if (complaintId) {
       try {
         const record = await fetchById("complaints", complaintId);
+        
+        // Wait for wards to load before populating
+        await loadWards();
+        
+        // Populate county first
+        if (record.county) {
+          county.value = record.county;
+          county.dispatchEvent(new Event('change'));
+          
+          // Wait a bit and populate sub-county
+          setTimeout(() => {
+            if (record.sub_county) {
+              sub_county.value = record.sub_county;
+              sub_county.dispatchEvent(new Event('change'));
+              
+              // Wait a bit and populate ward
+              setTimeout(() => {
+                if (record.ward) {
+                  ward.value = record.ward;
+                }
+              }, 100);
+            }
+          }, 100);
+        }
+        
+        // Populate other form fields
         populateForm(form, record);
         title.innerHTML = "✏️ Edit Complaint";
         saveBtn.innerHTML = "💾 Update Complaint";
       } catch (err) {
         showToast("❌ Error loading record: " + err.message, "error");
       }
+    } else {
+      // For new records, just load wards
+      loadWards();
     }
 
     // Save handler
@@ -503,6 +703,32 @@
         const payload = getFormData(form);
         const { data: userData } = await supabase.auth.getUser();
         payload.created_by = userData?.user?.id || null;
+
+        // Build full location string from components
+        let locationParts = [];
+        if (ward.value) locationParts.push(ward.value);
+        if (sub_county.value) locationParts.push(sub_county.value);
+        if (county.value) locationParts.push(county.value);
+        if (payload.location) locationParts.push(payload.location);
+        
+        // Add GPS coordinates if provided
+        if (latitudeInput.value && longitudeInput.value) {
+          locationParts.push(`GPS: ${latitudeInput.value}, ${longitudeInput.value}`);
+        }
+        
+        // Store the full location string
+        const fullLocation = locationParts.join(', ');
+        if (fullLocation) {
+          payload.location = fullLocation;
+        }
+
+        // Ensure latitude and longitude are stored as numbers
+        if (latitudeInput.value) {
+          payload.latitude = parseFloat(latitudeInput.value);
+        }
+        if (longitudeInput.value) {
+          payload.longitude = parseFloat(longitudeInput.value);
+        }
 
         if (complaintId) {
           await updateRecord("complaints", complaintId, payload);
