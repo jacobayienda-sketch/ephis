@@ -183,10 +183,43 @@
     .form-card {
       background: white;
       border-radius: 12px;
-      padding: 1.5rem;
+      padding: 2rem;
       margin-bottom: 2rem;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
       border: 1px solid #e2e8f0;
+    }
+
+    .form-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .form-section {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .form-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .form-section h3 {
+      font-size: 1.1rem;
+      color: #1f2937;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
     }
 
     form label {
@@ -197,7 +230,12 @@
       font-size: 0.95rem;
     }
 
-    form input, form select {
+    form label .required {
+      color: #dc2626;
+      margin-left: 0.25rem;
+    }
+
+    form input, form select, form textarea {
       width: 100%;
       padding: 0.75rem 1rem;
       border-radius: 10px;
@@ -207,10 +245,26 @@
       transition: all 0.2s ease;
     }
 
-    form input:focus, form select:focus {
+    form input:focus, form select:focus, form textarea:focus {
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    form textarea {
+      min-height: 100px;
+      resize: vertical;
+      line-height: 1.6;
+      font-family: inherit;
+    }
+
+    form select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 3rem;
     }
 
     .card {
@@ -263,8 +317,8 @@
       font-weight: 600;
     }
 
-    .badge.High { background: #fee2e2; color: #dc2626; }
-    .badge.Moderate { background: #fef3c7; color: #d97706; }
+    .badge.High, .badge.Critical { background: #fee2e2; color: #dc2626; }
+    .badge.Moderate, .badge.Medium { background: #fef3c7; color: #d97706; }
     .badge.Low { background: #d1fae5; color: #047857; }
 
     .actions {
@@ -292,6 +346,16 @@
       background: #2563eb;
       color: white;
       transform: translateY(-1px);
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid #f1f5f9;
+      flex-wrap: wrap;
     }
 
     .pagination {
@@ -362,6 +426,14 @@
       margin-bottom: 1rem;
     }
 
+    #locationStatus {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #6b7280;
+      text-align: center;
+      min-height: 1.5rem;
+    }
+
     @media (max-width: 768px) {
       header {
         padding: 1rem;
@@ -392,6 +464,18 @@
       .card {
         padding: 1rem;
       }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .form-actions .btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -419,26 +503,124 @@
     <button class="btn btn-primary" id="addBtn">+ Add Site</button>
   </div>
 
-    <div id="formContainer" style="display:none;" class="form-card">
-      <form id="siteForm">
-        <label>Site Name</label><input type="text" id="site_name" required />
-        <label>Site Type</label><input type="text" id="site_type" placeholder="Swamp, Stream, Drainage, etc." />
-        <label>Address</label><input type="text" id="address" />
-        <label>Latitude</label><input type="number" step="0.000001" id="latitude" />
-        <label>Longitude</label><input type="number" step="0.000001" id="longitude" />
-        <label>Reporting Agency</label><input type="text" id="reporting_agency" placeholder="e.g. County PH Dept" />
-        <label>Responsible Officer</label><input type="text" id="responsible_officer" />
-        <label>Risk Level</label>
-        <select id="risk_level">
-          <option value="">Select</option>
-          <option>Low</option><option>Moderate</option><option>High</option>
-        </select>
-        <div style="text-align:right;margin-top:0.6rem;">
-          <button type="submit" class="btn btn-primary">Save</button>
-          <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
+  <div id="formContainer" style="display:none;" class="form-card">
+    <form id="siteForm">
+      <h2>🦟 Vector Control Activity</h2>
+      
+      <div class="form-section">
+        <h3>🎯 Activity Information</h3>
+        
+        <div class="form-grid">
+          <div>
+            <label>Vector Type<span class="required">*</span></label>
+            <select id="vector_type" required>
+              <option value="">Select vector type</option>
+              <option>Mosquito</option>
+              <option>Rodent</option>
+              <option>Fly</option>
+              <option>Tick</option>
+              <option>Flea</option>
+              <option>Bedbug</option>
+              <option>Cockroach</option>
+              <option>Other</option>
+            </select>
+          </div>
+          
+          <div>
+            <label>Risk Level</label>
+            <select id="risk_level">
+              <option value="">Select risk level</option>
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+              <option>Critical</option>
+            </select>
+          </div>
         </div>
-      </form>
-    </div>
+        
+        <div class="form-grid">
+          <div>
+            <label>Intervention Type</label>
+            <select id="intervention_type">
+              <option value="">Select intervention</option>
+              <option>Fumigation/Spraying</option>
+              <option>Larviciding</option>
+              <option>Drainage Clearance</option>
+              <option>Public Awareness</option>
+              <option>Environmental Cleanup</option>
+              <option>Bednet Distribution</option>
+              <option>Rodent Control</option>
+              <option>Other</option>
+            </select>
+          </div>
+          
+          <div>
+            <label>Intervention Date</label>
+            <input type="date" id="intervention_date" />
+          </div>
+        </div>
+        
+        <label>Responsible Officer</label>
+        <input type="text" id="responsible_officer" placeholder="Name of officer in charge" />
+      </div>
+      
+      <div class="form-section">
+        <h3>📍 Location Details</h3>
+        
+        <div class="form-grid">
+          <div>
+            <label>County</label>
+            <select id="county">
+              <option value="">Select county</option>
+            </select>
+          </div>
+          
+          <div>
+            <label>Sub-county</label>
+            <select id="sub_county">
+              <option value="">Select sub-county</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-grid">
+          <div>
+            <label>Ward</label>
+            <select id="ward">
+              <option value="">Select ward</option>
+            </select>
+          </div>
+          
+          <div>
+            <label>Specific Location<span class="required">*</span></label>
+            <input type="text" id="location_name" placeholder="Village, area, site name..." required />
+          </div>
+        </div>
+        
+        <label>GPS Coordinates (Optional)</label>
+        <div class="form-grid">
+          <input type="number" step="0.000001" id="latitude" placeholder="Latitude" />
+          <input type="number" step="0.000001" id="longitude" placeholder="Longitude" />
+        </div>
+        
+        <button type="button" class="btn btn-secondary" id="getLocationBtn" style="width:100%;margin-top:1rem;">
+          📍 Get My Current Location
+        </button>
+        <div id="locationStatus"></div>
+      </div>
+      
+      <div class="form-section">
+        <h3>📝 Additional Information</h3>
+        <label>Remarks / Observations</label>
+        <textarea id="remarks" rows="4" placeholder="Details about the intervention, results, challenges, or recommendations..."></textarea>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary">💾 Save Record</button>
+      </div>
+    </form>
+  </div>
 
   <div id="cardsContainer"></div>
 
@@ -454,100 +636,215 @@
 
 <div id="toast" class="toast"></div>
 
-  <script type="module">
-    import { supabase } from "./main.js";
+<script type="module">
+  import { supabase } from "./main.js";
 
-    const toast=document.getElementById("toast");
-    const logoutBtn=document.getElementById("logoutBtn");
-    const addBtn=document.getElementById("addBtn");
-    const cancelBtn=document.getElementById("cancelBtn");
-    const formContainer=document.getElementById("formContainer");
-    const form=document.getElementById("siteForm");
-    const searchInput=document.getElementById("searchInput");
-    const cardsContainer=document.getElementById("cardsContainer");
-    const prevPage=document.getElementById("prevPage");
-    const nextPage=document.getElementById("nextPage");
+  const toast=document.getElementById("toast");
+  const logoutBtn=document.getElementById("logoutBtn");
+  const addBtn=document.getElementById("addBtn");
+  const cancelBtn=document.getElementById("cancelBtn");
+  const formContainer=document.getElementById("formContainer");
+  const form=document.getElementById("siteForm");
+  const searchInput=document.getElementById("searchInput");
+  const cardsContainer=document.getElementById("cardsContainer");
+  const prevPage=document.getElementById("prevPage");
+  const nextPage=document.getElementById("nextPage");
+  const county=document.getElementById("county");
+  const sub_county=document.getElementById("sub_county");
+  const ward=document.getElementById("ward");
+  const getLocationBtn=document.getElementById("getLocationBtn");
+  const locationStatus=document.getElementById("locationStatus");
+  const latitudeInput=document.getElementById("latitude");
+  const longitudeInput=document.getElementById("longitude");
 
-    let page=0;const limit=10;let total=0;
+  let page=0;const limit=10;let total=0;
+  let wardsData=[];
 
-    function showToast(msg,type="info"){toast.textContent=msg;toast.style.background=type==="error"?"#c62828":"#1976d2";toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
+  function showToast(msg,type="info"){toast.textContent=msg;toast.style.background=type==="error"?"#c62828":"#1976d2";toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
 
-    async function checkSession(){const {data}=await supabase.auth.getSession();if(!data.session)window.location.href="login.html";}
-    checkSession();
+  async function checkSession(){const {data}=await supabase.auth.getSession();if(!data.session)window.location.href="login.html";}
+  checkSession();
 
-    function toggleForm(show){formContainer.style.display=show?"block":"none";}
-    addBtn.addEventListener("click",()=>toggleForm(true));
-    cancelBtn.addEventListener("click",()=>toggleForm(false));
-
-    async function loadSites(){
-      cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading…</p>";
-      let query=supabase.from("vector_sites").select("*",{count:"exact"}).order("date_registered",{ascending:false}).range(page*limit,page*limit+limit-1);
-      const term=searchInput.value.trim();
-      if(term)query=query.or(`site_name.ilike.%${term}%,responsible_officer.ilike.%${term}%`);
-      const{data,count,error}=await query;
-      if(error){console.error(error);showToast("Load failed","error");return;}
-      total=count;renderCards(data);
+  // Load wards data
+  async function loadWards(){
+    try{
+      const res=await fetch("./kenya_wards.json");
+      wardsData=await res.json();
+      populateCounties();
+    }catch(error){
+      console.error("Error loading wards:",error);
     }
+  }
 
-    function renderCards(data){
-      if(!data.length){
-        cardsContainer.innerHTML=`
-          <div class="empty-state">
-            <div class="empty-state-icon">🦟</div>
-            <h3>No vector sites found</h3>
-            <p>Start by adding a new vector control site</p>
-          </div>
-        `;
-        return;
-      }
-      cardsContainer.innerHTML=data.map(d=>{
-        const badge=d.risk_level||"Low";
-        return`
-          <div class="card">
-            <div class="card-header">
-              <span class="card-title">${d.site_name||"Unnamed Site"}</span>
-              <span class="badge ${badge}">${d.risk_level||"N/A"}</span>
-            </div>
-            <div class="card-body">
-              <p><strong>Type:</strong> ${d.site_type||"-"} | <strong>Agency:</strong> ${d.reporting_agency||"-"}</p>
-              <p><strong>Officer:</strong> ${d.responsible_officer||"-"} | <strong>Registered:</strong> ${d.date_registered||"-"}</p>
-            </div>
-            <div class="actions">
-              <a href="vector_surveillance.html?id=${d.id}">📊 Surveillance</a>
-              <a href="vector_interventions.html?id=${d.id}">💉 Interventions</a>
-              <a href="vector_performance.html">📈 Performance</a>
-            </div>
-          </div>`;
-      }).join("");
-      prevPage.disabled=page===0;
-      nextPage.disabled=(page+1)*limit>=total;
-    }
-
-    form.addEventListener("submit",async e=>{
-      e.preventDefault();
-      const payload={
-        site_name:document.getElementById("site_name").value.trim(),
-        site_type:document.getElementById("site_type").value.trim()||null,
-        address:document.getElementById("address").value.trim()||null,
-        latitude:parseFloat(document.getElementById("latitude").value)||null,
-        longitude:parseFloat(document.getElementById("longitude").value)||null,
-        reporting_agency:document.getElementById("reporting_agency").value.trim()||null,
-        responsible_officer:document.getElementById("responsible_officer").value.trim()||null,
-        risk_level:document.getElementById("risk_level").value||null,
-        date_registered:new Date()
-      };
-      const{error}=await supabase.from("vector_sites").insert([payload]);
-      if(error){console.error(error);showToast("Save failed","error");return;}
-      showToast("Vector site added successfully");
-      form.reset();toggleForm(false);loadSites();
+  function populateCounties(){
+    const counties=[...new Set(wardsData.map(x=>x.county))].sort();
+    counties.forEach(c=>{
+      county.innerHTML+=`<option value="${c}">${c}</option>`;
     });
+  }
 
-    searchInput.addEventListener("input",()=>{page=0;loadSites();});
-    prevPage.addEventListener("click",()=>{if(page>0){page--;loadSites();}});
-    nextPage.addEventListener("click",()=>{if((page+1)*limit<total){page++;loadSites();}});
-    logoutBtn.addEventListener("click",async()=>{await supabase.auth.signOut();showToast("Logging out…");setTimeout(()=>window.location.href="login.html",800);});
-    document.getElementById("year").textContent=new Date().getFullYear();
-    loadSites();
-  </script>
+  county.addEventListener("change",()=>{
+    sub_county.innerHTML=`<option value="">Select sub-county</option>`;
+    ward.innerHTML=`<option value="">Select ward</option>`;
+    if(!county.value)return;
+    const subCounties=[...new Set(wardsData.filter(x=>x.county===county.value).map(x=>x.sub_county))].sort();
+    subCounties.forEach(sc=>{
+      sub_county.innerHTML+=`<option value="${sc}">${sc}</option>`;
+    });
+  });
+
+  sub_county.addEventListener("change",()=>{
+    ward.innerHTML=`<option value="">Select ward</option>`;
+    if(!sub_county.value)return;
+    const wards=wardsData.filter(x=>x.county===county.value&&x.sub_county===sub_county.value).map(x=>x.ward).sort();
+    wards.forEach(w=>{
+      ward.innerHTML+=`<option value="${w}">${w}</option>`;
+    });
+  });
+
+  // Get current location
+  getLocationBtn.addEventListener("click",()=>{
+    if(!navigator.geolocation){
+      locationStatus.textContent="❌ Geolocation is not supported";
+      locationStatus.style.color="#dc2626";
+      return;
+    }
+    locationStatus.textContent="📡 Getting your location...";
+    locationStatus.style.color="#8b5cf6";
+    getLocationBtn.disabled=true;
+    getLocationBtn.innerHTML="📡 Getting Location...";
+    navigator.geolocation.getCurrentPosition(
+      (position)=>{
+        const lat=position.coords.latitude;
+        const lng=position.coords.longitude;
+        latitudeInput.value=lat.toFixed(6);
+        longitudeInput.value=lng.toFixed(6);
+        locationStatus.textContent=`✅ Location captured: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        locationStatus.style.color="#10b981";
+        getLocationBtn.disabled=false;
+        getLocationBtn.innerHTML="📍 Get My Current Location";
+        showToast("✅ Location captured successfully");
+      },
+      (error)=>{
+        let errorMsg="❌ ";
+        switch(error.code){
+          case error.PERMISSION_DENIED:errorMsg+="Location access denied";break;
+          case error.POSITION_UNAVAILABLE:errorMsg+="Location unavailable";break;
+          case error.TIMEOUT:errorMsg+="Request timed out";break;
+          default:errorMsg+="Unknown error";
+        }
+        locationStatus.textContent=errorMsg;
+        locationStatus.style.color="#dc2626";
+        getLocationBtn.disabled=false;
+        getLocationBtn.innerHTML="📍 Get My Current Location";
+        showToast(errorMsg,"error");
+      },
+      {enableHighAccuracy:true,timeout:10000,maximumAge:0}
+    );
+  });
+
+  function toggleForm(show){
+    formContainer.style.display=show?"block":"none";
+    if(show){
+      form.reset();
+      locationStatus.textContent="";
+    }
+  }
+  addBtn.addEventListener("click",()=>toggleForm(true));
+  cancelBtn.addEventListener("click",()=>toggleForm(false));
+
+  async function loadSites(){
+    cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading…</p>";
+    let query=supabase.from("vector_sites").select("*",{count:"exact"}).order("created_at",{ascending:false}).range(page*limit,page*limit+limit-1);
+    const term=searchInput.value.trim();
+    if(term)query=query.or(`location_name.ilike.%${term}%,responsible_officer.ilike.%${term}%,vector_type.ilike.%${term}%`);
+    const{data,count,error}=await query;
+    if(error){console.error(error);showToast("Load failed","error");return;}
+    total=count;renderCards(data);
+  }
+
+  function renderCards(data){
+    if(!data.length){
+      cardsContainer.innerHTML=`
+        <div class="empty-state">
+          <div class="empty-state-icon">🦟</div>
+          <h3>No vector sites found</h3>
+          <p>Start by adding a new vector control site</p>
+        </div>
+      `;
+      return;
+    }
+    cardsContainer.innerHTML=data.map(d=>{
+      const badge=d.risk_level||"Low";
+      return`
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">${d.location_name||"Unnamed Site"} - ${d.vector_type||"Vector"}</span>
+            <span class="badge ${badge}">${d.risk_level||"N/A"}</span>
+          </div>
+          <div class="card-body">
+            <p><strong>Type:</strong> ${d.vector_type||"-"} | <strong>Intervention:</strong> ${d.intervention_type||"-"}</p>
+            <p><strong>Officer:</strong> ${d.responsible_officer||"-"} | <strong>Date:</strong> ${d.intervention_date||"-"}</p>
+            <p><strong>Location:</strong> ${d.location||d.location_name||"-"}</p>
+          </div>
+          <div class="actions">
+            <a href="vector_control_form.html?id=${d.id}">✏️ Edit</a>
+            <a href="vector_surveillance.html?id=${d.id}">📊 Surveillance</a>
+            <a href="vector_interventions.html?id=${d.id}">💉 Interventions</a>
+          </div>
+        </div>`;
+    }).join("");
+    prevPage.disabled=page===0;
+    nextPage.disabled=(page+1)*limit>=total;
+  }
+
+  form.addEventListener("submit",async e=>{
+    e.preventDefault();
+    
+    // Build location string
+    let locationParts=[];
+    if(ward.value)locationParts.push(ward.value);
+    if(sub_county.value)locationParts.push(sub_county.value);
+    if(county.value)locationParts.push(county.value);
+    const locationName=document.getElementById("location_name").value.trim();
+    if(locationName)locationParts.push(locationName);
+    if(latitudeInput.value&&longitudeInput.value){
+      locationParts.push(`GPS: ${latitudeInput.value}, ${longitudeInput.value}`);
+    }
+    
+    const payload={
+      vector_type:document.getElementById("vector_type").value,
+      risk_level:document.getElementById("risk_level").value||null,
+      intervention_type:document.getElementById("intervention_type").value||null,
+      intervention_date:document.getElementById("intervention_date").value||null,
+      responsible_officer:document.getElementById("responsible_officer").value.trim()||null,
+      county:county.value||null,
+      sub_county:sub_county.value||null,
+      ward:ward.value||null,
+      location_name:locationName,
+      location:locationParts.join(', ')||locationName,
+      latitude:parseFloat(latitudeInput.value)||null,
+      longitude:parseFloat(longitudeInput.value)||null,
+      remarks:document.getElementById("remarks").value.trim()||null
+    };
+    
+    const{data:userData}=await supabase.auth.getUser();
+    payload.created_by=userData?.user?.id||null;
+    
+    const{error}=await supabase.from("vector_sites").insert([payload]);
+    if(error){console.error(error);showToast("Save failed","error");return;}
+    showToast("✅ Vector site added successfully");
+    form.reset();toggleForm(false);loadSites();
+  });
+
+  searchInput.addEventListener("input",()=>{page=0;loadSites();});
+  prevPage.addEventListener("click",()=>{if(page>0){page--;loadSites();}});
+  nextPage.addEventListener("click",()=>{if((page+1)*limit<total){page++;loadSites();}});
+  logoutBtn.addEventListener("click",async()=>{await supabase.auth.signOut();showToast("Logging out…");setTimeout(()=>window.location.href="login.html",800);});
+  document.getElementById("year").textContent=new Date().getFullYear();
+  
+  loadWards();
+  loadSites();
+</script>
 </body>
 </html>
