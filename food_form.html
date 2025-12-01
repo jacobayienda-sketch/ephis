@@ -3,36 +3,63 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#2563eb" />
+  <meta name="theme-color" content="#f59e0b" />
   <title>EPHIS | Food Premise Form</title>
   <link rel="manifest" href="manifest.json" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'SF Pro Display', system-ui, sans-serif;
-      background: linear-gradient(135deg, #f8fafc 0%, #fef3c7 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #f8fafc;
       min-height: 100vh;
-      color: #1e293b;
+      color: #0f172a;
       line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 500px;
+      background: linear-gradient(135deg, 
+        rgba(245, 158, 11, 0.1) 0%, 
+        rgba(251, 146, 60, 0.1) 50%, 
+        rgba(251, 191, 36, 0.1) 100%);
+      z-index: -1;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
     }
     
     header {
-      background: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       position: sticky;
       top: 0;
       z-index: 100;
-      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #e2e8f0;
     }
     
     .header-container {
-      max-width: 1200px;
+      max-width: 900px;
       margin: 0 auto;
-      padding: 1rem 1.5rem;
+      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -46,25 +73,27 @@
     }
     
     .logo-icon {
-      width: 40px;
-      height: 40px;
+      width: 48px;
+      height: 48px;
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      border-radius: 10px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
-      font-weight: 700;
-      font-size: 1.2rem;
+      font-weight: 800;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
     }
     
     header h1 {
-      font-size: 1.25rem;
+      font-size: 1.5rem;
       font-weight: 700;
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      letter-spacing: -0.02em;
     }
     
     .header-actions {
@@ -78,153 +107,297 @@
       border-radius: 10px;
       cursor: pointer;
       font-weight: 600;
-      padding: 0.625rem 1.25rem;
-      font-size: 0.9rem;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 0.75rem 1.5rem;
+      font-size: 0.95rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
       white-space: nowrap;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
     }
     
     .btn-primary {
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
       color: white;
-      box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2), 0 2px 4px -1px rgba(37, 99, 235, 0.1);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
     }
     
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.15);
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
     }
     
     .btn-secondary {
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: white;
-      box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -1px rgba(16, 185, 129, 0.1);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     }
     
-    .btn-secondary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.15);
+    .btn-secondary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
     }
     
     .btn-light {
       background: white;
-      color: #2563eb;
-      border: 2px solid #e0f2fe;
+      color: #f59e0b;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
     
     .btn-light:hover {
-      background: #f0f9ff;
-      border-color: #bae6fd;
-      transform: translateY(-1px);
+      background: #fef3c7;
+      border-color: #fbbf24;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
     }
     
     main {
-      max-width: 800px;
+      flex: 1;
+      max-width: 900px;
       margin: 0 auto;
-      padding: 2rem 1.5rem;
+      padding: 2.5rem 2rem;
+      width: 100%;
     }
     
     .form-card {
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -1px rgba(0,0,0,0.04);
-      padding: 2rem;
-      border: 1px solid #f1f5f9;
+      border-radius: 16px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      padding: 2.5rem;
+      border: 1px solid #e2e8f0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .form-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #f59e0b, #fb923c, #fbbf24);
+      background-size: 200% 100%;
+      animation: gradientMove 3s ease infinite;
+    }
+
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .form-section {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .form-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
     }
     
     .form-card h2 {
-      margin: 0 0 1.5rem 0;
-      color: #1e293b;
-      font-size: 1.25rem;
+      margin: 0 0 2rem 0;
+      color: #0f172a;
+      font-size: 1.75rem;
       font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .form-section h3 {
+      font-size: 1.25rem;
+      color: #1f2937;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
-    
-    .form-card h2::before {
-      content: '';
-      width: 4px;
-      height: 24px;
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      border-radius: 2px;
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
     }
     
     form label {
       font-weight: 600;
       display: block;
-      margin-top: 1rem;
       margin-bottom: 0.5rem;
-      color: #334155;
-      font-size: 0.9rem;
+      color: #374151;
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+    }
+
+    label .required {
+      color: #dc2626;
+      margin-left: 0.25rem;
+    }
+
+    .field-description {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+      font-weight: normal;
     }
     
     form input, form select, form textarea {
       width: 100%;
-      padding: 0.75rem 1rem;
+      padding: 0.875rem 1rem;
       border-radius: 10px;
       border: 2px solid #e2e8f0;
-      font-size: 0.95rem;
-      transition: all 0.2s;
+      font-size: 1rem;
+      transition: all 0.3s ease;
       font-family: inherit;
+      background: white;
+      color: #0f172a;
     }
     
     form input:focus, form select:focus, form textarea:focus {
       outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+      transform: translateY(-1px);
     }
     
     form textarea {
       resize: vertical;
-      min-height: 80px;
+      min-height: 100px;
+      line-height: 1.6;
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 3rem;
+    }
+
+    #locationStatus {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #6b7280;
+      text-align: center;
+      min-height: 1.5rem;
     }
     
     .form-actions {
       display: flex;
-      gap: 0.75rem;
+      gap: 1rem;
       justify-content: flex-end;
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #e2e8f0;
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 2px solid #f1f5f9;
     }
     
     footer {
       text-align: center;
       background: white;
       color: #64748b;
-      padding: 1.5rem;
-      font-size: 0.85rem;
-      margin-top: 3rem;
-      border-top: 1px solid #f1f5f9;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      margin-top: 4rem;
+      border-top: 1px solid #e2e8f0;
     }
     
     .toast {
       position: fixed;
       bottom: 2rem;
       left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      transform: translateX(-50%) translateY(100px);
+      background: #0f172a;
       color: white;
       padding: 1rem 1.5rem;
-      border-radius: 12px;
+      border-radius: 10px;
       opacity: 0;
-      transition: opacity 0.3s ease;
-      box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.15);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
       font-weight: 500;
       z-index: 1000;
+      min-width: 250px;
+      text-align: center;
     }
     
-    .toast.show { opacity: 1; }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
     
     @media(max-width: 768px) {
-      .header-container { flex-wrap: wrap; padding: 1rem; }
-      header h1 { font-size: 1.1rem; }
-      .form-card { padding: 1.5rem; }
-      main { padding: 1rem; }
+      .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+        gap: 1rem;
+      }
+
+      .header-actions {
+        width: 100%;
+      }
+
+      .header-actions .btn {
+        flex: 1;
+      }
+
+      header h1 {
+        font-size: 1.25rem;
+      }
+
+      main {
+        padding: 1.5rem 1rem;
+      }
+
+      .form-card {
+        padding: 1.75rem;
+      }
+
+      .form-card h2 {
+        font-size: 1.5rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -233,8 +406,8 @@
   <header>
     <div class="header-container">
       <div class="logo-section">
-        <div class="logo-icon">📝</div>
-        <h1>Food Premise Form</h1>
+        <div class="logo-icon">🍔</div>
+        <h1 id="formTitle">New Food Premise</h1>
       </div>
       <div class="header-actions">
         <button class="btn btn-light" onclick="window.location.href='food_control.html'">← Back</button>
@@ -245,54 +418,145 @@
 
   <main>
     <div class="form-card">
-      <h2>Premise Details</h2>
+      <h2>🏪 Food Premise Registration</h2>
+      
       <form id="foodForm">
-        <label>Premise Name *</label>
-        <input type="text" id="name" placeholder="Enter premise name" required />
+        <div class="form-section">
+          <h3>📋 Basic Information</h3>
 
-        <label>Type</label>
-        <input type="text" id="type" placeholder="e.g., Hotel, Butchery, Bakery" />
+          <div class="form-group">
+            <label>
+              Premise Name<span class="required">*</span>
+            </label>
+            <input type="text" id="name" placeholder="Enter premise name" required />
+            <div class="field-description">The official name of the food establishment</div>
+          </div>
 
-        <label>Category</label>
-        <input type="text" id="category" placeholder="e.g., Food Processing, Retail, Restaurant" />
+          <div class="form-row">
+            <div class="form-group">
+              <label>Type</label>
+              <input type="text" id="type" placeholder="e.g., Hotel, Butchery, Bakery" />
+              <div class="field-description">Type of food business</div>
+            </div>
 
-        <label>Ownership Type</label>
-        <select id="ownership">
-          <option value="">Select</option>
-          <option>Public</option>
-          <option>Private</option>
-          <option>Community</option>
-        </select>
+            <div class="form-group">
+              <label>Category</label>
+              <input type="text" id="category" placeholder="e.g., Food Processing, Retail" />
+              <div class="field-description">Business category</div>
+            </div>
+          </div>
 
-        <label>Owner Details</label>
-        <textarea id="owner_details" placeholder="Name, ID, or Contact Info"></textarea>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Ownership Type</label>
+              <select id="ownership">
+                <option value="">Select ownership</option>
+                <option>Public</option>
+                <option>Private</option>
+                <option>Community</option>
+              </select>
+            </div>
 
-        <label>Responsible Agency</label>
-        <input type="text" id="responsible_agency" placeholder="e.g., MOH, County Health Department" />
+            <div class="form-group">
+              <label>Operating Hours</label>
+              <input type="text" id="operating_hours" placeholder="e.g., 8:00 AM - 6:00 PM" />
+              <div class="field-description">Daily operating schedule</div>
+            </div>
+          </div>
 
-        <label>Registration Status</label>
-        <select id="registration_status">
-          <option value="">Select</option>
-          <option>Registered</option>
-          <option>Pending</option>
-          <option>Suspended</option>
-          <option>Closed</option>
-        </select>
+          <div class="form-group">
+            <label>Owner Details</label>
+            <textarea id="owner_details" placeholder="Owner name, ID number, or contact information..."></textarea>
+            <div class="field-description">Information about the premise owner</div>
+          </div>
+        </div>
 
-        <label>Date Registered</label>
-        <input type="date" id="date_registered" />
+        <div class="form-section">
+          <h3>📍 Location Details</h3>
 
-        <label>Address *</label>
-        <input type="text" id="address" placeholder="Physical address or description" required />
+          <div class="form-row">
+            <div class="form-group">
+              <label>County</label>
+              <select id="county">
+                <option value="">Select county</option>
+              </select>
+              <div class="field-description">County where premise is located</div>
+            </div>
 
-        <label>Operating Hours</label>
-        <input type="text" id="operating_hours" placeholder="e.g., 8:00 AM - 6:00 PM" />
+            <div class="form-group">
+              <label>Sub-county</label>
+              <select id="sub_county">
+                <option value="">Select sub-county</option>
+              </select>
+              <div class="field-description">Sub-county location</div>
+            </div>
+          </div>
 
-        <label>Latitude</label>
-        <input type="number" step="0.000001" id="latitude" placeholder="Optional GPS coordinate" />
+          <div class="form-row">
+            <div class="form-group">
+              <label>Ward</label>
+              <select id="ward">
+                <option value="">Select ward</option>
+              </select>
+              <div class="field-description">Ward location</div>
+            </div>
 
-        <label>Longitude</label>
-        <input type="number" step="0.000001" id="longitude" placeholder="Optional GPS coordinate" />
+            <div class="form-group">
+              <label>
+                Specific Address<span class="required">*</span>
+              </label>
+              <input type="text" id="address" placeholder="Building, street, landmark..." required />
+              <div class="field-description">Physical address details</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>GPS Coordinates (Optional)</label>
+            <div class="field-description">Precise location coordinates</div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="number" step="0.000001" id="latitude" placeholder="Latitude" />
+            </div>
+            <div class="form-group">
+              <input type="number" step="0.000001" id="longitude" placeholder="Longitude" />
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-secondary" id="getLocationBtn" style="width: 100%;">
+            📍 Get My Current Location
+          </button>
+          <div id="locationStatus"></div>
+        </div>
+
+        <div class="form-section">
+          <h3>🏛️ Registration & Compliance</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Registration Status</label>
+              <select id="registration_status">
+                <option value="">Select status</option>
+                <option>Registered</option>
+                <option>Pending</option>
+                <option>Suspended</option>
+                <option>Closed</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Date Registered</label>
+              <input type="date" id="date_registered" />
+              <div class="field-description">Official registration date</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Responsible Agency</label>
+            <input type="text" id="responsible_agency" placeholder="e.g., MOH, County Health Department" />
+            <div class="field-description">Agency overseeing this premise</div>
+          </div>
+        </div>
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">💾 Save Premise</button>
@@ -302,7 +566,7 @@
   </main>
 
   <footer>
-    County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span>
+    <p>County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span></p>
   </footer>
 
   <div id="toast" class="toast"></div>
@@ -313,14 +577,22 @@
     const toast = document.getElementById("toast");
     const logoutBtn = document.getElementById("logoutBtn");
     const form = document.getElementById("foodForm");
+    const formTitle = document.getElementById("formTitle");
+    const county = document.getElementById("county");
+    const sub_county = document.getElementById("sub_county");
+    const ward = document.getElementById("ward");
+    const getLocationBtn = document.getElementById("getLocationBtn");
+    const locationStatus = document.getElementById("locationStatus");
+    const latitudeInput = document.getElementById("latitude");
+    const longitudeInput = document.getElementById("longitude");
     const params = new URLSearchParams(window.location.search);
     const foodId = params.get("id");
 
+    let wardsData = [];
+
     function showToast(msg, type = "info") {
       toast.textContent = msg;
-      toast.style.background = type === "error" 
-        ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)" 
-        : "linear-gradient(135deg, #10b981 0%, #059669 100%)";
+      toast.style.background = type === "error" ? "#dc2626" : "#10b981";
       toast.classList.add("show");
       setTimeout(() => toast.classList.remove("show"), 3000);
     }
@@ -331,40 +603,201 @@
     }
     checkSession();
 
+    // Get current location
+    getLocationBtn.addEventListener("click", () => {
+      if (!navigator.geolocation) {
+        locationStatus.textContent = "❌ Geolocation is not supported by your browser";
+        locationStatus.style.color = "#dc2626";
+        return;
+      }
+
+      locationStatus.textContent = "📡 Getting your location...";
+      locationStatus.style.color = "#2563eb";
+      getLocationBtn.disabled = true;
+      getLocationBtn.innerHTML = "📡 Getting Location...";
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          
+          latitudeInput.value = lat.toFixed(6);
+          longitudeInput.value = lng.toFixed(6);
+          
+          locationStatus.textContent = `✅ Location captured: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+          locationStatus.style.color = "#10b981";
+          
+          getLocationBtn.disabled = false;
+          getLocationBtn.innerHTML = "📍 Get My Current Location";
+          
+          showToast("✅ Location captured successfully");
+        },
+        (error) => {
+          let errorMsg = "❌ ";
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMsg += "Location access denied. Please enable location permissions.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMsg += "Location information unavailable.";
+              break;
+            case error.TIMEOUT:
+              errorMsg += "Location request timed out.";
+              break;
+            default:
+              errorMsg += "An unknown error occurred.";
+          }
+          
+          locationStatus.textContent = errorMsg;
+          locationStatus.style.color = "#dc2626";
+          
+          getLocationBtn.disabled = false;
+          getLocationBtn.innerHTML = "📍 Get My Current Location";
+          
+          showToast(errorMsg, "error");
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    });
+
+    // Load wards data
+    async function loadWards() {
+      try {
+        const res = await fetch("./kenya_wards.json");
+        wardsData = await res.json();
+        populateCounties();
+      } catch (error) {
+        console.error("Error loading wards:", error);
+        showToast("⚠️ Error loading location data", "error");
+      }
+    }
+
+    function populateCounties() {
+      const counties = [...new Set(wardsData.map(x => x.county))].sort();
+      counties.forEach(c => {
+        county.innerHTML += `<option value="${c}">${c}</option>`;
+      });
+    }
+
+    county.addEventListener("change", () => {
+      sub_county.innerHTML = `<option value="">Select sub-county</option>`;
+      ward.innerHTML = `<option value="">Select ward</option>`;
+
+      if (!county.value) return;
+
+      const subCounties = [...new Set(
+        wardsData
+          .filter(x => x.county === county.value)
+          .map(x => x.sub_county)
+      )].sort();
+
+      subCounties.forEach(sc => {
+        sub_county.innerHTML += `<option value="${sc}">${sc}</option>`;
+      });
+    });
+
+    sub_county.addEventListener("change", () => {
+      ward.innerHTML = `<option value="">Select ward</option>`;
+
+      if (!sub_county.value) return;
+
+      const wards = wardsData
+        .filter(x => x.county === county.value && x.sub_county === sub_county.value)
+        .map(x => x.ward)
+        .sort();
+
+      wards.forEach(w => {
+        ward.innerHTML += `<option value="${w}">${w}</option>`;
+      });
+    });
+
     async function loadFoodPremise() {
       if (!foodId) return;
+      formTitle.textContent = "✏️ Edit Food Premise";
+
       const { data, error } = await supabase.from("food_premises").select("*").eq("id", foodId).single();
       if (error) {
         console.error(error);
+        showToast("Failed to load premise", "error");
         return;
       }
+
+      // Populate basic fields
       for (const key in data) {
         const el = document.getElementById(key);
-        if (el) el.value = data[key] || "";
+        if (el && data[key] !== null && data[key] !== undefined) {
+          el.value = data[key];
+        }
+      }
+
+      // Populate location dropdowns
+      if (data.county) {
+        county.value = data.county;
+        county.dispatchEvent(new Event('change'));
+        
+        setTimeout(() => {
+          if (data.sub_county) {
+            sub_county.value = data.sub_county;
+            sub_county.dispatchEvent(new Event('change'));
+            
+            setTimeout(() => {
+              if (data.ward) {
+                ward.value = data.ward;
+              }
+            }, 100);
+          }
+        }, 100);
       }
     }
+
+    // Initialize
+    loadWards().then(() => {
+      if (foodId) {
+        loadFoodPremise();
+      }
+    });
 
     form.addEventListener("submit", async e => {
       e.preventDefault();
       
       const submitBtn = form.querySelector('button[type="submit"]');
       const originalText = submitBtn.textContent;
-      submitBtn.textContent = "Saving...";
+      submitBtn.textContent = "💾 Saving...";
       submitBtn.disabled = true;
+
+      // Build full address with location components
+      let addressParts = [];
+      if (ward.value) addressParts.push(ward.value);
+      if (sub_county.value) addressParts.push(sub_county.value);
+      if (county.value) addressParts.push(county.value);
+      const specificAddress = document.getElementById("address").value.trim();
+      if (specificAddress) addressParts.push(specificAddress);
+
+      // Add GPS if provided
+      if (latitudeInput.value && longitudeInput.value) {
+        addressParts.push(`GPS: ${latitudeInput.value}, ${longitudeInput.value}`);
+      }
       
       const payload = {
         name: document.getElementById("name").value.trim(),
-        type: document.getElementById("type").value.trim(),
-        category: document.getElementById("category").value.trim(),
+        type: document.getElementById("type").value.trim() || null,
+        category: document.getElementById("category").value.trim() || null,
         ownership: document.getElementById("ownership").value || null,
         owner_details: document.getElementById("owner_details").value.trim() || null,
         responsible_agency: document.getElementById("responsible_agency").value.trim() || null,
         registration_status: document.getElementById("registration_status").value || null,
         date_registered: document.getElementById("date_registered").value || null,
-        address: document.getElementById("address").value.trim(),
+        address: addressParts.join(', ') || specificAddress,
         operating_hours: document.getElementById("operating_hours").value.trim() || null,
-        latitude: parseFloat(document.getElementById("latitude").value) || null,
-        longitude: parseFloat(document.getElementById("longitude").value) || null
+        county: county.value || null,
+        sub_county: sub_county.value || null,
+        ward: ward.value || null,
+        latitude: parseFloat(latitudeInput.value) || null,
+        longitude: parseFloat(longitudeInput.value) || null
       };
 
       let error;
@@ -379,11 +812,11 @@
 
       if (error) {
         console.error(error);
-        showToast("Failed to save premise", "error");
+        showToast("❌ Failed to save premise", "error");
         return;
       }
 
-      showToast("Premise saved successfully");
+      showToast("✅ Premise saved successfully");
       setTimeout(() => window.location.href = "food_control.html", 1000);
     });
 
@@ -394,7 +827,6 @@
     });
 
     document.getElementById("year").textContent = new Date().getFullYear();
-    loadFoodPremise();
   </script>
 </body>
 </html>

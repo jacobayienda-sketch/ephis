@@ -5,19 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Air Monitoring Station Form | EPHIS</title>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#2563eb" />
+  <meta name="theme-color" content="#06b6d4" />
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #f8fafc;
       min-height: 100vh;
       color: #0f172a;
+      display: flex;
+      flex-direction: column;
     }
 
     body::before {
@@ -26,35 +33,32 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 400px;
-      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+      height: 500px;
+      background: linear-gradient(135deg, 
+        rgba(6, 182, 212, 0.1) 0%, 
+        rgba(14, 165, 233, 0.1) 50%, 
+        rgba(56, 189, 248, 0.1) 100%);
       z-index: -1;
-      opacity: 0.05;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
     }
 
     header {
-      background: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      padding: 1.2rem 2rem;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      padding: 1rem 2rem;
       position: sticky;
       top: 0;
       z-index: 100;
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-
-    .logo {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, #0ea5e9, #2563eb);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      color: white;
-      font-size: 1.2rem;
+      border-bottom: 1px solid #e2e8f0;
     }
 
     .header-content {
@@ -63,10 +67,28 @@
       gap: 1rem;
     }
 
+    .logo {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #06b6d4 0%, #0ea5e9 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: white;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+    }
+
     .header-content h1 {
-      font-size: 1.3rem;
-      font-weight: 600;
-      color: #0f172a;
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #06b6d4, #0ea5e9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
     }
 
     .header-actions {
@@ -75,118 +97,299 @@
     }
 
     main {
-      max-width: 800px;
-      margin: 2rem auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      flex: 1;
+      padding: 2.5rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
     }
 
-    main h2 {
-      font-size: 1.5rem;
+    .form-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      padding: 2.5rem;
+      border: 1px solid #e2e8f0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .form-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #06b6d4, #0ea5e9, #38bdf8);
+      background-size: 200% 100%;
+      animation: gradientMove 3s ease infinite;
+    }
+
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .form-card h2 {
+      font-size: 1.75rem;
+      margin-bottom: 2rem;
+      color: #0f172a;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .form-section {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .form-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .form-section h3 {
+      font-size: 1.25rem;
+      color: #1f2937;
       margin-bottom: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+    }
+
+    label .required {
+      color: #dc2626;
+      margin-left: 0.25rem;
+    }
+
+    .field-description {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+      font-weight: normal;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      background: white;
       color: #0f172a;
     }
 
-    .field {
-      margin-bottom: 1rem;
-    }
-
-    .field label {
-      font-size: 0.9rem;
-      color: #475569;
-      font-weight: 600;
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-
-    .field input {
-      width: 100%;
-      padding: 0.75rem;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: all 0.2s;
-    }
-
-    .field input:focus {
+    input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+      border-color: #06b6d4;
+      box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1);
+      transform: translateY(-1px);
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 3rem;
     }
 
     .btn {
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
-      cursor: pointer;
       border: none;
+      border-radius: 10px;
+      cursor: pointer;
       font-weight: 600;
-      transition: all 0.2s;
-      font-size: 1rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.95rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      background: linear-gradient(135deg, #06b6d4 0%, #0ea5e9 100%);
       color: white;
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
     }
 
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
     }
 
     .btn-secondary {
-      background: linear-gradient(135deg, #059669, #10b981);
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     }
 
-    .btn-secondary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+    .btn-secondary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
     }
 
     .btn-light {
       background: white;
-      color: #2563eb;
+      color: #06b6d4;
       border: 2px solid #e2e8f0;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
 
     .btn-light:hover {
-      border-color: #2563eb;
-      background: #f8fafc;
+      background: #ecfeff;
+      border-color: #06b6d4;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #locationStatus {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #6b7280;
+      text-align: center;
+      min-height: 1.5rem;
     }
 
     .actions {
       display: flex;
       gap: 0.75rem;
-      margin-top: 2rem;
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 2px solid #f1f5f9;
       justify-content: flex-end;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      color: #64748b;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 4rem;
     }
 
     .toast {
       position: fixed;
-      bottom: 20px;
+      bottom: 2rem;
       left: 50%;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateY(100px);
       background: #0f172a;
       color: white;
       padding: 1rem 1.5rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      border-radius: 10px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 500;
+      z-index: 1000;
+      min-width: 250px;
+      text-align: center;
     }
 
     .toast.show {
       opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
     @media (max-width: 768px) {
-      main { margin: 1rem; padding: 1.5rem; }
-      .header-content h1 { font-size: 1.1rem; }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+        gap: 1rem;
+      }
+
+      .header-actions {
+        width: 100%;
+      }
+
+      .header-actions .btn {
+        flex: 1;
+      }
+
+      .header-content h1 {
+        font-size: 1.25rem;
+      }
+
+      main {
+        padding: 1.5rem 1rem;
+      }
+
+      .form-card {
+        padding: 1.75rem;
+      }
+
+      .form-card h2 {
+        font-size: 1.5rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .actions .btn {
+        width: 100%;
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -194,8 +397,8 @@
 <body>
   <header>
     <div class="header-content">
-      <div class="logo">E</div>
-      <h1>Air Monitoring Station</h1>
+      <div class="logo">🏭</div>
+      <h1 id="formTitle">New Air Monitoring Station</h1>
     </div>
     <div class="header-actions">
       <button class="btn btn-light" onclick="window.location.href='air_quality.html'">← Back</button>
@@ -204,167 +407,399 @@
   </header>
 
   <main>
-    <h2>🏭 Station Details</h2>
-      transform: translateX(-50%);
-      padding: 0.8rem 1rem; border-radius: 6px;
-      background: #1976d2; color: white;
-      opacity: 0; transition: opacity 0.3s ease;
+    <div class="form-card">
+      <h2>🏭 Air Monitoring Station</h2>
+
+      <form id="stationForm">
+        <div class="form-section">
+          <h3>📊 Station Information</h3>
+
+          <div class="form-group">
+            <label>
+              Station Name<span class="required">*</span>
+            </label>
+            <input type="text" id="station_name" placeholder="Enter station name" required />
+            <div class="field-description">Name or identifier of the monitoring station</div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Station Type</label>
+              <select id="station_type">
+                <option value="">Select type</option>
+                <option>Fixed</option>
+                <option>Mobile</option>
+                <option>Reference</option>
+                <option>Industrial</option>
+                <option>Community</option>
+              </select>
+              <div class="field-description">Type of monitoring station</div>
+            </div>
+
+            <div class="form-group">
+              <label>Device Code</label>
+              <input type="text" id="device_code" placeholder="e.g., AQ-001" />
+              <div class="field-description">Unique device identifier</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Operator</label>
+              <input type="text" id="operator" placeholder="Organization or person" />
+              <div class="field-description">Entity operating the station</div>
+            </div>
+
+            <div class="form-group">
+              <label>Status</label>
+              <select id="status">
+                <option>Active</option>
+                <option>Inactive</option>
+                <option>Maintenance</option>
+                <option>Decommissioned</option>
+              </select>
+              <div class="field-description">Current operational status</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Install Date</label>
+              <input type="date" id="install_date" />
+              <div class="field-description">Date when station was installed</div>
+            </div>
+
+            <div class="form-group">
+              <label>Calibration Date</label>
+              <input type="date" id="calibration_date" />
+              <div class="field-description">Last calibration date</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>📍 Location Details</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>County</label>
+              <select id="county">
+                <option value="">Select county</option>
+              </select>
+              <div class="field-description">County where station is located</div>
+            </div>
+
+            <div class="form-group">
+              <label>Sub-county</label>
+              <select id="sub_county">
+                <option value="">Select sub-county</option>
+              </select>
+              <div class="field-description">Sub-county location</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Ward</label>
+              <select id="ward">
+                <option value="">Select ward</option>
+              </select>
+              <div class="field-description">Ward location</div>
+            </div>
+
+            <div class="form-group">
+              <label>Specific Location</label>
+              <input type="text" id="specific_location" placeholder="Building, street, area..." />
+              <div class="field-description">Additional location details</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>GPS Coordinates (Required for mapping)</label>
+            <div class="field-description">Precise coordinates of the monitoring station</div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="number" step="0.000001" id="lat" placeholder="Latitude" />
+            </div>
+            <div class="form-group">
+              <input type="number" step="0.000001" id="lng" placeholder="Longitude" />
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-secondary" id="getLocationBtn" style="width: 100%;">
+            📍 Get My Current Location
+          </button>
+          <div id="locationStatus"></div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn btn-light" onclick="history.back()">Cancel</button>
+          <button type="submit" class="btn btn-primary">💾 Save Station</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <p>County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span></p>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { supabase } from "./main.js";
+
+    const toast = document.getElementById("toast");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const formTitle = document.getElementById("formTitle");
+    const form = document.getElementById("stationForm");
+    const county = document.getElementById("county");
+    const sub_county = document.getElementById("sub_county");
+    const ward = document.getElementById("ward");
+    const getLocationBtn = document.getElementById("getLocationBtn");
+    const locationStatus = document.getElementById("locationStatus");
+    const latInput = document.getElementById("lat");
+    const lngInput = document.getElementById("lng");
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    let wardsData = [];
+
+    function showToast(msg, type = "info") {
+      toast.textContent = msg;
+      toast.style.background = type === "error" ? "#dc2626" : "#10b981";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
     }
-    .toast.show { opacity: 1; }
-  </style>
-</head>
 
-<body>
-<header>
-  <h1>Air Monitoring Station</h1>
-  <button class="btn btn-light" onclick="window.location.href='air_quality.html'">Back</button>
-</header>
+    // Get current location
+    getLocationBtn.addEventListener("click", () => {
+      if (!navigator.geolocation) {
+        locationStatus.textContent = "❌ Geolocation is not supported by your browser";
+        locationStatus.style.color = "#dc2626";
+        return;
+      }
 
-<main>
+      locationStatus.textContent = "📡 Getting your location...";
+      locationStatus.style.color = "#06b6d4";
+      getLocationBtn.disabled = true;
+      getLocationBtn.innerHTML = "📡 Getting Location...";
 
-  <h2 id="formTitle">New Station</h2>
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          
+          latInput.value = lat.toFixed(6);
+          lngInput.value = lng.toFixed(6);
+          
+          locationStatus.textContent = `✅ Location captured: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+          locationStatus.style.color = "#10b981";
+          
+          getLocationBtn.disabled = false;
+          getLocationBtn.innerHTML = "📍 Get My Current Location";
+          
+          showToast("✅ Location captured successfully");
+        },
+        (error) => {
+          let errorMsg = "❌ ";
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMsg += "Location access denied. Please enable location permissions.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMsg += "Location information unavailable.";
+              break;
+            case error.TIMEOUT:
+              errorMsg += "Location request timed out.";
+              break;
+            default:
+              errorMsg += "An unknown error occurred.";
+          }
+          
+          locationStatus.textContent = errorMsg;
+          locationStatus.style.color = "#dc2626";
+          
+          getLocationBtn.disabled = false;
+          getLocationBtn.innerHTML = "📍 Get My Current Location";
+          
+          showToast(errorMsg, "error");
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    });
 
-  <div class="field">
-    <label>Station Name</label>
-    <input id="station_name" />
-  </div>
+    // Load wards data
+    async function loadWards() {
+      try {
+        const res = await fetch("./kenya_wards.json");
+        wardsData = await res.json();
+        populateCounties();
+      } catch (error) {
+        console.error("Error loading wards:", error);
+        showToast("⚠️ Error loading location data", "error");
+      }
+    }
 
-  <div class="field">
-    <label>Station Type</label>
-    <input id="station_type" />
-  </div>
+    function populateCounties() {
+      const counties = [...new Set(wardsData.map(x => x.county))].sort();
+      counties.forEach(c => {
+        county.innerHTML += `<option value="${c}">${c}</option>`;
+      });
+    }
 
-  <div class="field">
-    <label>Device Code</label>
-    <input id="device_code" />
-  </div>
+    county.addEventListener("change", () => {
+      sub_county.innerHTML = `<option value="">Select sub-county</option>`;
+      ward.innerHTML = `<option value="">Select ward</option>`;
 
-  <div class="field">
-    <label>Operator</label>
-    <input id="operator" />
-  </div>
+      if (!county.value) return;
 
-  <div class="field">
-    <label>Sub County</label>
-    <input id="sub_county" />
-  </div>
+      const subCounties = [...new Set(
+        wardsData
+          .filter(x => x.county === county.value)
+          .map(x => x.sub_county)
+      )].sort();
 
-  <div class="field">
-    <label>Ward</label>
-    <input id="ward" />
-  </div>
+      subCounties.forEach(sc => {
+        sub_county.innerHTML += `<option value="${sc}">${sc}</option>`;
+      });
+    });
 
-  <div class="field">
-    <label>Latitude</label>
-    <input id="lat" />
-  </div>
+    sub_county.addEventListener("change", () => {
+      ward.innerHTML = `<option value="">Select ward</option>`;
 
-  <div class="field">
-    <label>Longitude</label>
-    <input id="lng" />
-  </div>
+      if (!sub_county.value) return;
 
-  <div class="field">
-    <label>Install Date</label>
-    <input type="date" id="install_date" />
-  </div>
+      const wards = wardsData
+        .filter(x => x.county === county.value && x.sub_county === sub_county.value)
+        .map(x => x.ward)
+        .sort();
 
-  <div class="field">
-    <label>Calibration Date</label>
-    <input type="date" id="calibration_date" />
-  </div>
+      wards.forEach(w => {
+        ward.innerHTML += `<option value="${w}">${w}</option>`;
+      });
+    });
 
-  <div class="field">
-    <label>Status</label>
-    <input id="status" />
-  </div>
+    async function loadData() {
+      if (!id) return;
 
-  <div class="actions">
-    <button class="btn btn-secondary" onclick="saveStation()">Save</button>
-    <button class="btn" onclick="history.back()">Cancel</button>
-  </div>
+      formTitle.textContent = "✏️ Edit Air Monitoring Station";
 
-</main>
-
-<div id="toast" class="toast"></div>
-
-<script type="module">
-  import { supabase } from "./main.js";
-
-  const toast = document.getElementById("toast");
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
-
-  function showToast(msg) {
-    toast.textContent = msg;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 2000);
-  }
-
-  async function loadData() {
-    if (!id) return;
-
-    document.getElementById("formTitle").textContent = "Edit Station";
-
-    const { data, error } = await supabase
-      .from("air_monitoring_network")
-      .select("*")
-      .eq("id", id)
-      .single();
-
-    if (error || !data) return;
-
-    document.getElementById("station_name").value = data.station_name;
-    document.getElementById("station_type").value = data.station_type;
-    document.getElementById("device_code").value = data.device_code;
-    document.getElementById("operator").value = data.operator;
-    document.getElementById("sub_county").value = data.sub_county;
-    document.getElementById("ward").value = data.ward;
-    document.getElementById("lat").value = data.geo?.coordinates?.[1] || "";
-    document.getElementById("lng").value = data.geo?.coordinates?.[0] || "";
-    document.getElementById("install_date").value = data.install_date;
-    document.getElementById("calibration_date").value = data.calibration_date;
-    document.getElementById("status").value = data.status;
-  }
-
-  async function saveStation() {
-    const payload = {
-      station_name: station_name.value,
-      station_type: station_type.value,
-      device_code: device_code.value,
-      operator: operator.value,
-      sub_county: sub_county.value,
-      ward: ward.value,
-      install_date: install_date.value,
-      calibration_date: calibration_date.value,
-      status: status.value,
-      geo: `POINT(${lng.value} ${lat.value})`
-    };
-
-    let res;
-
-    if (id) {
-      res = await supabase
+      const { data, error } = await supabase
         .from("air_monitoring_network")
-        .update(payload)
-        .eq("id", id);
-    } else {
-      res = await supabase.from("air_monitoring_network").insert(payload);
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error || !data) {
+        showToast("❌ Error loading station", "error");
+        return;
+      }
+
+      // Load wards first
+      await loadWards();
+
+      // Populate location dropdowns
+      if (data.county) {
+        county.value = data.county;
+        county.dispatchEvent(new Event('change'));
+        
+        setTimeout(() => {
+          if (data.sub_county) {
+            sub_county.value = data.sub_county;
+            sub_county.dispatchEvent(new Event('change'));
+            
+            setTimeout(() => {
+              if (data.ward) {
+                ward.value = data.ward;
+              }
+            }, 100);
+          }
+        }, 100);
+      }
+
+      // Populate other fields
+      document.getElementById("station_name").value = data.station_name || "";
+      document.getElementById("station_type").value = data.station_type || "";
+      document.getElementById("device_code").value = data.device_code || "";
+      document.getElementById("operator").value = data.operator || "";
+      document.getElementById("specific_location").value = data.specific_location || "";
+      latInput.value = data.geo?.coordinates?.[1] || "";
+      lngInput.value = data.geo?.coordinates?.[0] || "";
+      document.getElementById("install_date").value = data.install_date || "";
+      document.getElementById("calibration_date").value = data.calibration_date || "";
+      document.getElementById("status").value = data.status || "Active";
     }
 
-    if (res.error) {
-      console.error(res.error);
-      showToast("Failed to save");
-      return;
-    }
+    // Initialize
+    loadWards().then(() => {
+      if (id) loadData();
+    });
 
-    showToast("Saved successfully");
-    setTimeout(() => (window.location.href = "air_quality.html"), 1200);
-  }
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-  loadData();
-  document.getElementById("year").textContent = new Date().getFullYear();
-</script>
+      const submitBtn = form.querySelector('.btn-primary');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = "💾 Saving...";
+      submitBtn.disabled = true;
 
+      // Build location string
+      let locationParts = [];
+      if (ward.value) locationParts.push(ward.value);
+      if (sub_county.value) locationParts.push(sub_county.value);
+      if (county.value) locationParts.push(county.value);
+      const specificLoc = document.getElementById("specific_location").value;
+      if (specificLoc) locationParts.push(specificLoc);
+
+      const payload = {
+        station_name: document.getElementById("station_name").value,
+        station_type: document.getElementById("station_type").value || null,
+        device_code: document.getElementById("device_code").value || null,
+        operator: document.getElementById("operator").value || null,
+        county: county.value || null,
+        sub_county: sub_county.value || null,
+        ward: ward.value || null,
+        specific_location: specificLoc || null,
+        location: locationParts.join(', ') || null,
+        install_date: document.getElementById("install_date").value || null,
+        calibration_date: document.getElementById("calibration_date").value || null,
+        status: document.getElementById("status").value || "Active",
+        geo: latInput.value && lngInput.value ? `POINT(${lngInput.value} ${latInput.value})` : null
+      };
+
+      let res;
+      if (id) {
+        res = await supabase.from("air_monitoring_network").update(payload).eq("id", id);
+      } else {
+        res = await supabase.from("air_monitoring_network").insert(payload);
+      }
+
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+
+      if (res.error) {
+        console.error(res.error);
+        showToast("❌ Failed to save station", "error");
+        return;
+      }
+
+      showToast("✅ Station saved successfully");
+      setTimeout(() => (window.location.href = "air_quality.html"), 1200);
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      showToast("Logging out...");
+      setTimeout(() => (window.location.href = "login.html"), 800);
+    });
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
