@@ -5,18 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Water Quality | EPHIS</title>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#2563eb" />
+  <meta name="theme-color" content="#0ea5e9" />
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <script type="module" src="main.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #f8fafc;
       min-height: 100vh;
       color: #0f172a;
@@ -27,23 +25,33 @@
     body::before {
       content: '';
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 400px;
-      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+      top: 0; left: 0; right: 0;
+      height: 500px;
+      background: linear-gradient(135deg, 
+        rgba(14, 165, 233, 0.1) 0%, 
+        rgba(37, 99, 235, 0.1) 50%, 
+        rgba(59, 130, 246, 0.1) 100%);
       z-index: -1;
-      opacity: 0.05;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
     }
 
     header {
-      background: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      padding: 1.2rem 2rem;
-      border-bottom: 1px solid #e2e8f0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      padding: 1rem 2rem;
       position: sticky;
       top: 0;
       z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e2e8f0;
     }
 
     .header-content {
@@ -53,6 +61,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 1rem;
+      width: 100%;
     }
 
     .header-left {
@@ -62,23 +71,25 @@
     }
 
     .logo {
-      width: 40px;
-      height: 40px;
+      width: 48px; height: 48px;
       background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
-      border-radius: 10px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+      font-weight: 800;
       color: white;
-      font-size: 1.2rem;
+      font-size: 1.5rem;
     }
 
     header h1 {
-      font-size: 1.4rem;
-      color: #0f172a;
+      font-size: 1.5rem;
       font-weight: 700;
+      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       letter-spacing: -0.02em;
     }
 
@@ -89,54 +100,73 @@
     }
 
     .btn {
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.95rem;
-      border: none;
-      transition: all 0.2s ease;
+      border: none; border-radius: 10px;
+      cursor: pointer; font-weight: 600;
+      padding: 0.75rem 1.5rem; font-size: 0.95rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+      font-family: inherit;
+    }
+
+    .btn::before {
+      content: ''; position: absolute;
+      top: 50%; left: 50%;
+      width: 0; height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before {
+      width: 300px; height: 300px;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
       color: white;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
     }
 
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
     }
 
     .btn-secondary {
-      background: #10b981;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     }
 
-    .btn-secondary:hover {
-      background: #059669;
-      transform: translateY(-1px);
+    .btn-secondary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
     }
 
     .btn-light {
-      background: white;
-      color: #2563eb;
-      border: 2px solid #2563eb;
+      background: white; color: #0ea5e9;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
 
     .btn-light:hover {
-      background: #2563eb;
-      color: white;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      background: #f0f9ff; border-color: #0ea5e9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn:disabled {
+      opacity: 0.6; cursor: not-allowed; transform: none;
     }
 
     main {
-      flex: 1;
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem;
+      flex: 1; max-width: 1400px;
+      margin: 0 auto; padding: 2.5rem 2rem;
       width: 100%;
     }
 
@@ -157,43 +187,62 @@
 
     .search-box input {
       width: 100%;
-      padding: 0.75rem 1rem 0.75rem 2.8rem;
-      border: 1px solid #d1d5db;
+      padding: 0.875rem 1rem 0.875rem 2.8rem;
+      border: 2px solid #e2e8f0;
       border-radius: 10px;
       font-size: 1rem;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
       background: white;
+      font-family: inherit;
     }
 
     .search-box input:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      outline: none; border-color: #0ea5e9;
+      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+      transform: translateY(-1px);
     }
 
     .search-box::before {
       content: '🔍';
       position: absolute;
-      left: 1rem;
-      top: 50%;
+      left: 1rem; top: 50%;
       transform: translateY(-50%);
       font-size: 1.2rem;
+      opacity: 0.6;
     }
 
     .form-card {
-      background: white;
-      border-radius: 12px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      background: white; border-radius: 16px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
       border: 1px solid #e2e8f0;
+      margin-bottom: 2rem; position: relative;
+      overflow: hidden;
+    }
+
+    .form-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #0ea5e9, #2563eb, #3b82f6);
+      background-size: 200% 100%;
+      animation: gradientMove 3s ease infinite;
+    }
+
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .form-card form {
+      padding: 2.5rem;
     }
 
     .form-card h2 {
-      font-size: 1.5rem;
-      margin-bottom: 1.5rem;
+      font-size: 1.75rem;
+      margin-bottom: 2rem;
       color: #0f172a;
       font-weight: 700;
+      letter-spacing: -0.02em;
     }
 
     .form-section {
@@ -209,20 +258,23 @@
     }
 
     .form-section h3 {
-      font-size: 1.1rem;
+      font-size: 1.25rem;
       color: #1f2937;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .form-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
+      gap: 1.5rem;
       margin-top: 1rem;
     }
 
-    form label {
+    .form-card label {
       font-weight: 600;
       display: block;
       margin-top: 1rem;
@@ -230,35 +282,42 @@
       font-size: 0.95rem;
     }
 
-    form label .required {
+    .form-card label .required {
       color: #dc2626;
       margin-left: 0.25rem;
     }
 
-    form input, form select, form textarea {
+    .form-card input,
+    .form-card select,
+    .form-card textarea {
       width: 100%;
-      padding: 0.75rem 1rem;
+      padding: 0.875rem 1rem;
       border-radius: 10px;
-      border: 1px solid #d1d5db;
+      border: 2px solid #e2e8f0;
       font-size: 1rem;
       margin-top: 0.5rem;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      background: white;
+      color: #0f172a;
     }
 
-    form input:focus, form select:focus, form textarea:focus {
+    .form-card input:focus,
+    .form-card select:focus,
+    .form-card textarea:focus {
       outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      border-color: #0ea5e9;
+      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+      transform: translateY(-1px);
     }
 
-    form textarea {
+    .form-card textarea {
       min-height: 100px;
       resize: vertical;
       line-height: 1.6;
-      font-family: inherit;
     }
 
-    form select {
+    .form-card select {
       cursor: pointer;
       appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
@@ -268,18 +327,26 @@
     }
 
     .card {
-      background: white;
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      background: white; border-radius: 16px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
       border: 1px solid #e2e8f0;
-      transition: all 0.2s ease;
+      padding: 1.5rem; margin-bottom: 1rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative; overflow: hidden;
+    }
+
+    .card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #0ea5e9, #2563eb, #3b82f6);
+      background-size: 200% 100%;
+      animation: gradientMove 3s ease infinite;
     }
 
     .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
 
     .card-header {
@@ -327,25 +394,43 @@
       gap: 0.6rem;
       flex-wrap: wrap;
       padding-top: 1rem;
-      border-top: 1px solid #f1f5f9;
+      border-top: 2px solid #f1f5f9;
     }
 
     .actions a {
       text-decoration: none;
-      background: #eff6ff;
-      color: #2563eb;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      color: white;
+      padding: 0.625rem 1.25rem;
+      border-radius: 10px;
       font-size: 0.9rem;
       font-weight: 600;
-      transition: all 0.2s ease;
-      border: 1px solid #dbeafe;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .actions a::before {
+      content: ''; position: absolute;
+      top: 50%; left: 50%;
+      width: 0; height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .actions a:hover::before {
+      width: 200px; height: 200px;
     }
 
     .actions a:hover {
-      background: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
       color: white;
-      transform: translateY(-1px);
     }
 
     .form-actions {
@@ -362,90 +447,90 @@
       display: flex;
       justify-content: center;
       gap: 0.75rem;
-      margin-top: 2rem;
+      margin-top: 2.5rem;
     }
 
     .pagination button {
-      border: none;
-      background: white;
-      color: #2563eb;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: 2px solid #2563eb;
+      border: 2px solid #e2e8f0; background: white;
+      color: #0ea5e9; border-radius: 10px;
+      padding: 0.75rem 1.25rem; cursor: pointer;
+      font-weight: 600; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: inherit;
     }
 
     .pagination button:hover:not(:disabled) {
-      background: #2563eb;
-      color: white;
-      transform: translateY(-1px);
+      border-color: #0ea5e9; background: #f0f9ff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .pagination button:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
+      opacity: 0.5; cursor: not-allowed; transform: none;
     }
 
     footer {
-      text-align: center;
-      padding: 2rem 1rem;
-      font-size: 0.9rem;
-      color: #64748b;
-      background: white;
-      border-top: 1px solid #e2e8f0;
-      margin-top: 3rem;
+      text-align: center; padding: 2rem 1rem;
+      font-size: 0.9rem; color: #64748b;
+      background: white; border-top: 1px solid #e2e8f0;
+      margin-top: 4rem;
+    }
+
+    .empty-state {
+      text-align: center; padding: 4rem 2rem;
+      color: #64748b; background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+    }
+
+    .empty-state-icon {
+      font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.5;
+    }
+
+    .empty-state h3 {
+      font-size: 1.5rem; font-weight: 700;
+      margin-bottom: 0.5rem; color: #0f172a;
     }
 
     .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
+      position: fixed; bottom: 20px; left: 50%;
       transform: translateX(-50%);
-      background: #2563eb;
-      color: white;
-      padding: 1rem 1.5rem;
-      border-radius: 10px;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 1000;
+      background: #0f172a; color: white;
+      padding: 1rem 1.5rem; border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      opacity: 0; transition: opacity 0.3s ease;
+      font-weight: 600; z-index: 1000;
     }
 
     .toast.show { opacity: 1; }
 
-    .empty-state {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: #64748b;
-    }
-
-    .empty-state-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-
     #locationStatus {
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-      color: #6b7280;
-      text-align: center;
+      margin-top: 0.5rem; font-size: 0.9rem;
+      color: #6b7280; text-align: center;
       min-height: 1.5rem;
     }
 
     @media (max-width: 768px) {
       header {
-        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem; gap: 1rem;
       }
 
-      .header-content h1 {
-        font-size: 1.1rem;
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
       }
 
-      main {
-        padding: 1rem;
+      .header-actions {
+        width: 100%;
       }
+
+      .header-actions .btn {
+        flex: 1; justify-content: center;
+      }
+
+      main { padding: 1.5rem 1rem; }
 
       .toolbar {
         flex-direction: column;
@@ -454,15 +539,6 @@
 
       .search-box {
         max-width: 100%;
-      }
-
-      .header-actions {
-        width: 100%;
-        justify-content: space-between;
-      }
-
-      .card {
-        padding: 1rem;
       }
 
       .form-grid {
@@ -476,6 +552,14 @@
       .form-actions .btn {
         width: 100%;
       }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .actions a {
+        width: 100%; justify-content: center;
+      }
     }
   </style>
 </head>
@@ -485,7 +569,7 @@
 <header>
   <div class="header-content">
     <div class="header-left">
-      <div class="logo">E</div>
+      <div class="logo">💧</div>
       <h1>Water Quality Monitoring</h1>
     </div>
     <div class="header-actions">
@@ -576,7 +660,7 @@
           <input type="number" step="0.000001" id="longitude" placeholder="Longitude" />
         </div>
         
-        <button type="button" class="btn btn-secondary" id="getLocationBtn" style="width:100%;margin-top:1rem;">
+        <button type="button" class="btn btn-secondary" id="getLocationBtn" style="width:100%; margin-top:1rem;">
           📍 Get My Current Location
         </button>
         <div id="locationStatus"></div>
@@ -634,134 +718,173 @@
 <script type="module">
   import { supabase } from "./main.js";
 
-  const toast=document.getElementById("toast");
-  const logoutBtn=document.getElementById("logoutBtn");
-  const addBtn=document.getElementById("addBtn");
-  const cancelBtn=document.getElementById("cancelBtn");
-  const formContainer=document.getElementById("formContainer");
-  const form=document.getElementById("sourceForm");
-  const searchInput=document.getElementById("searchInput");
-  const cardsContainer=document.getElementById("cardsContainer");
-  const prevPage=document.getElementById("prevPage");
-  const nextPage=document.getElementById("nextPage");
-  const county=document.getElementById("county");
-  const sub_county=document.getElementById("sub_county");
-  const ward=document.getElementById("ward");
-  const specific_location=document.getElementById("specific_location");
-  const getLocationBtn=document.getElementById("getLocationBtn");
-  const locationStatus=document.getElementById("locationStatus");
-  const latitudeInput=document.getElementById("latitude");
-  const longitudeInput=document.getElementById("longitude");
+  const toast = document.getElementById("toast");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const addBtn = document.getElementById("addBtn");
+  const cancelBtn = document.getElementById("cancelBtn");
+  const formContainer = document.getElementById("formContainer");
+  const form = document.getElementById("sourceForm");
+  const searchInput = document.getElementById("searchInput");
+  const cardsContainer = document.getElementById("cardsContainer");
+  const prevPage = document.getElementById("prevPage");
+  const nextPage = document.getElementById("nextPage");
+  const county = document.getElementById("county");
+  const sub_county = document.getElementById("sub_county");
+  const ward = document.getElementById("ward");
+  const specific_location = document.getElementById("specific_location");
+  const getLocationBtn = document.getElementById("getLocationBtn");
+  const locationStatus = document.getElementById("locationStatus");
+  const latitudeInput = document.getElementById("latitude");
+  const longitudeInput = document.getElementById("longitude");
 
-  let page=0;const limit=10;let total=0;
-  let wardsData=[];
+  let page = 0;
+  const limit = 10;
+  let total = 0;
+  let wardsData = [];
 
-  function showToast(msg,type="info"){toast.textContent=msg;toast.style.background=type==="error"?"#c62828":"#1976d2";toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
+  function showToast(msg, type = "info") {
+    toast.textContent = msg;
+    toast.style.background = type === "error" ? "#c62828" : "#0ea5e9";
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3000);
+  }
 
-  async function checkSession(){const {data}=await supabase.auth.getSession();if(!data.session)window.location.href="login.html";}
+  async function checkSession() {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) window.location.href = "login.html";
+  }
   checkSession();
 
   // Load wards data
-  async function loadWards(){
-    try{
-      const res=await fetch("./kenya_wards.json");
-      wardsData=await res.json();
+  async function loadWards() {
+    try {
+      const res = await fetch("./kenya_wards.json");
+      wardsData = await res.json();
       populateCounties();
-    }catch(error){
-      console.error("Error loading wards:",error);
+    } catch (error) {
+      console.error("Error loading wards:", error);
+      showToast("⚠️ Error loading location data", "error");
     }
   }
 
-  function populateCounties(){
-    const counties=[...new Set(wardsData.map(x=>x.county))].sort();
-    counties.forEach(c=>{
-      county.innerHTML+=`<option value="${c}">${c}</option>`;
+  function populateCounties() {
+    const counties = [...new Set(wardsData.map(x => x.county))].sort();
+    counties.forEach(c => {
+      county.innerHTML += `<option value="${c}">${c}</option>`;
     });
   }
 
-  county.addEventListener("change",()=>{
-    sub_county.innerHTML=`<option value="">Select sub-county</option>`;
-    ward.innerHTML=`<option value="">Select ward</option>`;
-    if(!county.value)return;
-    const subCounties=[...new Set(wardsData.filter(x=>x.county===county.value).map(x=>x.sub_county))].sort();
-    subCounties.forEach(sc=>{
-      sub_county.innerHTML+=`<option value="${sc}">${sc}</option>`;
+  county.addEventListener("change", () => {
+    sub_county.innerHTML = `<option value="">Select sub-county</option>`;
+    ward.innerHTML = `<option value="">Select ward</option>`;
+    if (!county.value) return;
+    const subCounties = [...new Set(wardsData.filter(x => x.county === county.value).map(x => x.sub_county))].sort();
+    subCounties.forEach(sc => {
+      sub_county.innerHTML += `<option value="${sc}">${sc}</option>`;
     });
   });
 
-  sub_county.addEventListener("change",()=>{
-    ward.innerHTML=`<option value="">Select ward</option>`;
-    if(!sub_county.value)return;
-    const wards=wardsData.filter(x=>x.county===county.value&&x.sub_county===sub_county.value).map(x=>x.ward).sort();
-    wards.forEach(w=>{
-      ward.innerHTML+=`<option value="${w}">${w}</option>`;
+  sub_county.addEventListener("change", () => {
+    ward.innerHTML = `<option value="">Select ward</option>`;
+    if (!sub_county.value) return;
+    const wards = wardsData.filter(x => x.county === county.value && x.sub_county === sub_county.value).map(x => x.ward).sort();
+    wards.forEach(w => {
+      ward.innerHTML += `<option value="${w}">${w}</option>`;
     });
   });
 
   // Get current location
-  getLocationBtn.addEventListener("click",()=>{
-    if(!navigator.geolocation){
-      locationStatus.textContent="❌ Geolocation is not supported";
-      locationStatus.style.color="#dc2626";
+  getLocationBtn.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      locationStatus.textContent = "❌ Geolocation is not supported";
+      locationStatus.style.color = "#dc2626";
       return;
     }
-    locationStatus.textContent="📡 Getting your location...";
-    locationStatus.style.color="#2563eb";
-    getLocationBtn.disabled=true;
-    getLocationBtn.innerHTML="📡 Getting Location...";
+    locationStatus.textContent = "📡 Getting your location...";
+    locationStatus.style.color = "#2563eb";
+    getLocationBtn.disabled = true;
+    getLocationBtn.innerHTML = "📡 Getting Location...";
     navigator.geolocation.getCurrentPosition(
-      (position)=>{
-        const lat=position.coords.latitude;
-        const lng=position.coords.longitude;
-        latitudeInput.value=lat.toFixed(6);
-        longitudeInput.value=lng.toFixed(6);
-        locationStatus.textContent=`✅ Location captured: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-        locationStatus.style.color="#10b981";
-        getLocationBtn.disabled=false;
-        getLocationBtn.innerHTML="📍 Get My Current Location";
-        showToast("✅ Location captured successfully");
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        latitudeInput.value = lat.toFixed(6);
+        longitudeInput.value = lng.toFixed(6);
+        locationStatus.textContent = `✅ Location captured: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        locationStatus.style.color = "#10b981";
+        getLocationBtn.disabled = false;
+        getLocationBtn.innerHTML = "📍 Get My Current Location";
+        showToast("✅ Location captured successfully", "success");
       },
-      (error)=>{
-        let errorMsg="❌ ";
-        switch(error.code){
-          case error.PERMISSION_DENIED:errorMsg+="Location access denied";break;
-          case error.POSITION_UNAVAILABLE:errorMsg+="Location unavailable";break;
-          case error.TIMEOUT:errorMsg+="Request timed out";break;
-          default:errorMsg+="Unknown error";
+      (error) => {
+        let errorMsg = "❌ ";
+        switch (error.code) {
+          case error.PERMISSION_DENIED: errorMsg += "Location access denied"; break;
+          case error.POSITION_UNAVAILABLE: errorMsg += "Location unavailable"; break;
+          case error.TIMEOUT: errorMsg += "Request timed out"; break;
+          default: errorMsg += "Unknown error";
         }
-        locationStatus.textContent=errorMsg;
-        locationStatus.style.color="#dc2626";
-        getLocationBtn.disabled=false;
-        getLocationBtn.innerHTML="📍 Get My Current Location";
-        showToast(errorMsg,"error");
+        locationStatus.textContent = errorMsg;
+        locationStatus.style.color = "#dc2626";
+        getLocationBtn.disabled = false;
+        getLocationBtn.innerHTML = "📍 Get My Current Location";
+        showToast(errorMsg, "error");
       },
-      {enableHighAccuracy:true,timeout:10000,maximumAge:0}
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   });
 
-  function toggleForm(show){
-    formContainer.style.display=show?"block":"none";
-    if(show){
+  function toggleForm(show) {
+    formContainer.style.display = show ? "block" : "none";
+    if (show) {
       form.reset();
-      locationStatus.textContent="";
+      locationStatus.textContent = "";
     }
   }
-  addBtn.addEventListener("click",()=>toggleForm(true));
-  cancelBtn.addEventListener("click",()=>toggleForm(false));
 
-  async function loadSources(){
-    cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading…</p>";
-    let query=supabase.from("water_sources").select("*",{count:"exact"}).order("created_at",{ascending:false}).range(page*limit,page*limit+limit-1);
-    const term=searchInput.value.trim();
-    if(term)query=query.or(`water_source_name.ilike.%${term}%,water_source_type.ilike.%${term}%,specific_location.ilike.%${term}%`);
-    const{data,count,error}=await query;
-    if(error){console.error(error);showToast("Load failed","error");return;}
-    total=count;renderCards(data);
+  addBtn.addEventListener("click", () => toggleForm(true));
+  cancelBtn.addEventListener("click", () => toggleForm(false));
+
+  async function loadSources() {
+    cardsContainer.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">⏳</div>
+        <p>Loading water sources...</p>
+      </div>
+    `;
+    
+    let query = supabase
+      .from("water_sources")
+      .select("*", { count: "exact" })
+      .order("created_at", { ascending: false })
+      .range(page * limit, page * limit + limit - 1);
+
+    const term = searchInput.value.trim();
+    if (term) {
+      query = query.or(`water_source_name.ilike.%${term}%,water_source_type.ilike.%${term}%,specific_location.ilike.%${term}%`);
+    }
+
+    const { data, count, error } = await query;
+    
+    if (error) {
+      console.error(error);
+      showToast("❌ Failed to load water sources", "error");
+      cardsContainer.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">⚠️</div>
+          <p>Error loading data</p>
+        </div>
+      `;
+      return;
+    }
+    
+    total = count;
+    renderCards(data);
   }
 
-  function renderCards(data){
-    if(!data.length){
-      cardsContainer.innerHTML=`
+  function renderCards(data) {
+    if (!data || !data.length) {
+      cardsContainer.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">💧</div>
           <h3>No water sources found</h3>
@@ -770,74 +893,115 @@
       `;
       return;
     }
-    cardsContainer.innerHTML=data.map(d=>{
-      const status=d.classification||"Pending";
-      const badge=status.includes("Safe")?"badge Safe":status.includes("Unsafe")||status.includes("Critical")?"badge Unsafe":"badge Pending";
-      return`
+
+    cardsContainer.innerHTML = data.map(d => {
+      const status = d.classification || "Pending";
+      const badgeClass = status.includes("Safe") ? "badge Safe" : 
+                        (status.includes("Unsafe") || status.includes("Critical")) ? "badge Unsafe" : 
+                        "badge Pending";
+      return `
         <div class="card">
           <div class="card-header">
-            <span class="card-title">${d.water_source_name||"Unnamed Source"}</span>
-            <span class="${badge}">${status}</span>
+            <span class="card-title">${d.water_source_name || "Unnamed Source"}</span>
+            <span class="${badgeClass}">${status}</span>
           </div>
           <div class="card-body">
-            <p><strong>Type:</strong> ${d.water_source_type||"-"} | <strong>Sampled:</strong> ${d.sampling_date||"-"}</p>
-            <p><strong>Location:</strong> ${d.location||d.specific_location||"-"}</p>
-            <p><strong>Alert:</strong> ${d.contamination_alert_status?"⚠️ Active":"✅ None"}</p>
+            <p><strong>Type:</strong> ${d.water_source_type || "-"} | <strong>Sampled:</strong> ${d.sampling_date || "-"}</p>
+            <p><strong>Location:</strong> ${d.location || d.specific_location || "-"}</p>
+            <p><strong>Alert:</strong> ${d.contamination_alert_status ? "🚨 Active" : "✅ None"}</p>
           </div>
           <div class="actions">
             <a href="water_quality_form.html?id=${d.id}">✏️ Edit</a>
-            <a href="water_samples.html?id=${d.id}">📊 Samples</a>
+            <a href="water_samples.html?id=${d.id}">🧪 Samples</a>
             <a href="water_lab_results.html?id=${d.id}">🔬 Lab Results</a>
           </div>
-        </div>`;
+        </div>
+      `;
     }).join("");
-    prevPage.disabled=page===0;
-    nextPage.disabled=(page+1)*limit>=total;
+    
+    prevPage.disabled = page === 0;
+    nextPage.disabled = (page + 1) * limit >= total;
   }
 
-  form.addEventListener("submit",async e=>{
+  form.addEventListener("submit", async e => {
     e.preventDefault();
     
+    const submitBtn = form.querySelector('.btn-primary');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = "💾 Saving...";
+    submitBtn.disabled = true;
+
     // Build location string
-    let locationParts=[];
-    if(ward.value)locationParts.push(ward.value);
-    if(sub_county.value)locationParts.push(sub_county.value);
-    if(county.value)locationParts.push(county.value);
-    if(specific_location.value)locationParts.push(specific_location.value);
-    if(latitudeInput.value&&longitudeInput.value){
+    let locationParts = [];
+    if (ward.value) locationParts.push(ward.value);
+    if (sub_county.value) locationParts.push(sub_county.value);
+    if (county.value) locationParts.push(county.value);
+    if (specific_location.value) locationParts.push(specific_location.value);
+    if (latitudeInput.value && longitudeInput.value) {
       locationParts.push(`GPS: ${latitudeInput.value}, ${longitudeInput.value}`);
     }
-    
-    const payload={
-      water_source_name:document.getElementById("water_source_name").value.trim(),
-      water_source_type:document.getElementById("water_source_type").value||null,
-      sampling_date:document.getElementById("sampling_date").value||null,
-      county:county.value||null,
-      sub_county:sub_county.value||null,
-      ward:ward.value||null,
-      specific_location:specific_location.value||null,
-      location:locationParts.join(', ')||null,
-      latitude:parseFloat(latitudeInput.value)||null,
-      longitude:parseFloat(longitudeInput.value)||null,
-      classification:document.getElementById("classification").value||null,
-      contamination_alert_status:document.getElementById("contamination_alert_status").value==="true",
-      remarks:document.getElementById("remarks").value.trim()||null
+
+    const payload = {
+      water_source_name: document.getElementById("water_source_name").value.trim(),
+      water_source_type: document.getElementById("water_source_type").value || null,
+      sampling_date: document.getElementById("sampling_date").value || null,
+      county: county.value || null,
+      sub_county: sub_county.value || null,
+      ward: ward.value || null,
+      specific_location: specific_location.value || null,
+      location: locationParts.join(', ') || null,
+      latitude: parseFloat(latitudeInput.value) || null,
+      longitude: parseFloat(longitudeInput.value) || null,
+      classification: document.getElementById("classification").value || null,
+      contamination_alert_status: document.getElementById("contamination_alert_status").value === "true",
+      remarks: document.getElementById("remarks").value.trim() || null
     };
+
+    const { data: userData } = await supabase.auth.getUser();
+    payload.created_by = userData?.user?.id || null;
+
+    const { error } = await supabase.from("water_sources").insert([payload]);
     
-    const{data:userData}=await supabase.auth.getUser();
-    payload.created_by=userData?.user?.id||null;
+    if (error) {
+      console.error(error);
+      showToast("❌ Save failed", "error");
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+      return;
+    }
     
-    const{error}=await supabase.from("water_sources").insert([payload]);
-    if(error){console.error(error);showToast("Save failed","error");return;}
-    showToast("✅ Water source added successfully");
-    form.reset();toggleForm(false);loadSources();
+    showToast("✅ Water source added successfully", "success");
+    form.reset();
+    toggleForm(false);
+    loadSources();
   });
 
-  searchInput.addEventListener("input",()=>{page=0;loadSources();});
-  prevPage.addEventListener("click",()=>{if(page>0){page--;loadSources();}});
-  nextPage.addEventListener("click",()=>{if((page+1)*limit<total){page++;loadSources();}});
-  logoutBtn.addEventListener("click",async()=>{await supabase.auth.signOut();showToast("Logging out…");setTimeout(()=>window.location.href="login.html",800);});
-  document.getElementById("year").textContent=new Date().getFullYear();
+  searchInput.addEventListener("input", () => {
+    page = 0;
+    loadSources();
+  });
+
+  prevPage.addEventListener("click", () => {
+    if (page > 0) {
+      page--;
+      loadSources();
+    }
+  });
+
+  nextPage.addEventListener("click", () => {
+    if ((page + 1) * limit < total) {
+      page++;
+      loadSources();
+    }
+  });
+
+  logoutBtn.addEventListener("click", async () => {
+    await supabase.auth.signOut();
+    showToast("👋 Logging out...");
+    setTimeout(() => window.location.href = "login.html", 800);
+  });
+
+  document.getElementById("year").textContent = new Date().getFullYear();
   
   loadWards();
   loadSources();

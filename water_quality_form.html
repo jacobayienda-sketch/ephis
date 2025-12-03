@@ -679,7 +679,7 @@
 
     if (recordId) {
       try {
-        const record = await fetchById("water_quality", recordId);
+        const record = await fetchById("water_sources", recordId);
         
         // Load wards first
         await loadWards();
@@ -755,10 +755,10 @@
         payload.created_by = userData?.user?.id || null;
         
         if (recordId) {
-          await updateRecord("water_quality", recordId, payload);
+          await updateRecord("water_sources", recordId, payload);
           showToast("✅ Record updated successfully", "success");
         } else {
-          await insertRecord("water_quality", payload);
+          await insertRecord("water_sources", payload);
           showToast("✅ Record added successfully", "success");
         }
         
@@ -779,7 +779,7 @@
       deleteBtn.disabled = true;
       
       try {
-        await deleteRecord("water_quality", recordId);
+        await deleteRecord("water_sources", recordId);
         showToast("✅ Record deleted successfully", "success");
         setTimeout(() => window.location.href = "water_quality.html", 800);
       } catch (err) {

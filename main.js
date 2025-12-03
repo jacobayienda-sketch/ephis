@@ -35,6 +35,15 @@ export async function requireLogin() {
   return data.user;
 }
 
+// Required by all EPHIS modules
+export async function getSession() {
+  return supabase.auth.getSession();
+}
+
+export async function signOut() {
+  return supabase.auth.signOut();
+}
+
 // ======================================================
 // 3. TOAST NOTIFICATIONS (Top Center)
 // ======================================================
