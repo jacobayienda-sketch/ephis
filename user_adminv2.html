@@ -286,10 +286,6 @@
       box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
     }
 
-    .form-group select {
-      cursor: pointer;
-    }
-
     .form-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -609,7 +605,7 @@
           </div>
         </div>
 
-        <!-- Location Section with Cascading Dropdowns -->
+        <!-- Location Section -->
         <div class="form-section">
           <div class="section-header" onclick="toggleSection(this)">
             <h3>📍 Location</h3>
@@ -619,28 +615,22 @@
             <div class="form-grid">
               <div class="form-group">
                 <label for="county">County</label>
-                <select id="county" name="county">
-                  <option value="">Select County</option>
-                </select>
+                <input type="text" id="county" name="county" placeholder="Nairobi" />
               </div>
               
               <div class="form-group">
                 <label for="subCounty">Sub-County</label>
-                <select id="subCounty" name="subCounty" disabled>
-                  <option value="">Select Sub-County</option>
-                </select>
+                <input type="text" id="subCounty" name="subCounty" placeholder="Westlands" />
               </div>
               
               <div class="form-group">
                 <label for="ward">Ward</label>
-                <select id="ward" name="ward" disabled>
-                  <option value="">Select Ward</option>
-                </select>
+                <input type="text" id="ward" name="ward" placeholder="Kilimani" />
               </div>
               
               <div class="form-group">
-                <label for="location">Specific Location</label>
-                <input type="text" id="location" name="location" placeholder="Village/Area name" />
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" placeholder="Specific location" />
               </div>
               
               <div class="form-group">
@@ -723,13 +713,8 @@
     const passwordGroup = document.getElementById("passwordGroup");
     const submitBtn = document.getElementById("submitBtn");
 
-    const countySelect = document.getElementById("county");
-    const subCountySelect = document.getElementById("subCounty");
-    const wardSelect = document.getElementById("ward");
-
     let allUsers = [];
     let currentUser = null;
-    let locationData = [];
 
     function showToast(msg, type = "info") {
       toast.textContent = msg;
@@ -745,11 +730,9 @@
       modalTitle.textContent = "Create New User";
       passwordGroup.style.display = "block";
       submitBtn.textContent = "Create User";
-      // Reset location dropdowns
-      subCountySelect.innerHTML = '<option value="">Select Sub-County</option>';
-      wardSelect.innerHTML = '<option value="">Select Ward</option>';
-      subCountySelect.disabled = true;
-      wardSelect.disabled = true;
+      document.querySelectorAll('.section-content').forEach(section => {
+        section.classList.remove('show');
+      });
     }
 
     window.toggleSection = function(header) {
@@ -765,82 +748,6 @@
       currentUser = data.session.user;
     }
     await checkSession();
-
-    async function loadLocationData() {
-      try {
-        const response = await fetch('./kenya_wards.json');
-        locationData = await response.json();
-        populateCounties();
-      } catch (error) {
-        console.error("Error loading location data:", error);
-        showToast("⚠️ Error loading location data", "error");
-      }
-    }
-
-    function populateCounties() {
-      const counties = [...new Set(locationData.map(item => item.county))].sort();
-      countySelect.innerHTML = '<option value="">Select County</option>';
-      counties.forEach(county => {
-        const option = document.createElement('option');
-        option.value = county;
-        option.textContent = county;
-        countySelect.appendChild(option);
-      });
-    }
-
-    function setupLocationDropdowns() {
-      // County change handler
-      countySelect.addEventListener('change', () => {
-        const selectedCounty = countySelect.value;
-        
-        // Reset sub-county and ward
-        subCountySelect.innerHTML = '<option value="">Select Sub-County</option>';
-        wardSelect.innerHTML = '<option value="">Select Ward</option>';
-        subCountySelect.disabled = !selectedCounty;
-        wardSelect.disabled = true;
-
-        if (!selectedCounty) return;
-
-        // Filter and populate sub-counties
-        const subCounties = [...new Set(
-          locationData
-            .filter(item => item.county === selectedCounty)
-            .map(item => item.sub_county)
-        )].sort();
-
-        subCounties.forEach(subCounty => {
-          const option = document.createElement('option');
-          option.value = subCounty;
-          option.textContent = subCounty;
-          subCountySelect.appendChild(option);
-        });
-      });
-
-      // Sub-county change handler
-      subCountySelect.addEventListener('change', () => {
-        const selectedCounty = countySelect.value;
-        const selectedSubCounty = subCountySelect.value;
-        
-        // Reset ward
-        wardSelect.innerHTML = '<option value="">Select Ward</option>';
-        wardSelect.disabled = !selectedSubCounty;
-
-        if (!selectedSubCounty) return;
-
-        // Filter and populate wards
-        const wards = locationData
-          .filter(item => item.county === selectedCounty && item.sub_county === selectedSubCounty)
-          .map(item => item.ward)
-          .sort();
-
-        wards.forEach(w => {
-          const option = document.createElement('option');
-          option.value = w;
-          option.textContent = w;
-          wardSelect.appendChild(option);
-        });
-      });
-    }
 
     async function loadUsers() {
       usersTable.innerHTML = '<div class="loading">Loading users...</div>';
@@ -881,7 +788,8 @@
             allowed_subcounties: profile?.allowed_subcounties || [],
             allowed_wards: profile?.allowed_wards || [],
             allowed_facilities: profile?.allowed_facilities || '',
-            allowed_radius_km: profile?.allowed_radius_km || '',        
+            allowed_radius_km: profile?.allowed_radius_km || '',
+            facility_ids: profile?.facility_ids || []
           };
         });
         
@@ -919,9 +827,6 @@
               <th>Phone</th>
               <th>Role</th>
               <th>Status</th>
-              <th>County</th>
-              <th>Sub-County</th>
-              <th>Ward</th>
               <th>Created</th>
               <th>Last Sign In</th>
               <th>Actions</th>
@@ -939,9 +844,6 @@
                     ${user.is_active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
-                <td>${user.county || '-'}</td>
-                <td>${user.sub_county || '-'}</td>
-                <td>${user.ward || '-'}</td>
                 <td>${new Date(user.created_at).toLocaleDateString()}</td>
                 <td>${user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString() : 'Never'}</td>
                 <td>
@@ -961,12 +863,8 @@
         const email = (user.email || '').toLowerCase();
         const name = (user.full_name || '').toLowerCase();
         const phone = (user.phone || '').toLowerCase();
-        const county = (user.county || '').toLowerCase();
-        const subCounty = (user.sub_county || '').toLowerCase();
-        const ward = (user.ward || '').toLowerCase();
         const term = searchTerm.toLowerCase();
-        return email.includes(term) || name.includes(term) || phone.includes(term) || 
-               county.includes(term) || subCounty.includes(term) || ward.includes(term);
+        return email.includes(term) || name.includes(term) || phone.includes(term);
       });
       renderUsers(filtered);
     }
@@ -1000,35 +898,9 @@
       document.getElementById("phone").value = user.phone || '';
       document.getElementById("role").value = user.role;
       document.getElementById("isActive").value = String(user.is_active);
-
-      // Populate location dropdowns
-      if (user.county) {
-        // Load location data first if not already loaded
-        if (locationData.length === 0) {
-          await loadLocationData();
-        }
-        
-        // Set county and trigger change
-        countySelect.value = user.county;
-        countySelect.dispatchEvent(new Event('change'));
-        
-        // Wait for sub-counties to populate, then set sub-county
-        if (user.sub_county) {
-          setTimeout(() => {
-            subCountySelect.value = user.sub_county;
-            subCountySelect.dispatchEvent(new Event('change'));
-            
-            // Wait for wards to populate, then set ward
-            if (user.ward) {
-              setTimeout(() => {
-                wardSelect.value = user.ward;
-              }, 100);
-            }
-          }, 100);
-        }
-      }
-
-      // Populate other fields
+      document.getElementById("county").value = user.county || '';
+      document.getElementById("subCounty").value = user.sub_county || '';
+      document.getElementById("ward").value = user.ward || '';
       document.getElementById("location").value = user.location || '';
       document.getElementById("homeLatitude").value = user.home_latitude || '';
       document.getElementById("homeLongitude").value = user.home_longitude || '';
@@ -1036,6 +908,7 @@
       document.getElementById("allowedWards").value = (user.allowed_wards || []).join(', ');
       document.getElementById("allowedFacilities").value = user.allowed_facilities || '';
       document.getElementById("allowedRadiusKm").value = user.allowed_radius_km || '';
+      document.getElementById("facilityIds").value = (user.facility_ids || []).join(', ');
 
       userModal.classList.add("show");
     }
@@ -1069,6 +942,7 @@
         allowed_wards: processArray(formData.allowedWards),
         allowed_facilities: formData.allowedFacilities || null,
         allowed_radius_km: formData.allowedRadiusKm ? parseFloat(formData.allowedRadiusKm) : null,
+        facility_ids: processArray(formData.facilityIds)
       };
 
       try {
@@ -1138,8 +1012,6 @@
     });
 
     // Initialize
-    await loadLocationData();
-    setupLocationDropdowns();
     loadUsers();
   </script>
 </body>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -48,7 +49,6 @@
       flex-direction: column;
     }
 
-    /* Animated gradient background */
     body::before {
       content: '';
       position: fixed;
@@ -56,20 +56,28 @@
       left: 0;
       right: 0;
       height: 500px;
-      background: linear-gradient(135deg, 
-        rgba(37, 99, 235, 0.1) 0%, 
-        rgba(139, 92, 246, 0.1) 50%, 
-        rgba(16, 185, 129, 0.1) 100%);
+      background: linear-gradient(135deg,
+          rgba(37, 99, 235, 0.1) 0%,
+          rgba(139, 92, 246, 0.1) 50%,
+          rgba(16, 185, 129, 0.1) 100%);
       z-index: -1;
       animation: gradientShift 15s ease infinite;
     }
 
     @keyframes gradientShift {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.05); }
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+      }
     }
 
-    /* Modern Header */
     header {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(12px);
@@ -83,8 +91,15 @@
     }
 
     @keyframes slideDown {
-      from { transform: translateY(-100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
 
     .header-content {
@@ -100,6 +115,7 @@
       display: flex;
       align-items: center;
       gap: 1rem;
+      flex: 1;
     }
 
     .logo {
@@ -126,14 +142,19 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
       transform: rotate(45deg);
       animation: shine 3s infinite;
     }
 
     @keyframes shine {
-      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+      0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+      }
+
+      100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+      }
     }
 
     .logo:hover {
@@ -151,13 +172,32 @@
       letter-spacing: -0.02em;
     }
 
+    /* Location Filter Badge */
+    .location-badge {
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      color: var(--primary);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .location-badge::before {
+      content: '📍';
+      font-size: 1rem;
+    }
+
     .header-actions {
       display: flex;
       gap: 0.75rem;
       align-items: center;
     }
 
-    /* Modern Buttons */
     .btn {
       padding: 0.75rem 1.5rem;
       border-radius: var(--radius);
@@ -228,7 +268,6 @@
       box-shadow: var(--shadow);
     }
 
-    /* Main Content */
     main {
       flex: 1;
       max-width: 1400px;
@@ -243,13 +282,13 @@
         opacity: 0;
         transform: translateY(20px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
 
-    /* Toolbar */
     .toolbar {
       display: flex;
       justify-content: space-between;
@@ -299,7 +338,6 @@
       transform: translateY(-50%) scale(1.1);
     }
 
-    /* Modern Cards */
     .card {
       background: white;
       border-radius: var(--radius-lg);
@@ -344,7 +382,6 @@
       color: var(--text-primary);
     }
 
-    /* Modern Badges */
     .badge {
       padding: 0.5rem 1rem;
       border-radius: 20px;
@@ -366,8 +403,17 @@
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+      }
     }
 
     .badge.Compliant {
@@ -409,7 +455,6 @@
       font-weight: 600;
     }
 
-    /* Action Links */
     .actions {
       display: flex;
       flex-wrap: wrap;
@@ -441,7 +486,6 @@
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
 
-    /* Pagination */
     .pagination {
       display: flex;
       justify-content: center;
@@ -476,7 +520,6 @@
       transform: none;
     }
 
-    /* Floating Action Button */
     .floating-btn {
       position: fixed;
       bottom: 2rem;
@@ -506,7 +549,6 @@
       transform: scale(0.95) rotate(90deg);
     }
 
-    /* Footer */
     footer {
       text-align: center;
       padding: 2rem 1rem;
@@ -517,7 +559,6 @@
       margin-top: 4rem;
     }
 
-    /* Toast Notification */
     .toast {
       position: fixed;
       bottom: 2rem;
@@ -541,7 +582,6 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Empty State */
     .empty-state {
       text-align: center;
       padding: 4rem 1rem;
@@ -556,8 +596,15 @@
     }
 
     @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
     }
 
     .empty-state h3 {
@@ -566,7 +613,6 @@
       font-size: 1.25rem;
     }
 
-    /* Loading State */
     .loading {
       text-align: center;
       padding: 3rem;
@@ -586,10 +632,11 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
-    /* Responsive Design */
     @media (max-width: 768px) {
       header {
         padding: 1rem;
@@ -597,6 +644,7 @@
 
       .header-content {
         gap: 1rem;
+        flex-wrap: wrap;
       }
 
       .header-content h1 {
@@ -607,6 +655,11 @@
         width: 40px;
         height: 40px;
         font-size: 1.25rem;
+      }
+
+      .location-badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.75rem;
       }
 
       main {
@@ -671,6 +724,7 @@
       <div class="header-left">
         <div class="logo">E</div>
         <h1>Premises Management</h1>
+        <div class="location-badge" id="locationBadge">Loading...</div>
       </div>
       <div class="header-actions">
         <button class="btn btn-light" onclick="window.location.href='dashboard.html'">← Dashboard</button>
@@ -705,6 +759,11 @@
 
   <script type="module">
     import { supabase } from "./main.js";
+    import {
+      getCurrentUserProfile,
+      applyLocationFilters,
+      getLocationFilterDescription
+    } from "./locationAccessControl.js";
 
     const toast = document.getElementById("toast");
     const logoutBtn = document.getElementById("logoutBtn");
@@ -713,10 +772,12 @@
     const cardsContainer = document.getElementById("cardsContainer");
     const prevPage = document.getElementById("prevPage");
     const nextPage = document.getElementById("nextPage");
+    const locationBadge = document.getElementById("locationBadge");
 
     let page = 0;
     const limit = 10;
     let total = 0;
+    let userProfile = null;
 
     function showToast(msg, type = "info") {
       toast.textContent = msg;
@@ -727,18 +788,76 @@
 
     async function checkSession() {
       const { data } = await supabase.auth.getSession();
-      if (!data.session) window.location.href = "login.html";
+      if (!data.session) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      try {
+        // Load user profile with location data
+        userProfile = await getCurrentUserProfile(supabase);
+
+        // Update location badge in header
+        const filterDescription = getLocationFilterDescription(userProfile);
+        locationBadge.textContent = filterDescription;
+
+        console.log('User profile loaded:', userProfile);
+      } catch (error) {
+        console.error('Error loading user profile:', error);
+        showToast('Failed to load user profile', 'error');
+      }
     }
-    checkSession();
 
     async function loadPremises() {
+      if (!userProfile) {
+        cardsContainer.innerHTML = '<div class="loading">Loading user data...</div>';
+        return;
+      }
+
       cardsContainer.innerHTML = '<div class="loading">Loading premises...</div>';
 
+      // Start with base query
       let query = supabase
-        .from("vw_premises_summary")
-        .select("*", { count: "exact" })
-        .range(page * limit, page * limit + limit - 1);
+        .from("premises")
+        .select("*", { count: "exact" });
 
+      // Debug: Log user profile to identify which filter is being applied
+      console.log('User profile for filtering:', {
+        role: userProfile.role,
+        ward: userProfile.ward,
+        sub_county: userProfile.sub_county,
+        county: userProfile.county,
+        allowed_wards: userProfile.allowed_wards,
+        allowed_subcounties: userProfile.allowed_subcounties
+      });
+
+      try {
+        const beforeFilter = query;
+        query = applyLocationFilters(query, userProfile);
+        console.log('Location filter applied successfully');
+
+        // Log which filter was applied
+        if (userProfile.role === 'admin' || userProfile.role === 'supervisor') {
+          console.log('→ No filter (admin/supervisor access)');
+        } else if (userProfile.ward) {
+          console.log(`→ Filtering by ward: "${userProfile.ward}"`);
+        } else if (userProfile.sub_county) {
+          console.log(`→ Filtering by sub_county: "${userProfile.sub_county}"`);
+        } else if (userProfile.county) {
+          console.log(`→ Filtering by county: "${userProfile.county}"`);
+        } else {
+          console.log('→ No location assigned - will return empty results');
+        }
+      } catch (error) {
+        console.error('Error applying location filters:', error);
+        showToast('Error applying access filters', 'error');
+        return;
+      }
+
+      // Apply pagination
+      query = query.range(page * limit, page * limit + limit - 1);
+
+      // Apply sorting
       try {
         query = query.order("created_at", { ascending: false });
       } catch (e) {
@@ -746,51 +865,120 @@
         query = query.order("name", { ascending: true });
       }
 
+      // Apply search filter
       const term = searchInput.value.trim();
-      if (term) query = query.or(`name.ilike.%${term}%,type.ilike.%${term}%,sub_county_office.ilike.%${term}%`);
+      if (term) {
+        query = query.or(`name.ilike.%${term}%,type.ilike.%${term}%,sub_county_office.ilike.%${term}%`);
+      }
+
+      // DEBUG: Test if ilike works for ward filtering
+      if (userProfile.ward && userProfile.role === 'officer') {
+        console.log('Testing ilike filter...');
+        const testQuery = await supabase
+          .from('premises')
+          .select('id, name, ward')
+          .ilike('ward', userProfile.ward)
+          .limit(5);
+        console.log('Test query result:', testQuery);
+      }
 
       const { data, count, error } = await query;
 
       if (error) {
-        console.error(error);
+        console.error('Error loading premises:', error);
         showToast("Failed to load premises", "error");
-        return;
-      }
-      total = count;
-      renderCards(data);
-    }
-
-    function renderCards(data) {
-      if (!data.length) {
         cardsContainer.innerHTML = `
           <div class="empty-state">
-            <div class="empty-state-icon">🏭</div>
-            <h3>No premises found</h3>
-            <p>Start by adding a new premise to the system</p>
+            <div class="empty-state-icon">⚠️</div>
+            <h3>Error loading premises</h3>
+            <p>${error.message}</p>
           </div>
         `;
         return;
       }
 
+      total = count || 0;
+      renderCards(data || []);
+    }
+
+    function renderCards(data) {
+      if (!data.length) {
+        // If ward officer has no results, check if it's a data issue
+        if (userProfile && userProfile.ward && userProfile.role === 'officer') {
+          // Query to see what wards actually exist in the database
+          supabase
+            .from('premises')
+            .select('ward')
+            .not('ward', 'is', null)
+            .limit(100)
+            .then(({ data: wardData }) => {
+              const uniqueWards = [...new Set(wardData?.map(p => p.ward) || [])].sort();
+              console.log('Available wards in premises table:', uniqueWards);
+              console.log(`Your assigned ward: "${userProfile.ward}"`);
+              console.log('Ward match found:', uniqueWards.includes(userProfile.ward));
+
+              cardsContainer.innerHTML = `
+                <div class="empty-state">
+                  <div class="empty-state-icon">🏭</div>
+                  <h3>No premises found in your ward</h3>
+                  <p>You are assigned to: <strong>${userProfile.ward}</strong></p>
+                  <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">
+                    ${uniqueWards.includes(userProfile.ward)
+                  ? 'Your ward exists in the system but has no premises yet.'
+                  : `⚠️ Your ward "${userProfile.ward}" doesn't match any premises in the database.<br>Available wards: ${uniqueWards.slice(0, 5).join(', ')}${uniqueWards.length > 5 ? '...' : ''}`
+                }
+                  </p>
+                  <button class="btn btn-primary" onclick="window.location.href='premises_form.html'" style="margin-top: 1rem;">
+                    + Add First Premise
+                  </button>
+                </div>
+              `;
+            });
+        } else {
+          cardsContainer.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">🏭</div>
+              <h3>No premises found</h3>
+              <p>Start by adding a new premise to the system</p>
+            </div>
+          `;
+        }
+        return;
+      }
+
       cardsContainer.innerHTML = data.map(p => {
-        const compliance = p.compliance_status || "Pending";
-        const licenseDate = p.last_license_expiry || "—";
-        const licenseStatus = p.last_license_status || "—";
-        const inspectionDate = p.last_inspection_date || "—";
-        const totalLicenses = p.total_licenses || 0;
-        const totalInspections = p.total_inspections || 0;
+        const regStatus = p.registration_status || "Unknown";
+        const ownership = p.ownership || "—";
+        const entryDate = p.date_of_entry ? new Date(p.date_of_entry).toLocaleDateString() : "—";
+        const createdDate = p.created_at ? new Date(p.created_at).toLocaleDateString() : "—";
+
+        // Build location string
+        const locationParts = [p.ward, p.sub_county, p.county].filter(Boolean);
+        const locationInfo = locationParts.length > 0 ? locationParts.join(', ') : '—';
+
+        // Specific address if available
+        const specificLocation = p.address || p.location || '—';
+
+        // Registration status badge color
+        let statusClass = 'Pending';
+        if (regStatus === 'Registered') statusClass = 'Compliant';
+        else if (regStatus === 'Suspended' || regStatus === 'Closed') statusClass = 'NonCompliant';
 
         return `
           <div class="card">
             <div class="card-header">
               <span>${p.name}</span>
-              <span class="badge ${compliance.replace(" ", "") || "Pending"}">${compliance}</span>
+              <span class="badge ${statusClass}">${regStatus}</span>
             </div>
-            <p><strong>Type:</strong> ${p.type || "-"} | <strong>Category:</strong> ${p.category || "-"}</p>
-            <p><strong>Ownership:</strong> ${p.ownership || "-"} | <strong>Sub-County:</strong> ${p.sub_county_office || "-"}</p>
-            <p><strong>License:</strong> ${licenseDate} • ${licenseStatus} (${totalLicenses} total)</p>
-            <p><strong>Inspections:</strong> Last: ${inspectionDate} (${totalInspections} total)</p>
+            <p><strong>Type:</strong> ${p.type || "—"} ${p.category ? `| <strong>Category:</strong> ${p.category}` : ''}</p>
+            <p><strong>Ownership:</strong> ${ownership} ${p.sub_county_office ? `| <strong>Office:</strong> ${p.sub_county_office}` : ''}</p>
+            <p><strong>Location:</strong> ${locationInfo}</p>
+            ${specificLocation !== '—' ? `<p><strong>Address:</strong> ${specificLocation}</p>` : ''}
+            ${p.latitude && p.longitude ? `<p><strong>Coordinates:</strong> ${p.latitude}, ${p.longitude}</p>` : ''}
+            <p><strong>Entry Date:</strong> ${entryDate} | <strong>Added:</strong> ${createdDate}</p>
+            ${p.remarks ? `<p style="font-style: italic; color: var(--text-muted); margin-top: 0.5rem;">${p.remarks}</p>` : ''}
             <div class="actions">
+              <a href="premises_form.html?id=${p.id}">✏️ Edit</a>
               <a href="premises_contacts.html?id=${p.id}">📞 Contacts</a>
               <a href="premises_licenses.html?id=${p.id}">📋 Licenses</a>
               <a href="premises_inspections.html?id=${p.id}">🔍 Inspections</a>
@@ -833,7 +1021,14 @@
     });
 
     document.getElementById("year").textContent = new Date().getFullYear();
-    loadPremises();
+
+    // Initialize
+    checkSession().then(() => {
+      if (userProfile) {
+        loadPremises();
+      }
+    });
   </script>
 </body>
+
 </html>

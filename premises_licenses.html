@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -55,17 +56,26 @@
       left: 0;
       right: 0;
       height: 500px;
-      background: linear-gradient(135deg, 
-        rgba(37, 99, 235, 0.1) 0%, 
-        rgba(139, 92, 246, 0.1) 50%, 
-        rgba(16, 185, 129, 0.1) 100%);
+      background: linear-gradient(135deg,
+          rgba(37, 99, 235, 0.1) 0%,
+          rgba(139, 92, 246, 0.1) 50%,
+          rgba(16, 185, 129, 0.1) 100%);
       z-index: -1;
       animation: gradientShift 15s ease infinite;
     }
 
     @keyframes gradientShift {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.05); }
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+      }
     }
 
     header {
@@ -84,8 +94,15 @@
     }
 
     @keyframes slideDown {
-      from { transform: translateY(-100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
 
     .logo {
@@ -112,14 +129,19 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
       transform: rotate(45deg);
       animation: shine 3s infinite;
     }
 
     @keyframes shine {
-      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+      0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+      }
+
+      100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+      }
     }
 
     .logo:hover {
@@ -230,6 +252,7 @@
         opacity: 0;
         transform: translateY(20px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -328,8 +351,17 @@
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+      }
     }
 
     .badge.Valid {
@@ -504,8 +536,15 @@
     }
 
     @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
     }
 
     .loading {
@@ -562,6 +601,9 @@
   </header>
 
   <main>
+    <!-- Premise Context Header -->
+    <div id="premiseContext"></div>
+
     <div class="toolbar">
       <input type="text" id="searchInput" placeholder="Search license number or status..." />
       <button class="btn btn-primary" id="addBtn">+ Add License</button>
@@ -625,6 +667,7 @@
 
   <script type="module">
     import { supabase } from "./main.js";
+    import { loadPremiseContext } from "./premiseContext.js";
 
     const params = new URLSearchParams(window.location.search);
     const premiseId = params.get("id");
@@ -642,6 +685,7 @@
     let page = 0;
     const limit = 10;
     let total = 0;
+    let editingId = null;
 
     function showToast(msg, type = "info") {
       toast.textContent = msg;
@@ -656,10 +700,28 @@
     }
     checkSession();
 
-    function toggleForm(show) {
+    function toggleForm(show, licenseData = null) {
       formContainer.style.display = show ? "block" : "none";
+      if (!show) {
+        form.reset();
+        editingId = null;
+        document.querySelector('#licenseForm button[type="submit"]').textContent = '💾 Save License';
+      } else if (licenseData) {
+        // Populate form for editing
+        editingId = licenseData.id;
+        document.getElementById("license_number").value = licenseData.license_number || '';
+        document.getElementById("license_type").value = licenseData.license_type || '';
+        document.getElementById("license_expiry").value = licenseData.license_expiry || '';
+        document.getElementById("license_status").value = licenseData.license_status || '';
+        document.getElementById("registration_number").value = licenseData.registration_number || '';
+        document.getElementById("registration_date").value = licenseData.registration_date || '';
+        document.getElementById("licensing_officer").value = licenseData.licensing_officer || '';
+        document.getElementById("licensing_fee").value = licenseData.licensing_fee || '';
+        document.getElementById("payment_method").value = licenseData.payment_method || '';
+        document.querySelector('#licenseForm button[type="submit"]').textContent = '💾 Update License';
+      }
     }
-    
+
     addBtn.addEventListener("click", () => toggleForm(true));
     cancelBtn.addEventListener("click", () => toggleForm(false));
 
@@ -672,10 +734,10 @@
         .eq("premises_id", premiseId)
         .order("license_expiry", { ascending: false })
         .range(page * limit, page * limit + limit - 1);
-        
+
       const term = searchInput.value.trim();
       if (term) query = query.or(`license_number.ilike.%${term}%,license_status.ilike.%${term}%`);
-      
+
       const { data, count, error } = await query;
       if (error) {
         console.error(error);
@@ -697,19 +759,42 @@
         `;
         return;
       }
-      
-      cardsContainer.innerHTML = data.map(l => `
+
+      cardsContainer.innerHTML = data.map(l => {
+        // Calculate days until expiry
+        let renewalInfo = '';
+        if (l.license_expiry) {
+          const expiryDate = new Date(l.license_expiry);
+          const today = new Date();
+          const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+
+          if (daysUntilExpiry < 0) {
+            renewalInfo = `<span style="color: #dc2626; font-weight: 600;">⚠️ Expired ${Math.abs(daysUntilExpiry)} days ago</span>`;
+          } else if (daysUntilExpiry <= 30) {
+            renewalInfo = `<span style="color: #d97706; font-weight: 600;">⏰ Expires in ${daysUntilExpiry} days</span>`;
+          } else {
+            renewalInfo = `<span style="color: #047857;">✓ Valid for ${daysUntilExpiry} days</span>`;
+          }
+        }
+
+        return `
         <div class="card">
           <div class="card-header">
             <span>${l.license_number || "License"}</span>
             <span class="badge ${l.license_status || "Pending"}">${l.license_status || "Pending"}</span>
           </div>
           <p><strong>Type:</strong> ${l.license_type || "—"} | <strong>Expiry:</strong> ${l.license_expiry || "—"}</p>
+          ${renewalInfo ? `<p>${renewalInfo}</p>` : ''}
           <p><strong>Officer:</strong> ${l.licensing_officer || "—"} | <strong>Fee:</strong> ${l.licensing_fee ? `KES ${l.licensing_fee.toLocaleString()}` : "—"}</p>
-          <p><strong>Method:</strong> ${l.payment_method || "—"}</p>
+          <p><strong>Payment:</strong> ${l.payment_method || "—"} ${l.registration_date ? `| <strong>Reg. Date:</strong> ${l.registration_date}` : ''}</p>
+          <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem;">
+            <button onclick="editLicense('${l.id}')" class="btn btn-light" style="padding: 0.5rem 1rem; font-size: 0.875rem;">✏️ Edit</button>
+            <button onclick="deleteLicense('${l.id}', '${l.license_number}')" class="btn btn-light" style="padding: 0.5rem 1rem; font-size: 0.875rem; color: #dc2626;">🗑️ Delete</button>
+          </div>
         </div>
-      `).join("");
-      
+      `;
+      }).join("");
+
       prevPage.disabled = page === 0;
       nextPage.disabled = (page + 1) * limit >= total;
     }
@@ -728,30 +813,63 @@
         licensing_fee: parseFloat(document.getElementById("licensing_fee").value) || null,
         payment_method: document.getElementById("payment_method").value.trim() || null
       };
-      
-      const { error } = await supabase.from("premises_licenses").insert([payload]);
+
+      let error;
+      if (editingId) {
+        ({ error } = await supabase.from("premises_licenses").update(payload).eq("id", editingId));
+      } else {
+        ({ error } = await supabase.from("premises_licenses").insert([payload]));
+      }
+
       if (error) {
         console.error(error);
         showToast("Save failed", "error");
         return;
       }
-      
-      showToast("License added successfully");
+
+      showToast(editingId ? "License updated successfully" : "License added successfully");
       form.reset();
       toggleForm(false);
       loadLicenses();
     });
 
+    // Global functions for edit/delete buttons
+    window.editLicense = async (id) => {
+      const { data, error } = await supabase.from("premises_licenses").select("*").eq("id", id).single();
+      if (error) {
+        showToast("Failed to load license", "error");
+        return;
+      }
+      toggleForm(true, data);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.deleteLicense = async (id, licenseNumber) => {
+      if (!confirm(`Are you sure you want to delete license "${licenseNumber}"? This action cannot be undone.`)) {
+        return;
+      }
+
+      const { error } = await supabase.from("premises_licenses").delete().eq("id", id);
+      if (error) {
+        console.error(error);
+        showToast("Delete failed", "error");
+        return;
+      }
+
+      showToast("License deleted successfully");
+      loadLicenses();
+    };
+
     searchInput.addEventListener("input", () => {
       page = 0;
       loadLicenses();
     });
-    
+
     nextPage.addEventListener("click", () => {
       page++;
       loadLicenses();
     });
-    
+
     prevPage.addEventListener("click", () => {
       if (page > 0) {
         page--;
@@ -766,7 +884,15 @@
     });
 
     document.getElementById("year").textContent = new Date().getFullYear();
-    loadLicenses();
+
+    // Initialize: Load premise context first, then licenses
+    loadPremiseContext(supabase, premiseId).then(() => {
+      loadLicenses();
+    }).catch(error => {
+      console.error('Failed to load premise context:', error);
+      showToast('Failed to load premise information', 'error');
+    });
   </script>
 </body>
+
 </html>
