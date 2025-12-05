@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,7 +11,11 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -33,7 +38,7 @@
 
     header {
       background: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       padding: 1.2rem 2rem;
       position: sticky;
       top: 0;
@@ -62,39 +67,169 @@
       gap: 1rem;
     }
 
-    .header-content h1 { font-size: 1.3rem; font-weight: 600; color: #0f172a; }
-    .header-actions { display: flex; gap: 0.75rem; }
+    .header-content h1 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
 
-    .btn { border: none; border-radius: 8px; cursor: pointer; font-weight: 600; padding: 0.75rem 1.5rem; font-size: 1rem; transition: all 0.2s; }
-    .btn-primary { background: linear-gradient(135deg, #0ea5e9, #2563eb); color: white; }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
-    .btn-secondary { background: linear-gradient(135deg, #059669, #10b981); color: white; }
-    .btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
-    .btn-light { background: white; color: #2563eb; border: 2px solid #e2e8f0; }
-    .btn-light:hover { border-color: #2563eb; background: #f8fafc; }
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
 
-    main { padding: 2rem; max-width: 900px; margin: 0 auto; }
-    .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; gap: 1rem; }
+    .btn {
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
 
-    .form-card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 2rem; margin-bottom: 1rem; }
-    form label { font-weight: 600; display: block; margin-top: 0.75rem; color: #0f172a; }
-    form select, form input { width: 100%; padding: 0.75rem; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 0.95rem; transition: all 0.2s; }
-    form select:focus, form input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .btn-primary {
+      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      color: white;
+    }
 
-    .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem; margin-bottom: 1rem; transition: transform 0.2s, box-shadow 0.2s; }
-    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .card-header { display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: #0f172a; margin-bottom: 0.75rem; }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
 
-    .file-link { color: #2563eb; text-decoration: none; font-weight: 600; }
-    .file-link:hover { text-decoration: underline; }
+    .btn-secondary {
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: white;
+    }
 
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transition: opacity 0.3s; }
-    .toast.show { opacity: 1; }
+    .btn-secondary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-light {
+      background: white;
+      color: #2563eb;
+      border: 2px solid #e2e8f0;
+    }
+
+    .btn-light:hover {
+      border-color: #2563eb;
+      background: #f8fafc;
+    }
+
+    main {
+      padding: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      gap: 1rem;
+    }
+
+    .form-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    form label {
+      font-weight: 600;
+      display: block;
+      margin-top: 0.75rem;
+      color: #0f172a;
+    }
+
+    form select,
+    form input {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 2px solid #e2e8f0;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    form select:focus,
+    form input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 0.75rem;
+    }
+
+    .file-link {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .file-link:hover {
+      text-decoration: underline;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
 
     @media (max-width: 768px) {
-      main { padding: 1rem; }
-      .toolbar { flex-direction: column; align-items: stretch; }
-      .header-content h1 { font-size: 1.1rem; }
+      main {
+        padding: 1rem;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .header-content h1 {
+        font-size: 1.1rem;
+      }
     }
   </style>
 </head>
@@ -112,6 +247,8 @@
   </header>
 
   <main>
+    <div id="premiseContext"></div>
+
     <div class="toolbar">
       <button class="btn btn-primary" id="toggleFormBtn">+ Upload Document</button>
     </div>
@@ -150,55 +287,56 @@
 
   <script type="module">
     import { supabase } from "./main.js";
+    import { loadPremiseContext } from "./premiseContext.js";
 
-    const params=new URLSearchParams(window.location.search);
-    const premiseId=params.get("id");
-    const toast=document.getElementById("toast");
-    const logoutBtn=document.getElementById("logoutBtn");
-    const toggleFormBtn=document.getElementById("toggleFormBtn");
-    const cancelBtn=document.getElementById("cancelBtn");
-    const formContainer=document.getElementById("formContainer");
-    const form=document.getElementById("docForm");
-    const cardsContainer=document.getElementById("cardsContainer");
+    const params = new URLSearchParams(window.location.search);
+    const premiseId = params.get("id");
+    const toast = document.getElementById("toast");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const toggleFormBtn = document.getElementById("toggleFormBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const formContainer = document.getElementById("formContainer");
+    const form = document.getElementById("docForm");
+    const cardsContainer = document.getElementById("cardsContainer");
 
-    function showToast(msg,type="info"){
-      toast.textContent=msg;
-      toast.style.background=type==="error"?"#c62828":"#1976d2";
+    function showToast(msg, type = "info") {
+      toast.textContent = msg;
+      toast.style.background = type === "error" ? "#c62828" : "#1976d2";
       toast.classList.add("show");
-      setTimeout(()=>toast.classList.remove("show"),3000);
+      setTimeout(() => toast.classList.remove("show"), 3000);
     }
 
-    async function checkSession(){
-      const {data}=await supabase.auth.getSession();
-      if(!data.session)window.location.href="login.html";
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) window.location.href = "login.html";
     }
     checkSession();
 
-    function toggleForm(show){formContainer.style.display=show?"block":"none";}
-    toggleFormBtn.addEventListener("click",()=>toggleForm(true));
-    cancelBtn.addEventListener("click",()=>toggleForm(false));
+    function toggleForm(show) { formContainer.style.display = show ? "block" : "none"; }
+    toggleFormBtn.addEventListener("click", () => toggleForm(true));
+    cancelBtn.addEventListener("click", () => toggleForm(false));
 
-    async function ensureBucket(){
-      const {data}=await supabase.storage.listBuckets();
-      if(!data.some(b=>b.name==="premises_docs")){
-        await supabase.storage.createBucket("premises_docs",{public:true});
+    async function ensureBucket() {
+      const { data } = await supabase.storage.listBuckets();
+      if (!data.some(b => b.name === "premises_docs")) {
+        await supabase.storage.createBucket("premises_docs", { public: true });
       }
     }
 
-    async function loadDocs(){
-      cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading...</p>";
-      const {data,error}=await supabase.from("premises_documents").select("*").eq("premises_id",premiseId).single();
-      if(error&&error.code!=="PGRST116"){console.error(error);showToast("Failed to load docs","error");return;}
-      const docs=data||{};
-      const entries=Object.entries(docs).filter(([k,v])=>k.endsWith("_url")&&v);
-      if(!entries.length){
-        cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No files uploaded</p>";
+    async function loadDocs() {
+      cardsContainer.innerHTML = "<p style='text-align:center;color:gray;'>Loading...</p>";
+      const { data, error } = await supabase.from("premises_documents").select("*").eq("premises_id", premiseId).single();
+      if (error && error.code !== "PGRST116") { console.error(error); showToast("Failed to load docs", "error"); return; }
+      const docs = data || {};
+      const entries = Object.entries(docs).filter(([k, v]) => k.endsWith("_url") && v);
+      if (!entries.length) {
+        cardsContainer.innerHTML = "<p style='text-align:center;color:gray;'>No files uploaded</p>";
         return;
       }
-      cardsContainer.innerHTML=entries.map(([key,url])=>`
+      cardsContainer.innerHTML = entries.map(([key, url]) => `
         <div class="card">
           <div class="card-header">
-            <span>${key.replace(/_/g," ").replace(" url","").toUpperCase()}</span>
+            <span>${key.replace(/_/g, " ").replace(" url", "").toUpperCase()}</span>
             <button class="btn btn-light" onclick="deleteDoc('${key}')">Delete</button>
           </div>
           <p><a href="${url}" target="_blank" class="file-link">View File</a></p>
@@ -206,38 +344,42 @@
       `).join("");
     }
 
-    window.deleteDoc=async(column)=>{
-      if(!confirm("Delete this file link?"))return;
-      const update={[column]:null};
-      const {error}=await supabase.from("premises_documents").update(update).eq("premises_id",premiseId);
-      if(error)return showToast("Delete failed","error");
-      showToast("File removed");loadDocs();
+    window.deleteDoc = async (column) => {
+      if (!confirm("Delete this file link?")) return;
+      const update = { [column]: null };
+      const { error } = await supabase.from("premises_documents").update(update).eq("premises_id", premiseId);
+      if (error) return showToast("Delete failed", "error");
+      showToast("File removed"); loadDocs();
     };
 
-    form.addEventListener("submit",async e=>{
+    form.addEventListener("submit", async e => {
       e.preventDefault();
-      const file=document.getElementById("file").files[0];
-      const column=document.getElementById("doc_type").value;
-      if(!file)return showToast("Select a file first","error");
+      const file = document.getElementById("file").files[0];
+      const column = document.getElementById("doc_type").value;
+      if (!file) return showToast("Select a file first", "error");
       await ensureBucket();
-      const path=`${premiseId}/${Date.now()}_${file.name}`;
-      const{error:uploadErr}=await supabase.storage.from("premises_docs").upload(path,file,{upsert:true});
-      if(uploadErr)return showToast("Upload failed","error");
-      const {data:urlData}=supabase.storage.from("premises_docs").getPublicUrl(path);
-      const update={premises_id:premiseId,[column]:urlData.publicUrl};
-      await supabase.from("premises_documents").upsert(update,{onConflict:"premises_id"});
+      const path = `${premiseId}/${Date.now()}_${file.name}`;
+      const { error: uploadErr } = await supabase.storage.from("premises_docs").upload(path, file, { upsert: true });
+      if (uploadErr) return showToast("Upload failed", "error");
+      const { data: urlData } = supabase.storage.from("premises_docs").getPublicUrl(path);
+      const update = { premises_id: premiseId, [column]: urlData.publicUrl };
+      await supabase.from("premises_documents").upsert(update, { onConflict: "premises_id" });
       showToast("File uploaded successfully");
-      form.reset();toggleForm(false);loadDocs();
+      form.reset(); toggleForm(false); loadDocs();
     });
 
-    logoutBtn.addEventListener("click",async()=>{
+    logoutBtn.addEventListener("click", async () => {
       await supabase.auth.signOut();
       showToast("Logging out...");
-      setTimeout(()=>window.location.href="login.html",800);
+      setTimeout(() => window.location.href = "login.html", 800);
     });
 
-    document.getElementById("year").textContent=new Date().getFullYear();
-    loadDocs();
+    document.getElementById("year").textContent = new Date().getFullYear();
+    loadPremiseContext(supabase, premiseId).then(() => loadDocs()).catch(error => {
+      console.error('Failed to load premise context:', error);
+      showToast('Failed to load premise information', 'error');
+    });
   </script>
 </body>
+
 </html>

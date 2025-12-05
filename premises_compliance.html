@@ -567,6 +567,8 @@
   </header>
 
   <main>
+    <div id="premiseContext"></div>
+
     <div class="toolbar">
       <input type="text" id="searchInput" placeholder="Search by action or officer..." />
       <button class="btn btn-primary" id="addBtn">+ Add Action</button>
@@ -636,6 +638,7 @@
 
   <script type="module">
     import { supabase } from "./main.js";
+    import { loadPremiseContext } from "./premiseContext.js";
 
     const params = new URLSearchParams(window.location.search);
     const premiseId = params.get("id");
@@ -653,6 +656,7 @@
     let page = 0;
     const limit = 10;
     let total = 0;
+    let editingId = null;
 
     function showToast(msg, type = "info") {
       toast.textContent = msg;
@@ -667,8 +671,25 @@
     }
     checkSession();
 
-    function toggleForm(show) {
+    function toggleForm(show, actionData = null) {
       formContainer.style.display = show ? "block" : "none";
+      if (!show) {
+        form.reset();
+        editingId = null;
+        document.querySelector('#complianceForm button[type="submit"]').textContent = '💾 Save Action';
+      } else if (actionData) {
+        editingId = actionData.id;
+        document.getElementById("action_type").value = actionData.action_type || '';
+        document.getElementById("action_details").value = actionData.action_details || '';
+        document.getElementById("date_of_action").value = actionData.date_of_action || '';
+        document.getElementById("responsible_officer").value = actionData.responsible_officer || '';
+        document.getElementById("fine_amount").value = actionData.fine_amount || '';
+        document.getElementById("payment_reference").value = actionData.payment_reference || '';
+        document.getElementById("compliance_status").value = actionData.compliance_status || '';
+        document.getElementById("reinspection_date").value = actionData.reinspection_date || '';
+        document.getElementById("comments").value = actionData.comments || '';
+        document.querySelector('#complianceForm button[type="submit"]').textContent = '💾 Update Action';
+      }
     }
     
     addBtn.addEventListener("click", () => toggleForm(true));
@@ -712,13 +733,17 @@
       cardsContainer.innerHTML = data.map(a => `
         <div class="card">
           <div class="card-header">
-            <span>${a.action_type || "Action"}</span>
+            <span>${a.action_type || "Action"} - ${a.date_of_action || "—"}</span>
             <span class="badge ${a.compliance_status || "Pending"}">${a.compliance_status || "Pending"}</span>
           </div>
-          <p><strong>Date:</strong> ${a.date_of_action || "—"} | <strong>Officer:</strong> ${a.responsible_officer || "—"}</p>
-          <p><strong>Fine:</strong> ${a.fine_amount ? `KES ${a.fine_amount.toLocaleString()}` : "—"} | <strong>Reference:</strong> ${a.payment_reference || "—"}</p>
-          <p><strong>Reinspection:</strong> ${a.reinspection_date || "—"}</p>
-          <p><strong>Details:</strong> ${a.action_details || "—"}</p>
+          <p><strong>Officer:</strong> ${a.responsible_officer || "—"} | <strong>Reinspection:</strong> ${a.reinspection_date || "None"}</p>
+          ${a.fine_amount ? `<p><strong>Fine:</strong> KES ${a.fine_amount.toLocaleString()} ${a.payment_reference ? `| <strong>Ref:</strong> ${a.payment_reference}` : ''}</p>` : ''}
+          ${a.action_details ? `<p><strong>Details:</strong> ${a.action_details}</p>` : ''}
+          ${a.comments ? `<p style="font-style: italic; color: var(--text-muted);"><strong>Comments:</strong> ${a.comments}</p>` : ''}
+          <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem;">
+            <button onclick="editAction('${a.id}')" class="btn btn-light" style="padding: 0.5rem 1rem; font-size: 0.875rem;">✏️ Edit</button>
+            <button onclick="deleteAction('${a.id}', '${a.action_type}')" class="btn btn-light" style="padding: 0.5rem 1rem; font-size: 0.875rem; color: #dc2626;">🗑️ Delete</button>
+          </div>
         </div>
       `).join("");
       
@@ -741,18 +766,39 @@
         comments: document.getElementById("comments").value
       };
       
-      const { error } = await supabase.from("premises_compliance_actions").insert([payload]);
+      let error;
+      if (editingId) {
+        ({ error } = await supabase.from("premises_compliance_actions").update(payload).eq("id", editingId));
+      } else {
+        ({ error } = await supabase.from("premises_compliance_actions").insert([payload]));
+      }
+      
       if (error) {
         console.error(error);
         showToast("Save failed", "error");
         return;
       }
       
-      showToast("Compliance action recorded");
+      showToast(editingId ? "Action updated" : "Compliance action recorded");
       form.reset();
       toggleForm(false);
       loadCompliance();
     });
+
+    window.editAction = async (id) => {
+      const { data, error } = await supabase.from("premises_compliance_actions").select("*").eq("id", id).single();
+      if (error) { showToast("Failed to load action", "error"); return; }
+      toggleForm(true, data);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.deleteAction = async (id, type) => {
+      if (!confirm(`Delete ${type} action? This cannot be undone.`)) return;
+      const { error } = await supabase.from("premises_compliance_actions").delete().eq("id", id);
+      if (error) { console.error(error); showToast("Delete failed", "error"); return; }
+      showToast("Action deleted");
+      loadCompliance();
+    };
 
     searchInput.addEventListener("input", () => {
       page = 0;
@@ -778,7 +824,10 @@
     });
 
     document.getElementById("year").textContent = new Date().getFullYear();
-    loadCompliance();
+    loadPremiseContext(supabase, premiseId).then(() => loadCompliance()).catch(error => {
+      console.error('Failed to load premise context:', error);
+      showToast('Failed to load premise information', 'error');
+    });
   </script>
 </body>
 </html>
