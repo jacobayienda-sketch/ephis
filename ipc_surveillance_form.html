@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IPC Surveillance Report Form | EPHIS</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#dc2626" />
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+    <script type="module" src="main.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #dc2626;
+            --primary-dark: #b91c1c;
+            --primary-light: #ef4444;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(16, 185, 129, 0.1) 100%);
+            z-index: -1;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-light {
+            background: white;
+            color: #dc2626;
+            border: 2px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-light:hover {
+            border-color: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        main {
+            flex: 1;
+            padding: 2.5rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        form {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 2.5rem;
+            margin-top: 1.5rem;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #dc2626, #ef4444, #f87171);
+            background-size: 200% 100%;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        @keyframes gradientMove {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        form h2 {
+            font-size: 1.75rem;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        form label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.625rem;
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        form label:first-of-type {
+            margin-top: 0;
+        }
+
+        form input,
+        form select,
+        form textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            background: white;
+            color: var(--text-primary);
+        }
+
+        form input:focus,
+        form select:focus,
+        form textarea:focus {
+            outline: none;
+            border-color: #dc2626;
+            box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
+            transform: translateY(-1px);
+        }
+
+        form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        form select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            padding-right: 3rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text-primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            z-index: 1000;
+            font-weight: 500;
+            min-width: 250px;
+            text-align: center;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1 id="pageTitle">New Surveillance Report</h1>
+        </div>
+        <button class="btn btn-light" onclick="history.back()">Cancel</button>
+    </header>
+    <main>
+        <form id="reportForm">
+            <h2>🦠 Infection Surveillance Report</h2>
+            <input type="hidden" name="county" id="county" />
+            <input type="hidden" name="sub_county" id="sub_county" />
+            <input type="hidden" name="ward" id="ward" />
+
+            <label>Facility Name *</label>
+            <input type="text" name="facility_name" required />
+
+            <label>Report Date *</label>
+            <input type="date" name="report_date" required />
+
+            <label>Infection Type *</label>
+            <select name="infection_type" required>
+                <option value="">Select Type</option>
+                <option value="Healthcare-Associated Infection">🏥 Healthcare-Associated Infection</option>
+                <option value="Bloodstream Infection">💉 Bloodstream Infection</option>
+                <option value="Surgical Site Infection">🔪 Surgical Site Infection</option>
+                <option value="Urinary Tract Infection">🚽 Urinary Tract Infection</option>
+                <option value="Respiratory Infection">🫁 Respiratory Infection</option>
+                <option value="Gastrointestinal Infection">🦠 Gastrointestinal Infection</option>
+                <option value="Other">📋 Other</option>
+            </select>
+
+            <label>Suspected Cause</label>
+            <textarea name="suspected_cause" placeholder="What is suspected to have caused this infection?"></textarea>
+
+            <label>Number of Cases *</label>
+            <input type="number" name="number_of_cases" min="0" required />
+
+            <label>Number of Deaths</label>
+            <input type="number" name="number_of_deaths" min="0" value="0" />
+
+            <label>Severity Level</label>
+            <select name="severity">
+                <option value="">Select Severity</option>
+                <option value="Low">✅ Low</option>
+                <option value="Medium">⚠️ Medium</option>
+                <option value="High">🔴 High</option>
+                <option value="Critical">⛔ Critical</option>
+            </select>
+
+            <label>Response Actions</label>
+            <textarea name="response_actions"
+                placeholder="What actions have been taken in response to this outbreak?"></textarea>
+
+            <label>Reported By</label>
+            <input type="text" name="reported_by" readonly style="background: #f8fafc; cursor: not-allowed;" />
+
+            <label>Status</label>
+            <select name="status">
+                <option value="Pending">🕒 Pending</option>
+                <option value="Under Investigation">🔍 Under Investigation</option>
+                <option value="Confirmed">✅ Confirmed</option>
+                <option value="Contained">🛡️ Contained</option>
+                <option value="Resolved">✔️ Resolved</option>
+            </select>
+
+            <label>Location / Address *</label>
+            <textarea name="location" required placeholder="Physical location..."></textarea>
+
+            <label>Latitude</label>
+            <input type="number" step="any" name="latitude" id="latitude" />
+
+            <label>Longitude</label>
+            <input type="number" step="any" name="longitude" id="longitude" />
+
+            <button type="button" class="btn btn-light" style="margin-top: 1rem; width: 100%;" onclick="updateGPS()">
+                📍 Update GPS Coordinates
+            </button>
+
+
+            <label>Remarks / Additional Notes</label>
+            <textarea name="remarks" placeholder="Additional details about the infection outbreak..."></textarea>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 2rem; width: 100%;">
+                💾 Save Report
+            </button>
+        </form>
+    </main>
+    <div id="toast" class="toast"></div>
+    <script type="module">
+        import { supabase } from "./main.js";
+        import { getCurrentUserProfile } from "./locationAccessControl.js";
+        const form = document.getElementById("reportForm");
+        const toast = document.getElementById("toast");
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+        let currentUser = null;
+        function showToast(msg, type = "info") {
+            toast.textContent = msg;
+            toast.style.background = type === "error" ? "#dc2626" : "#dc2626";
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 3000);
+        }
+        window.updateGPS = () => {
+            if (!navigator.geolocation) {
+                showToast("Geolocation not supported", "error");
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    document.getElementById("latitude").value = pos.coords.latitude.toFixed(6);
+                    document.getElementById("longitude").value = pos.coords.longitude.toFixed(6);
+                    showToast("GPS coordinates updated");
+                },
+                err => showToast("GPS error: " + err.message, "error")
+            );
+        };
+        async function init() {
+            try {
+                currentUser = await getCurrentUserProfile(supabase);
+                if (!currentUser) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                form.elements.reported_by.value = currentUser.name || currentUser.email;
+                if (!form.elements.report_date.value) {
+                    form.elements.report_date.value = new Date().toISOString().split('T')[0];
+                }
+                if (currentUser.county) document.getElementById('county').value = currentUser.county;
+                if (currentUser.sub_county) document.getElementById('sub_county').value = currentUser.sub_county;
+                if (currentUser.ward) document.getElementById('ward').value = currentUser.ward;
+                if (id) {
+                    document.getElementById('pageTitle').textContent = 'Edit Surveillance Report';
+                    await loadReport(id);
+                }
+            } catch (err) {
+                console.error('Init error:', err);
+                showToast('Initialization failed', 'error');
+            }
+        }
+        async function loadReport(id) {
+            const { data, error } = await supabase.from('ipc_surveillance_reports').select('*').eq('id', id).single();
+            if (error) {
+                showToast('Failed to load report', 'error');
+                return;
+            }
+            if (data) {
+                for (const [key, value] of Object.entries(data)) {
+                    const input = form.elements[key];
+                    if (input) input.value = value || '';
+                }
+            }
+        }
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const payload = Object.fromEntries(formData.entries());
+            payload.county = document.getElementById('county').value || null;
+            payload.sub_county = document.getElementById('sub_county').value || null;
+            payload.ward = document.getElementById('ward').value || null;
+            if (payload.number_of_cases) payload.number_of_cases = parseInt(payload.number_of_cases);
+            else delete payload.number_of_cases;
+            if (payload.number_of_deaths) payload.number_of_deaths = parseInt(payload.number_of_deaths);
+            else delete payload.number_of_deaths;
+            if (payload.latitude) payload.latitude = parseFloat(payload.latitude);
+            else delete payload.latitude;
+            if (payload.longitude) payload.longitude = parseFloat(payload.longitude);
+            else delete payload.longitude;
+            payload.updated_at = new Date().toISOString();
+            if (currentUser) payload.last_updated_by = currentUser.id;
+            try {
+                let error;
+                if (id) {
+                    ({ error } = await supabase.from('ipc_surveillance_reports').update(payload).eq('id', id));
+                } else {
+                    payload.created_by = currentUser.id;
+                    ({ error } = await supabase.from('ipc_surveillance_reports').insert([payload]));
+                }
+                if (error) throw error;
+                showToast('Report saved successfully!');
+                setTimeout(() => window.location.href = 'ipc.html', 1000);
+            } catch (err) {
+                console.error('Save error:', err);
+                showToast('Save failed: ' + err.message, 'error');
+            }
+        });
+        init();
+    </script>
+</body>
+
+</html>

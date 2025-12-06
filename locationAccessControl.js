@@ -34,6 +34,19 @@ export async function getCurrentUserProfile(supabase) {
             };
         }
 
+        if (profile) {
+            // Parse CSV text columns into arrays if needed
+            if (typeof profile.allowed_wards === 'string') {
+                profile.allowed_wards = profile.allowed_wards.split(',').map(s => s.trim()).filter(Boolean);
+            }
+            if (typeof profile.allowed_subcounties === 'string') {
+                profile.allowed_subcounties = profile.allowed_subcounties.split(',').map(s => s.trim()).filter(Boolean);
+            }
+            // Ensure they are arrays if null/undefined
+            profile.allowed_wards = profile.allowed_wards || [];
+            profile.allowed_subcounties = profile.allowed_subcounties || [];
+        }
+
         return profile;
     } catch (err) {
         console.error('Unexpected error in getCurrentUserProfile:', err);
@@ -131,4 +144,65 @@ export function applyLocationFilters(query, profile) {
     }
 
     return query;
+}
+
+/**
+ * Applies location-based filters to a query by filtering on the linked site_id.
+ * Use this when the main table lacks location columns but has a site_id linking to waste_management_sites.
+ * @param {SupabaseClient} supabase - The supabase client
+ * @param {SupabaseQueryBuilder} query - The existing query object
+ * @param {Object} profile - The user profile object
+ * @returns {Promise<SupabaseQueryBuilder>} The modified query object
+ */
+export async function applySiteLocationFilters(supabase, query, profile) {
+    if (!profile) return query;
+
+    // 1. Admin / High-level roles see everything
+    if (['admin', 'supervisor', 'director'].includes(profile.role)) {
+        return query;
+    }
+
+    // Build a sub-query for sites
+    let siteQuery = supabase.from('waste_management_sites').select('id');
+
+    // Reuse the logic from applyLocationFilters but on the siteQuery
+    // We can't reuse the function directly because it returns a query, and we want to modify siteQuery
+    // So we duplicate valid logic or refactor. Duplication is safer for now to avoid breaking existing sync function.
+
+    let hasFilter = false;
+
+    if (profile.ward) {
+        siteQuery = siteQuery.ilike('ward', profile.ward);
+        hasFilter = true;
+    } else if (profile.sub_county) {
+        siteQuery = siteQuery.ilike('sub_county', profile.sub_county);
+        hasFilter = true;
+    } else if (profile.county) {
+        siteQuery = siteQuery.ilike('county', profile.county);
+        hasFilter = true;
+    } else if (profile.allowed_wards && profile.allowed_wards.length > 0) {
+        siteQuery = siteQuery.in('ward', profile.allowed_wards);
+        hasFilter = true;
+    } else if (profile.allowed_subcounties && profile.allowed_subcounties.length > 0) {
+        siteQuery = siteQuery.in('sub_county', profile.allowed_subcounties);
+        hasFilter = true;
+    }
+
+    // Default restrict if officer has no location?
+    if (!hasFilter && (profile.role === 'officer' || profile.role === 'inspector')) {
+        // Return query that matches nothing
+        return query.eq('id', '00000000-0000-0000-0000-000000000000');
+    }
+
+    if (!hasFilter) return query; // If no specific filter and not restricted role, return all (or restricted? policy usually handles this)
+
+    const { data: sites, error } = await siteQuery;
+
+    if (error) {
+        console.error('Error fetching allowed sites:', error);
+        return query.eq('id', '00000000-0000-0000-0000-000000000000'); // Fail safe
+    }
+
+    const siteIds = sites.map(s => s.id);
+    return query.in('site_id', siteIds);
 }

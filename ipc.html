@@ -1,124 +1,586 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Infection Prevention & Control | EPHIS</title>
-<link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#2563eb" />
-<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
-<script type="module" src="main.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8fafc;min-height:100vh;color:#0f172a;display:flex;flex-direction:column;}
-body::before{content:'';position:fixed;top:0;left:0;right:0;height:400px;background:linear-gradient(135deg,#0ea5e9 0%,#2563eb 50%,#7c3aed 100%);z-index:-1;opacity:0.05;}
-header{background:white;box-shadow:0 1px 3px rgba(0,0,0,0.05);padding:1.2rem 2rem;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:100;}
-.header-content{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:1rem;}
-.header-left{display:flex;align-items:center;gap:1rem;}
-.logo{width:40px;height:40px;background:linear-gradient(135deg,#0ea5e9 0%,#2563eb 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(37,99,235,0.2);font-weight:bold;color:white;font-size:1.2rem;}
-header h1{font-size:1.4rem;color:#0f172a;font-weight:700;letter-spacing:-0.02em;}
-.header-actions{display:flex;gap:0.75rem;align-items:center;}
-.btn{padding:0.6rem 1.2rem;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.95rem;border:none;transition:all 0.2s ease;}
-.btn-primary{background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);color:white;box-shadow:0 4px 12px rgba(37,99,235,0.2);}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,0.3);}
-.btn-secondary{background:#10b981;color:white;}
-.btn-secondary:hover{background:#059669;transform:translateY(-1px);}
-.btn-light{background:white;color:#2563eb;border:2px solid #2563eb;}
-.btn-light:hover{background:#2563eb;color:white;transform:translateY(-1px);}
-main{flex:1;max-width:1400px;margin:0 auto;padding:2rem;width:100%;}
-.section{margin-bottom:3rem;}
-.section h2{color:#1e293b;margin-bottom:1.5rem;font-size:1.3rem;display:flex;align-items:center;gap:0.5rem;}
-.card{background:white;border-radius:12px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.05);border:1px solid #e2e8f0;transition:all 0.2s ease;}
-.card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.08);}
-.card-header{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:#0f172a;margin-bottom:1rem;font-size:1.1rem;}
-.card p{font-size:0.95rem;color:#475569;margin-bottom:0.5rem;line-height:1.6;}
-.card strong{color:#1e293b;font-weight:600;}
-.actions{display:flex;gap:0.6rem;margin-top:1.2rem;padding-top:1rem;border-top:1px solid #f1f5f9;}
-.actions a{text-decoration:none;background:#eff6ff;color:#2563eb;padding:0.5rem 1rem;border-radius:8px;font-size:0.9rem;font-weight:600;transition:all 0.2s ease;border:1px solid #dbeafe;}
-.actions a:hover{background:#2563eb;color:white;transform:translateY(-1px);}
-footer{text-align:center;padding:2rem 1rem;font-size:0.9rem;color:#64748b;background:white;border-top:1px solid #e2e8f0;margin-top:3rem;}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#2563eb;color:white;padding:1rem 1.5rem;border-radius:10px;opacity:0;transition:opacity 0.3s ease;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:1000;}
-.toast.show{opacity:1;}
-.empty-state{text-align:center;padding:3rem 1rem;color:#64748b;}
-.empty-state-icon{font-size:3rem;margin-bottom:1rem;}
-@media(max-width:768px){header{padding:1rem;}.header-content h1{font-size:1.1rem;}main{padding:1rem;}.header-actions{width:100%;justify-content:space-between;}}
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Infection Prevention & Control | EPHIS</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#9333ea" />
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+    <script type="module" src="main.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #9333ea;
+            --primary-dark: #7e22ce;
+            --primary-light: #a855f7;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(16, 185, 129, 0.1) 100%);
+            z-index: -1;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        .logo:hover {
+            transform: scale(1.05) rotate(-5deg);
+            box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .location-badge {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+            border: 1px solid #d8b4fe;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            color: #7e22ce;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
+        }
+
+        .btn-light {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-light:hover {
+            border-color: var(--primary);
+            background: var(--bg-main);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section {
+            margin-bottom: 3rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .section h2 {
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.25rem;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.625rem;
+            line-height: 1.7;
+        }
+
+        .card strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .badge {
+            padding: 0.4rem 0.875rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            border: 1.5px solid;
+            white-space: nowrap;
+        }
+
+        .badge.High {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #047857;
+            border-color: #86efac;
+        }
+
+        .badge.Moderate {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #d97706;
+            border-color: #fcd34d;
+        }
+
+        .badge.Low {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #dc2626;
+            border-color: #fca5a5;
+        }
+
+        .actions {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .actions a {
+            text-decoration: none;
+            background: #f3e8ff;
+            color: #7e22ce;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid #e9d5ff;
+        }
+
+        .actions a:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            background: white;
+            border-top: 1px solid var(--border);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text-primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            z-index: 1000;
+            font-weight: 500;
+            min-width: 250px;
+            text-align: center;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
 </head>
 
 <body>
-<header>
-<div class="header-content">
-<div class="header-left">
-<div class="logo">E</div>
-<h1>Infection Prevention & Control</h1>
-</div>
-<div class="header-actions">
-<button class="btn btn-light" onclick="window.location.href='dashboard.html'">← Dashboard</button>
-<button class="btn btn-secondary" id="logoutBtn">Logout</button>
-</div>
-</div>
-</header>
-
-<main>
-<div class="section">
-<h2>🏭 Facility IPC Assessments</h2>
-<button class="btn btn-primary" onclick="window.location.href='ipc_form.html'">+ New Assessment</button>
-<div id="assessmentsContainer"></div>
-</div>
-
-<div class="section">
-<h2>🦠 Infection Surveillance Reports</h2>
-<button class="btn btn-primary" onclick="window.location.href='ipc_form.html#report'">+ New Report</button>
-<div id="reportsContainer"></div>
-</div>
-</main>
-
-<footer><p>&copy; <span id="year"></span> EPHIS - Elgeyo Marakwet County Environmental Health System</p></footer>
-<div id="toast" class="toast"></div>
-
-<script type="module">
-import { supabase } from "./main.js";
-const toast=document.getElementById("toast");
-const logoutBtn=document.getElementById("logoutBtn");
-
-function showToast(msg){toast.textContent=msg;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
-async function checkSession(){const{data}=await supabase.auth.getSession();if(!data.session)window.location.href="login.html";}
-checkSession();
-
-async function loadAssessments(){
-const {data,error}=await supabase.from("ipc_facility_assessments").select("*").order("assessment_date",{ascending:false}).limit(5);
-if(error){console.error(error);return;}
-const c=document.getElementById("assessmentsContainer");
-if(!data.length){c.innerHTML=`<div class="empty-state"><div class="empty-state-icon">🏭</div><h3>No assessments found</h3><p>Start by creating a new facility assessment</p></div>`;return;}
-c.innerHTML=data.map(d=>`
-<div class="card">
-<div class="card-header"><span>${d.facility_name}</span><span>${d.assessment_date||''}</span></div>
-<p><strong>Auditor:</strong> ${d.auditor_name||'-'} | <strong>Compliance:</strong> ${d.compliance_level||'-'} (${d.compliance_score||'--'}%)</p>
-<p><strong>Status:</strong> ${d.status||'-'}</p>
-<div class="actions">
-<a href="ipc_actions.html?id=${d.id}">🎯 Actions</a>
-<a href="ipc_followups.html?id=${d.id}">📋 Follow-ups</a>
-</div>
-</div>`).join("");
-}
-
-async function loadReports(){
-const {data,error}=await supabase.from("ipc_surveillance_reports").select("*").order("report_date",{ascending:false}).limit(5);
-if(error){console.error(error);return;}
-const c=document.getElementById("reportsContainer");
-if(!data.length){c.innerHTML=`<div class="empty-state"><div class="empty-state-icon">🦠</div><h3>No surveillance reports found</h3><p>Start by adding a new infection surveillance report</p></div>`;return;}
-c.innerHTML=data.map(r=>`
-<div class="card">
-<div class="card-header"><span>${r.facility_name||'Unknown Facility'}</span><span>${r.report_date||''}</span></div>
-<p><strong>Infection:</strong> ${r.infection_type||'-'} | <strong>Cases:</strong> ${r.number_of_cases||0}</p>
-<p><strong>Severity:</strong> ${r.severity||'-'} | <strong>Status:</strong> ${r.status||'-'}</p>
-<p><strong>Reported By:</strong> ${r.reported_by||'-'}</p>
-</div>`).join("");
-}
-
-logoutBtn.onclick=async()=>{await supabase.auth.signOut();window.location.href="login.html";}
-document.getElementById("year").textContent=new Date().getFullYear();
-loadAssessments();loadReports();
-</script>
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <div class="logo">E</div>
+                <h1>Infection Prevention & Control</h1>
+                <div class="location-badge" id="locationBadge">📍 Loading...</div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-light" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+                <button class="btn btn-light" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="section">
+            <h2>🏭 Facility IPC Assessments</h2>
+            <button class="btn btn-primary" onclick="window.location.href='ipc_form.html'">+ New Assessment</button>
+            <div id="assessmentsContainer" class="cards-grid"></div>
+        </div>
+        <div class="section">
+            <h2>🦠 Infection Surveillance Reports</h2>
+            <button class="btn btn-primary" onclick="window.location.href='ipc_surveillance_form.html'">+ New
+                Report</button>
+            <div id="reportsContainer" class="cards-grid"></div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; <span id="year"></span> EPHIS - Elgeyo Marakwet County Environmental Health System</p>
+    </footer>
+    <div id="toast" class="toast"></div>
+    <script type="module">
+        import { supabase } from "./main.js";
+        import { getCurrentUserProfile, applyLocationFilters, getLocationFilterDescription } from './locationAccessControl.js';
+        const toast = document.getElementById("toast");
+        const logoutBtn = document.getElementById("logoutBtn");
+        let userProfile = null;
+        function showToast(msg, type = "info") {
+            toast.textContent = msg;
+            toast.style.background = type === "error" ? "#dc2626" : "#9333ea";
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 3000);
+        }
+        async function checkSession() {
+            const { data } = await supabase.auth.getSession();
+            if (!data.session) window.location.href = "login.html";
+        }
+        checkSession();
+        async function init() {
+            try {
+                userProfile = await getCurrentUserProfile(supabase);
+                document.getElementById('locationBadge').textContent = getLocationFilterDescription(userProfile);
+            } catch (err) {
+                console.error('Profile load error:', err);
+            }
+        }
+        async function loadAssessments() {
+            const c = document.getElementById("assessmentsContainer");
+            c.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:2rem;">Loading...</div>';
+            try {
+                let query = supabase.from("ipc_facility_assessments").select("*").order("assessment_date", { ascending: false }).limit(10);
+                query = applyLocationFilters(query, userProfile);
+                const { data, error } = await query;
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    c.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🏭</div><h3>No assessments found</h3><p>Start by creating a new facility assessment</p></div>`;
+                    return;
+                }
+                c.innerHTML = data.map(d => `
+          <div class="card">
+            <div class="card-header">
+              <span>${d.facility_name || 'Unknown Facility'}</span>
+              <span class="badge ${d.compliance_level || 'Low'}">${d.compliance_level || 'Pending'}</span>
+            </div>
+            <p><strong>Date:</strong> ${d.assessment_date || '-'}</p>
+            <p><strong>Auditor:</strong> ${d.auditor_name || '-'}</p>
+            <p><strong>Compliance Score:</strong> ${d.compliance_score || '--'}%</p>
+            <p><strong>Status:</strong> ${d.status || 'Pending'}</p>
+            ${d.location ? `<p><strong>Location:</strong> ${d.location}</p>` : ''}
+            <div class="actions">
+              <a href="ipc_form.html?id=${d.id}">✏️ Edit</a>
+              <a href="ipc_actions.html?ipc_id=${d.id}">🎯 Actions</a>
+              <a href="ipc_followups.html?ipc_id=${d.id}">📋 Follow-ups</a>
+            </div>
+          </div>
+        `).join("");
+            } catch (err) {
+                console.error(err);
+                c.innerHTML = `<div class="empty-state" style="color:#dc2626">Error loading assessments: ${err.message}</div>`;
+            }
+        }
+        async function loadReports() {
+            const c = document.getElementById("reportsContainer");
+            c.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:2rem;">Loading...</div>';
+            try {
+                let query = supabase.from("ipc_surveillance_reports").select("*").order("report_date", { ascending: false }).limit(10);
+                query = applyLocationFilters(query, userProfile);
+                const { data, error } = await query;
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    c.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🦠</div><h3>No surveillance reports found</h3><p>Start by adding a new infection surveillance report</p></div>`;
+                    return;
+                }
+                c.innerHTML = data.map(r => `
+          <div class="card">
+            <div class="card-header">
+              <span>${r.facility_name || 'Unknown Facility'}</span>
+            </div>
+            <p><strong>Report Date:</strong> ${r.report_date || '-'}</p>
+            <p><strong>Infection Type:</strong> ${r.infection_type || '-'}</p>
+            <p><strong>Cases:</strong> ${r.number_of_cases || 0}</p>
+            <p><strong>Severity:</strong> ${r.severity || '-'}</p>
+            <p><strong>Status:</strong> ${r.status || '-'}</p>
+            <p><strong>Reported By:</strong> ${r.reported_by || '-'}</p>
+            ${r.location ? `<p><strong>Location:</strong> ${r.location}</p>` : ''}
+            <div class="actions">
+              <a href="ipc_surveillance_form.html?id=${r.id}">✏️ Edit</a>
+            </div>
+          </div>
+        `).join("");
+            } catch (err) {
+                console.error(err);
+                c.innerHTML = `<div class="empty-state" style="color:#dc2626">Error loading reports: ${err.message}</div>`;
+            }
+        }
+        logoutBtn.onclick = async () => {
+            await supabase.auth.signOut();
+            showToast("Logging out...");
+            setTimeout(() => window.location.href = "login.html", 800);
+        };
+        document.getElementById("year").textContent = new Date().getFullYear();
+        init().then(() => {
+            loadAssessments();
+            loadReports();
+        });
+    </script>
 </body>
+
 </html>

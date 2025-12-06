@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Follow-up History | EPHIS</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#f59e0b" />
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+    <script type="module" src="main.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(16, 185, 129, 0.1) 100%);
+            z-index: -1;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-light {
+            background: white;
+            color: #f59e0b;
+            border: 2px solid var(--border);
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+
+        .btn-light:hover {
+            border-color: #f59e0b;
+            transform: translateY(-2px);
+        }
+
+        main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.75rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: #f59e0b;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.25rem;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .badge {
+            padding: 0.4rem 0.875rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 1.5px solid;
+        }
+
+        .badge.Compliant {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #047857;
+            border-color: #86efac;
+        }
+
+        .badge.NonCompliant {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #dc2626;
+            border-color: #fca5a5;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.625rem;
+            line-height: 1.7;
+        }
+
+        .card strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top-color: #f59e0b;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-top: 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text-primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            z-index: 1000;
+            font-weight: 500;
+            min-width: 250px;
+            text-align: center;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <div class="logo">E</div>
+                <h1>Follow-up History</h1>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <button class="btn btn-light" onclick="history.back()">← Back</button>
+                <button class="btn btn-primary" id="addBtn">+ Add Follow-up</button>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div id="cardsContainer" class="cards-grid"></div>
+    </main>
+    <div id="toast" class="toast"></div>
+    <script type="module">
+        import { supabase } from "./main.js";
+        const params = new URLSearchParams(window.location.search);
+        const enforcementId = params.get("enforcement_id");
+        const cardsContainer = document.getElementById("cardsContainer");
+        const toast = document.getElementById("toast");
+        function showToast(msg, type = "info") {
+            toast.textContent = msg;
+            toast.style.background = type === "error" ? "#dc2626" : "#f59e0b";
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 3000);
+        }
+        async function loadFollowups() {
+            if (!enforcementId) {
+                cardsContainer.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>No Enforcement ID</h3></div>`;
+                return;
+            }
+            cardsContainer.innerHTML = '<div class="loading">Loading follow-ups...</div>';
+            try {
+                const { data, error } = await supabase.from("building_followups").select("*").eq("enforcement_id", enforcementId).order("followup_date", { ascending: false });
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    cardsContainer.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📅</div><h3>No Follow-ups</h3><p>No follow-up visits recorded</p></div>`;
+                    return;
+                }
+                cardsContainer.innerHTML = data.map(f => `
+          <div class="card">
+            <div class="card-header">
+              <span>${f.followup_date || 'No Date'}</span>
+              <span class="badge ${f.status?.replace(' ', '') || 'NonCompliant'}">${f.status || 'Unknown'}</span>
+            </div>
+            <p><strong>Officer:</strong> ${f.officer_name || '-'}</p>
+            <p><strong>Findings:</strong> ${f.findings || 'No findings'}</p>
+            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 0.75rem;">
+              <a href="building_followup_form.html?id=${f.id}&enforcement_id=${enforcementId}" class="btn btn-light" style="padding: 0.5rem 1rem; font-size: 0.875rem;">✏️ Edit</a>
+              <button onclick="deleteFollowup('${f.id}')" class="btn btn-light" style="padding: 0.5rem 1rem; font-size: 0.875rem; color: #dc2626;">🗑️</button>
+            </div>
+          </div>
+        `).join("");
+            } catch (err) {
+                console.error("Load error:", err);
+                cardsContainer.innerHTML = `<div class="empty-state" style="color:#dc2626">Error: ${err.message}</div>`;
+            }
+        }
+        window.deleteFollowup = async (id) => {
+            if (!confirm("Delete this follow-up?")) return;
+            try {
+                const { error } = await supabase.from("building_followups").delete().eq("id", id);
+                if (error) throw error;
+                showToast("Follow-up deleted");
+                loadFollowups();
+            } catch (err) {
+                showToast("Delete failed: " + err.message, "error");
+            }
+        };
+        document.getElementById("addBtn").onclick = () => {
+            if (enforcementId) window.location.href = `building_followup_form.html?enforcement_id=${enforcementId}`;
+        };
+        loadFollowups();
+    </script>
+</body>
+
+</html>

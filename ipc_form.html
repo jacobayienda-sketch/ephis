@@ -1,160 +1,444 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>IPC Assessment Form | EPHIS</title>
-<link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#2563eb" />
-<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script type="module" src="main.js"></script>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IPC Assessment Form | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#9333ea" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <script type="module" src="main.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f8fafc;
-  min-height: 100vh;
-  color: #0f172a;
-}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 400px;
-  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
-  z-index: -1;
-  opacity: 0.05;
-}
+    :root {
+      --primary: #9333ea;
+      --primary-dark: #7e22ce;
+      --primary-light: #a855f7;
+      --secondary: #10b981;
+      --accent: #8b5cf6;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --radius: 12px;
+      --radius-lg: 16px;
+    }
 
-header {
-  background: white;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  padding: 1.2rem 2rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-main);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-.logo {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #0ea5e9, #2563eb);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  color: white;
-  font-size: 1.2rem;
-}
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 500px;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(16, 185, 129, 0.1) 100%);
+      z-index: -1;
+      animation: gradientShift 15s ease infinite;
+    }
 
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
+    @keyframes gradientShift {
 
-.header-content h1 {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #0f172a;
-}
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
 
-main { padding: 2rem; max-width: 800px; margin: 0 auto; }
-.form-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  padding: 2rem;
-  margin-top: 1rem;
-}
-.form-card h2 { font-size: 1.5rem; margin-bottom: 1.5rem; color: #0f172a; }
-label { font-weight: 600; color: #475569; margin-top: 1rem; display: block; margin-bottom: 0.5rem; font-size: 0.9rem; }
-label:first-of-type { margin-top: 0; }
-input, select, textarea {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.2s;
-}
-input:focus, select:focus, textarea:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
-}
-textarea { min-height: 100px; resize: vertical; }
-.btn { border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-weight: 600; transition: all 0.2s; cursor: pointer; font-size: 1rem; }
-.btn-primary { background: linear-gradient(135deg, #0ea5e9, #2563eb); color: white; }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
-.btn-light { background: white; color: #2563eb; border: 2px solid #e2e8f0; }
-.btn-light:hover { border-color: #2563eb; background: #f8fafc; }
-.form-actions { margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end; }
-.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transition: opacity 0.3s; }
-.toast.show { opacity: 1; }
+      50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+      }
+    }
 
-@media (max-width: 768px) {
-  main { padding: 1rem; }
-  .form-card { padding: 1.5rem; }
-}
-</style>
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-content h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
+    }
+
+    .btn-light {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-light:hover {
+      border-color: var(--primary);
+      background: var(--bg-main);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    main {
+      flex: 1;
+      padding: 2.5rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    form {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 2.5rem;
+      margin-top: 1.5rem;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    form::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+      background-size: 200% 100%;
+      animation: gradientMove 3s ease infinite;
+    }
+
+    @keyframes gradientMove {
+
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+
+    form h2 {
+      font-size: 1.75rem;
+      margin-bottom: 2rem;
+      color: var(--text-primary);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    form label {
+      display: block;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.625rem;
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    form label:first-of-type {
+      margin-top: 0;
+    }
+
+    form input,
+    form select,
+    form textarea {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      background: white;
+      color: var(--text-primary);
+    }
+
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.1);
+      transform: translateY(-1px);
+    }
+
+    form textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    form select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 3rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text-primary);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+      z-index: 1000;
+      font-weight: 500;
+      min-width: 250px;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
 </head>
 
 <body>
-<header>
-  <div class="header-content">
-    <div class="logo">E</div>
-    <h1>IPC Assessment Form</h1>
-  </div>
-  <button class="btn btn-light" onclick="history.back()">← Back</button>
-</header>
+  <header>
+    <div class="header-content">
+      <h1 id="pageTitle">New IPC Assessment</h1>
+    </div>
+    <button class="btn btn-light" onclick="history.back()">Cancel</button>
+  </header>
+  <main>
+    <form id="ipcForm">
+      <h2>🏥 IPC Assessment Details</h2>
+      <input type="hidden" name="county" id="county" />
+      <input type="hidden" name="sub_county" id="sub_county" />
+      <input type="hidden" name="ward" id="ward" />
 
-<main>
-<div class="form-card">
-<h2>🏥 IPC Assessment Details</h2>
-<form id="ipcForm">
-<label>Facility Name</label><input type="text" id="facility_name" required>
-<label>Assessment Date</label><input type="date" id="assessment_date" required>
-<label>Auditor Name</label><input type="text" id="auditor_name">
-<label>Compliance Level</label>
-<select id="compliance_level"><option value="">Select</option><option>High</option><option>Moderate</option><option>Low</option></select>
-<label>Compliance Score (%)</label><input type="number" id="compliance_score" step="0.1">
-<label>Remarks</label><textarea id="remarks"></textarea>
-<div class="form-actions">
-  <button type="button" class="btn btn-light" onclick="history.back()">Cancel</button>
-  <button type="submit" class="btn btn-primary">💾 Save Assessment</button>
-</div>
-</form>
-</div>
-</main>
-<div id="toast" class="toast"></div>
+      <label>Facility Name *</label>
+      <input type="text" name="facility_name" required />
 
-<script type="module">
-import { supabase } from "./main.js";
-const toast=document.getElementById("toast");
-function showToast(m){toast.textContent=m;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
-document.getElementById("ipcForm").addEventListener("submit",async e=>{
-e.preventDefault();
-const payload={
-facility_name:facility_name.value.trim(),
-assessment_date:assessment_date.value,
-auditor_name:auditor_name.value.trim(),
-compliance_level:compliance_level.value,
-compliance_score:parseFloat(compliance_score.value)||null,
-remarks:remarks.value.trim()
-};
-const {error}=await supabase.from("ipc_facility_assessments").insert([payload]);
-if(error){console.error(error);showToast("Save failed");}else{showToast("Saved successfully");setTimeout(()=>history.back(),1000);}
-});
-</script>
+      <label>Assessment Date *</label>
+      <input type="date" name="assessment_date" required />
+
+      <label>Auditor Name</label>
+      <input type="text" name="auditor_name" readonly style="background: #f8fafc; cursor: not-allowed;" />
+
+      <label>Compliance Level</label>
+      <select name="compliance_level">
+        <option value="">Select Level</option>
+        <option value="High">✅ High</option>
+        <option value="Moderate">⚠️ Moderate</option>
+        <option value="Low">❌ Low</option>
+      </select>
+
+      <label>Compliance Score (%)</label>
+      <input type="number" name="compliance_score" step="0.1" min="0" max="100" />
+
+      <label>Location / Address *</label>
+      <textarea name="location" required placeholder="Physical location..."></textarea>
+
+      <label>Latitude</label>
+      <input type="number" step="any" name="latitude" id="latitude" />
+
+      <label>Longitude</label>
+      <input type="number" step="any" name="longitude" id="longitude" />
+
+      <button type="button" class="btn btn-light" style="margin-top: 1rem; width: 100%;" onclick="updateGPS()">
+        📍 Update GPS Coordinates
+      </button>
+
+      <label>Remarks</label>
+      <textarea name="remarks" placeholder="Additional assessment notes..."></textarea>
+
+      <button type="submit" class="btn btn-primary" style="margin-top: 2rem; width: 100%;">
+        💾 Save Assessment
+      </button>
+    </form>
+  </main>
+  <div id="toast" class="toast"></div>
+  <script type="module">
+    import { supabase } from "./main.js";
+    import { getCurrentUserProfile } from "./locationAccessControl.js";
+    const form = document.getElementById("ipcForm");
+    const toast = document.getElementById("toast");
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    let currentUser = null;
+    function showToast(msg, type = "info") {
+      toast.textContent = msg;
+      toast.style.background = type === "error" ? "#dc2626" : "#9333ea";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+    window.updateGPS = () => {
+      if (!navigator.geolocation) {
+        showToast("Geolocation not supported", "error");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          document.getElementById("latitude").value = pos.coords.latitude.toFixed(6);
+          document.getElementById("longitude").value = pos.coords.longitude.toFixed(6);
+          showToast("GPS coordinates updated");
+        },
+        err => showToast("GPS error: " + err.message, "error")
+      );
+    };
+    async function init() {
+      try {
+        currentUser = await getCurrentUserProfile(supabase);
+        if (!currentUser) {
+          window.location.href = 'login.html';
+          return;
+        }
+        form.elements.auditor_name.value = currentUser.name || currentUser.email;
+        if (!form.elements.assessment_date.value) {
+          form.elements.assessment_date.value = new Date().toISOString().split('T')[0];
+        }
+        if (currentUser.county) document.getElementById('county').value = currentUser.county;
+        if (currentUser.sub_county) document.getElementById('sub_county').value = currentUser.sub_county;
+        if (currentUser.ward) document.getElementById('ward').value = currentUser.ward;
+        if (id) {
+          document.getElementById('pageTitle').textContent = 'Edit IPC Assessment';
+          await loadAssessment(id);
+        }
+      } catch (err) {
+        console.error('Init error:', err);
+        showToast('Initialization failed', 'error');
+      }
+    }
+    async function loadAssessment(id) {
+      const { data, error } = await supabase.from('ipc_facility_assessments').select('*').eq('id', id).single();
+      if (error) {
+        showToast('Failed to load assessment', 'error');
+        return;
+      }
+      if (data) {
+        for (const [key, value] of Object.entries(data)) {
+          const input = form.elements[key];
+          if (input) input.value = value || '';
+        }
+      }
+    }
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const payload = Object.fromEntries(formData.entries());
+      payload.county = document.getElementById('county').value || null;
+      payload.sub_county = document.getElementById('sub_county').value || null;
+      payload.ward = document.getElementById('ward').value || null;
+      if (payload.compliance_score) payload.compliance_score = parseFloat(payload.compliance_score);
+      else delete payload.compliance_score;
+      if (payload.latitude) payload.latitude = parseFloat(payload.latitude);
+      else delete payload.latitude;
+      if (payload.longitude) payload.longitude = parseFloat(payload.longitude);
+      else delete payload.longitude;
+      payload.updated_at = new Date().toISOString();
+      if (currentUser) payload.last_updated_by = currentUser.id;
+      try {
+        let error;
+        if (id) {
+          ({ error } = await supabase.from('ipc_facility_assessments').update(payload).eq('id', id));
+        } else {
+          payload.created_by = currentUser.id;
+          ({ error } = await supabase.from('ipc_facility_assessments').insert([payload]));
+        }
+        if (error) throw error;
+        showToast('Assessment saved successfully!');
+        setTimeout(() => window.location.href = 'ipc.html', 1000);
+      } catch (err) {
+        console.error('Save error:', err);
+        showToast('Save failed: ' + err.message, 'error');
+      }
+    });
+    init();
+  </script>
 </body>
+
 </html>

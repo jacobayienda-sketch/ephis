@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -33,17 +34,26 @@
       left: 0;
       right: 0;
       height: 500px;
-      background: linear-gradient(135deg, 
-        rgba(37, 99, 235, 0.1) 0%, 
-        rgba(139, 92, 246, 0.1) 50%, 
-        rgba(16, 185, 129, 0.1) 100%);
+      background: linear-gradient(135deg,
+          rgba(37, 99, 235, 0.1) 0%,
+          rgba(139, 92, 246, 0.1) 50%,
+          rgba(16, 185, 129, 0.1) 100%);
       z-index: -1;
       animation: gradientShift 15s ease infinite;
     }
 
     @keyframes gradientShift {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.05); }
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+      }
     }
 
     header {
@@ -201,8 +211,15 @@
     }
 
     @keyframes gradientMove {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
+
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
     }
 
     form h2 {
@@ -267,7 +284,9 @@
       font-weight: normal;
     }
 
-    input, select, textarea {
+    input,
+    select,
+    textarea {
       width: 100%;
       padding: 0.875rem 1rem;
       border: 2px solid #e2e8f0;
@@ -279,7 +298,9 @@
       color: #0f172a;
     }
 
-    input:focus, select:focus, textarea:focus {
+    input:focus,
+    select:focus,
+    textarea:focus {
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
@@ -338,7 +359,7 @@
       color: #64748b;
       background: white;
       border-top: 1px solid #e2e8f0;
-      margin-top: 4rem;
+      margin-top: auto;
     }
 
     .toast {
@@ -477,36 +498,15 @@
         </div>
       </div>
 
+      <!-- Hidden Location Fields (Auto-filled) -->
+      <input type="hidden" id="county" />
+      <input type="hidden" id="sub_county" />
+      <input type="hidden" id="ward" />
+
       <div class="form-section">
         <h3>📍 Location Information</h3>
 
         <div class="form-row">
-          <div class="form-group">
-            <label for="county">County</label>
-            <select id="county">
-              <option value="">Select county</option>
-            </select>
-            <div class="field-description">Select the county for inspection</div>
-          </div>
-
-          <div class="form-group">
-            <label for="sub_county">Sub-county</label>
-            <select id="sub_county">
-              <option value="">Select sub-county</option>
-            </select>
-            <div class="field-description">Select the sub-county</div>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="ward">Ward</label>
-            <select id="ward">
-              <option value="">Select ward</option>
-            </select>
-            <div class="field-description">Select the ward</div>
-          </div>
-
           <div class="form-group">
             <label for="geo_location">Specific Location</label>
             <input type="text" id="geo_location" placeholder="Building, street, landmark..." />
@@ -587,13 +587,14 @@
   </main>
 
   <footer>
-    <p>County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span></p>
+    <p>EPHIS 2025</p>
   </footer>
 
   <div id="toast" class="toast"></div>
 
   <script type="module">
     import { supabase } from "./main.js";
+    import { getCurrentUserProfile } from "./locationAccessControl.js";
 
     const toast = document.getElementById("toast");
     const logoutBtn = document.getElementById("logoutBtn");
@@ -610,7 +611,6 @@
     const params = new URLSearchParams(window.location.search);
     const inspectionId = params.get("id");
 
-    let wardsData = [];
     let uploadedFileUrl = "";
 
     function showToast(msg, type = "info") {
@@ -623,6 +623,14 @@
     async function checkSession() {
       const { data } = await supabase.auth.getSession();
       if (!data.session) window.location.href = "login.html";
+
+      const profile = await getCurrentUserProfile(supabase);
+      if (profile) {
+        // Auto-fill hidden location fields
+        if (profile.county) county.value = profile.county;
+        if (profile.sub_county) sub_county.value = profile.sub_county;
+        if (profile.ward) ward.value = profile.ward;
+      }
     }
     checkSession();
 
@@ -643,21 +651,21 @@
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          
+
           latitudeInput.value = lat.toFixed(6);
           longitudeInput.value = lng.toFixed(6);
-          
+
           locationStatus.textContent = `✅ Location captured: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
           locationStatus.style.color = "#10b981";
-          
+
           getLocationBtn.disabled = false;
           getLocationBtn.innerHTML = "📍 Get My Current Location";
-          
+
           showToast("✅ Location captured successfully");
         },
         (error) => {
           let errorMsg = "❌ ";
-          switch(error.code) {
+          switch (error.code) {
             case error.PERMISSION_DENIED:
               errorMsg += "Location access denied. Please enable location permissions.";
               break;
@@ -670,13 +678,13 @@
             default:
               errorMsg += "An unknown error occurred.";
           }
-          
+
           locationStatus.textContent = errorMsg;
           locationStatus.style.color = "#dc2626";
-          
+
           getLocationBtn.disabled = false;
           getLocationBtn.innerHTML = "📍 Get My Current Location";
-          
+
           showToast(errorMsg, "error");
         },
         {
@@ -685,57 +693,6 @@
           maximumAge: 0
         }
       );
-    });
-
-    // Load wards data
-    async function loadWards() {
-      try {
-        const res = await fetch("./kenya_wards.json");
-        wardsData = await res.json();
-        populateCounties();
-      } catch (error) {
-        console.error("Error loading wards:", error);
-        showToast("⚠️ Error loading location data", "error");
-      }
-    }
-
-    function populateCounties() {
-      const counties = [...new Set(wardsData.map(x => x.county))].sort();
-      counties.forEach(c => {
-        county.innerHTML += `<option value="${c}">${c}</option>`;
-      });
-    }
-
-    county.addEventListener("change", () => {
-      sub_county.innerHTML = `<option value="">Select sub-county</option>`;
-      ward.innerHTML = `<option value="">Select ward</option>`;
-
-      if (!county.value) return;
-
-      const subCounties = [...new Set(
-        wardsData
-          .filter(x => x.county === county.value)
-          .map(x => x.sub_county)
-      )].sort();
-
-      subCounties.forEach(sc => {
-        sub_county.innerHTML += `<option value="${sc}">${sc}</option>`;
-      });
-    });
-
-    sub_county.addEventListener("change", () => {
-      ward.innerHTML = `<option value="">Select ward</option>`;
-
-      if (!sub_county.value) return;
-
-      const wards = wardsData
-        .filter(x => x.county === county.value && x.sub_county === sub_county.value)
-        .map(x => x.ward)
-        .sort();
-
-      wards.forEach(w => {
-        ward.innerHTML += `<option value="${w}">${w}</option>`;
-      });
     });
 
     async function ensureBucket() {
@@ -760,24 +717,13 @@
         }
       }
 
-      // Populate location dropdowns
-      if (data.county) {
-        county.value = data.county;
-        county.dispatchEvent(new Event('change'));
-        
-        setTimeout(() => {
-          if (data.sub_county) {
-            sub_county.value = data.sub_county;
-            sub_county.dispatchEvent(new Event('change'));
-            
-            setTimeout(() => {
-              if (data.ward) {
-                ward.value = data.ward;
-              }
-            }, 100);
-          }
-        }, 100);
-      }
+      // Populate location hidden inputs (keep existing data if editing)
+      if (data.county) county.value = data.county;
+      if (data.sub_county) sub_county.value = data.sub_county;
+      if (data.ward) ward.value = data.ward;
+
+      // Extract parts from geo_location string if necessary, but we are keeping it as a string input for specific address/building
+      // The old form had geo_location as input. We keep it.
 
       // Load attached file info
       const { data: docs } = await supabase.from("inspection_docs").select("checklist_template_url").eq("inspection_id", inspectionId).single();
@@ -787,24 +733,52 @@
       }
     }
 
-    // Initialize
-    loadWards().then(() => {
-      if (inspectionId) {
-        loadInspection();
-      }
-    });
+    if (inspectionId) {
+      loadInspection();
+    }
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      // Build location string
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = "💾 Saving...";
+      submitBtn.disabled = true;
+
+      // Build location string from components?
+      // Actually `geo_location` is the "Specific Location" input now.
+      // We previously concatenated ward/sub/county into it if they were separate.
+      // But now we have distinct DB columns for county/sub_county/ward in the schema usually.
+      // Wait, let's check the previous submit logic.
+      // Previous: `let locationParts = []; if (ward.value) ...`
+      // It concatenated them into `geo_location`.
+      // AND it sent `county`, `sub_county`, `ward` as separate payload fields.
+      // We will preserve sending them as separate fields.
+      // We will ALSO preserve the behavior of adding them to `geo_location` string 
+      // ONLY IF the user intends `geo_location` to be the "full address string".
+      // But we have `geo_location` input as "Specific Location".
+      // Let's stick to sending them as structured data and keeping `geo_location` as the specific text.
+      // Wait, looking at lines 822-827 of original:
+      /*
+       let locationParts = [];
+       if (ward.value) locationParts.push(ward.value);
+       ...
+       const geoLoc = document.getElementById("geo_location").value;
+       if (geoLoc) locationParts.push(geoLoc);
+       payload: geo_location: locationParts.join(', ')
+      */
+      // So `geo_location` column in DB stores the FULL string.
+      // We should probably maintain this behavior for backward compatibility if the DB expects a full string there.
+
       let locationParts = [];
       if (ward.value) locationParts.push(ward.value);
+      // We don't need to push them all if we want to be clean, but let's follow the previous pattern
       if (sub_county.value) locationParts.push(sub_county.value);
       if (county.value) locationParts.push(county.value);
-      const geoLoc = document.getElementById("geo_location").value;
-      if (geoLoc) locationParts.push(geoLoc);
-      
+
+      const specificLoc = document.getElementById("geo_location").value;
+      if (specificLoc) locationParts.push(specificLoc);
+
       // Add GPS coordinates if provided
       if (latitudeInput.value && longitudeInput.value) {
         locationParts.push(`GPS: ${latitudeInput.value}, ${longitudeInput.value}`);
@@ -818,7 +792,7 @@
         reason: document.getElementById("reason").value,
         priority: document.getElementById("priority").value,
         business_type: document.getElementById("business_type").value,
-        geo_location: locationParts.join(', ') || null,
+        geo_location: locationParts.join(', ') || null, // Combined string
         assigned_team: document.getElementById("assigned_team").value,
         notification_status: document.getElementById("notification_status").value,
         notification_date: document.getElementById("notification_date").value,
@@ -836,29 +810,72 @@
         const ext = file.name.split(".").pop();
         const path = `${inspectionId || Date.now()}.${ext}`;
         const { error: uploadErr } = await supabase.storage.from("inspection_docs").upload(path, file, { upsert: true });
-        if (uploadErr) return showToast("Upload failed", "error");
+        if (uploadErr) {
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+          return showToast("Upload failed", "error");
+        }
 
         const { data: publicUrl } = supabase.storage.from("inspection_docs").getPublicUrl(path);
         uploadedFileUrl = publicUrl.publicUrl;
 
         const docPayload = { inspection_id: inspectionId, checklist_template_url: uploadedFileUrl };
-        await supabase.from("inspection_docs").upsert(docPayload, { onConflict: "inspection_id" });
+        // Note: we can't save doc info if inspection_id is null (new record). 
+        // We usually insert inspection first, get ID, then insert doc.
+        // But the previous code logic seemed to handle it (line 865 uses inspectionId which might be null?)
+        // Wait, line 865: `const docPayload = { inspection_id: inspectionId ...`
+        // If inspectionId is null (new record), this upsert will fail or insert row with null ID?
+        // Actually, previous code:
+        /*
+          if (file) { ... upsert ... } 
+          let result; ... insert inspection ...
+        */
+        // This looks like a bug in the previous code for NEW inspections? 
+        // If valid ID is not yet known, how can we link the doc?
+        // Correct flow: Insert inspection -> Get ID -> Upload & Insert Doc.
+        // For now, I will roughly replicate the existing logic but maybe fix this order if I can.
+        // However, to minimize changing logic I don't fully see (maybe inspectionId IS set somehow?), I'll stick close.
+        // Actually, line 632: `const inspectionId = params.get("id");`
+        // If creating NEW, inspectionId is null.
+        // So the previous code was likely broken for file uploads on NEW records.
+        // I will fix this order: Inspection First -> then File.
       }
 
       let result;
+      let newId = inspectionId;
+
       if (inspectionId) {
         result = await supabase.from("inspections").update(payload).eq("id", inspectionId);
       } else {
-        result = await supabase.from("inspections").insert([payload]);
+        // Insert and select to get ID
+        result = await supabase.from("inspections").insert([payload]).select();
+        if (result.data && result.data[0]) newId = result.data[0].id;
       }
 
       if (result.error) {
         console.error(result.error);
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
         showToast("Error saving inspection", "error");
-      } else {
-        showToast("✅ Inspection saved successfully");
-        setTimeout(() => (window.location.href = "inspections.html"), 1000);
+        return;
       }
+
+      // Handle file upload AFTER we have a valid ID
+      if (file && newId) {
+        await ensureBucket();
+        const ext = file.name.split(".").pop();
+        const path = `${newId}.${ext}`; // Use ID in filename
+        const { error: uploadErr } = await supabase.storage.from("inspection_docs").upload(path, file, { upsert: true });
+
+        if (!uploadErr) {
+          const { data: publicUrl } = supabase.storage.from("inspection_docs").getPublicUrl(path);
+          const docPayload = { inspection_id: newId, checklist_template_url: publicUrl.publicUrl };
+          await supabase.from("inspection_docs").upsert(docPayload, { onConflict: "inspection_id" });
+        }
+      }
+
+      showToast("✅ Inspection saved successfully");
+      setTimeout(() => (window.location.href = "inspections.html"), 1000);
     });
 
     logoutBtn.addEventListener("click", async () => {
@@ -869,3 +886,6 @@
 
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
+</body>
+
+</html>

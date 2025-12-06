@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,8 +10,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'SF Pro Display', system-ui, sans-serif;
       background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
@@ -19,16 +24,16 @@
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
-    
+
     header {
       background: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
       position: sticky;
       top: 0;
       z-index: 100;
       backdrop-filter: blur(10px);
     }
-    
+
     .header-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -38,13 +43,13 @@
       align-items: center;
       gap: 1rem;
     }
-    
+
     .logo-section {
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
-    
+
     .logo-icon {
       width: 40px;
       height: 40px;
@@ -57,7 +62,7 @@
       font-weight: 700;
       font-size: 1.2rem;
     }
-    
+
     header h1 {
       font-size: 1.25rem;
       font-weight: 700;
@@ -66,13 +71,13 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    
+
     .header-actions {
       display: flex;
       gap: 0.75rem;
       align-items: center;
     }
-    
+
     .btn {
       border: none;
       border-radius: 10px;
@@ -86,47 +91,47 @@
       gap: 0.5rem;
       white-space: nowrap;
     }
-    
+
     .btn-primary {
       background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       color: white;
       box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2), 0 2px 4px -1px rgba(37, 99, 235, 0.1);
     }
-    
+
     .btn-primary:hover {
       transform: translateY(-1px);
       box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.15);
     }
-    
+
     .btn-secondary {
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: white;
       box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -1px rgba(16, 185, 129, 0.1);
     }
-    
+
     .btn-secondary:hover {
       transform: translateY(-1px);
       box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.15);
     }
-    
+
     .btn-light {
       background: white;
       color: #2563eb;
       border: 2px solid #e0f2fe;
     }
-    
+
     .btn-light:hover {
       background: #f0f9ff;
       border-color: #bae6fd;
       transform: translateY(-1px);
     }
-    
+
     main {
       max-width: 1200px;
       margin: 0 auto;
       padding: 2rem 1.5rem;
     }
-    
+
     .toolbar {
       display: flex;
       justify-content: space-between;
@@ -135,14 +140,14 @@
       margin-bottom: 2rem;
       flex-wrap: wrap;
     }
-    
+
     .search-wrapper {
       position: relative;
       flex: 1;
       min-width: 250px;
       max-width: 400px;
     }
-    
+
     .search-icon {
       position: absolute;
       left: 1rem;
@@ -151,7 +156,7 @@
       color: #94a3b8;
       pointer-events: none;
     }
-    
+
     .toolbar input {
       width: 100%;
       padding: 0.75rem 1rem 0.75rem 2.75rem;
@@ -161,29 +166,29 @@
       transition: all 0.2s;
       background: white;
     }
-    
+
     .toolbar input:focus {
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
-    
+
     .card {
       background: white;
       border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
       padding: 1.5rem;
       margin-bottom: 1rem;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       border: 1px solid #f1f5f9;
     }
-    
+
     .card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
       border-color: #e0f2fe;
     }
-    
+
     .card-header {
       display: flex;
       justify-content: space-between;
@@ -193,25 +198,25 @@
       color: #1e293b;
       font-size: 1.05rem;
     }
-    
+
     .card p {
       color: #64748b;
       font-size: 0.95rem;
       margin: 0.5rem 0;
     }
-    
+
     .card p strong {
       color: #475569;
       font-weight: 600;
     }
-    
+
     .material-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
       margin: 0.75rem 0;
     }
-    
+
     .material-tag {
       background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
       color: #075985;
@@ -221,14 +226,14 @@
       font-weight: 600;
       border: 1px solid #7dd3fc;
     }
-    
+
     .pagination {
       display: flex;
       justify-content: center;
       gap: 0.75rem;
       margin-top: 2rem;
     }
-    
+
     .pagination button {
       border: none;
       background: white;
@@ -240,27 +245,27 @@
       font-weight: 600;
       transition: all 0.2s;
     }
-    
+
     .pagination button:hover:not(:disabled) {
       background: #f0f9ff;
       border-color: #bae6fd;
       transform: translateY(-1px);
     }
-    
+
     .pagination button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
-    
+
     .form-card {
       background: white;
       border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -1px rgba(0,0,0,0.04);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
       padding: 2rem;
       margin-bottom: 2rem;
       border: 1px solid #f1f5f9;
     }
-    
+
     form label {
       font-weight: 600;
       display: block;
@@ -269,8 +274,10 @@
       color: #334155;
       font-size: 0.9rem;
     }
-    
-    form input, form select, form textarea {
+
+    form input,
+    form select,
+    form textarea {
       width: 100%;
       padding: 0.75rem 1rem;
       border-radius: 10px;
@@ -279,13 +286,15 @@
       transition: all 0.2s;
       font-family: inherit;
     }
-    
-    form input:focus, form select:focus, form textarea:focus {
+
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
-    
+
     footer {
       text-align: center;
       background: white;
@@ -295,7 +304,7 @@
       margin-top: 3rem;
       border-top: 1px solid #f1f5f9;
     }
-    
+
     .toast {
       position: fixed;
       bottom: 2rem;
@@ -311,29 +320,73 @@
       font-weight: 500;
       z-index: 1000;
     }
-    
-    .toast.show { opacity: 1; }
-    
+
+    .toast.show {
+      opacity: 1;
+    }
+
     .empty-state {
       text-align: center;
       padding: 3rem 1rem;
       color: #94a3b8;
     }
-    
+
     .empty-state svg {
       width: 64px;
       height: 64px;
       margin: 0 auto 1rem;
       opacity: 0.5;
     }
-    
+
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-icon {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 0.25rem;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .btn-icon:hover {
+      background: #f1f5f9;
+    }
+
+    .btn-icon.delete:hover {
+      background: #fee2e2;
+    }
+
     @media(max-width: 768px) {
-      .header-container { flex-wrap: wrap; padding: 1rem; }
-      header h1 { font-size: 1.1rem; }
-      .toolbar { flex-direction: column; align-items: stretch; }
-      .search-wrapper { max-width: 100%; }
-      .card { padding: 1.25rem; }
-      .form-card { padding: 1.5rem; }
+      .header-container {
+        flex-wrap: wrap;
+        padding: 1rem;
+      }
+
+      header h1 {
+        font-size: 1.1rem;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-wrapper {
+        max-width: 100%;
+      }
+
+      .card {
+        padding: 1.25rem;
+      }
+
+      .form-card {
+        padding: 1.5rem;
+      }
     }
   </style>
 </head>
@@ -346,6 +399,8 @@
         <h1>Waste Collections</h1>
       </div>
       <div class="header-actions">
+        <span id="locationBadge" class="badge"
+          style="display:none; background: #ecfdf5; color: #047857; margin-right: 1rem;"></span>
         <button class="btn btn-light" onclick="history.back()">← Back</button>
         <button class="btn btn-secondary" id="logoutBtn">Logout</button>
       </div>
@@ -356,7 +411,9 @@
     <div class="toolbar">
       <div class="search-wrapper">
         <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+          <path fill-rule="evenodd"
+            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+            clip-rule="evenodd" />
         </svg>
         <input type="text" id="searchInput" placeholder="Search collection zone or contractor..." />
       </div>
@@ -367,10 +424,10 @@
       <form id="collectionForm">
         <label>Collection Zone</label>
         <input type="text" id="collection_zone" placeholder="Zone name or area" required />
-        
+
         <label>Waste Type (comma separated)</label>
         <input type="text" id="waste_type" placeholder="Plastic, Organic, Metal" />
-        
+
         <label>Frequency</label>
         <select id="frequency">
           <option value="">Select</option>
@@ -381,25 +438,25 @@
           <option>Quarterly</option>
           <option>Adhoc</option>
         </select>
-        
+
         <label>Contractor</label>
         <input type="text" id="contractor" placeholder="Company or individual" />
-        
+
         <label>Vehicle Details</label>
         <input type="text" id="vehicle_details" placeholder="e.g., Truck KDG 123A" />
-        
+
         <label>Waste Volume (tons)</label>
         <input type="number" step="0.1" id="waste_volume" placeholder="25.5" />
-        
+
         <label>Disposal Method</label>
         <input type="text" id="disposal_method" placeholder="Landfill, Composting, Transfer..." />
-        
+
         <label>Disposal Date</label>
         <input type="date" id="disposal_date" />
-        
+
         <label>Disposal Site</label>
         <input type="text" id="disposal_site" placeholder="Site name or location" />
-        
+
         <div style="text-align:right;margin-top:1.5rem;display:flex;gap:0.75rem;justify-content:flex-end;">
           <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
           <button type="submit" class="btn btn-primary">Save Collection</button>
@@ -423,6 +480,8 @@
 
   <script type="module">
     import { supabase } from "./main.js";
+    import { getCurrentUserProfile, getLocationFilterDescription } from "./locationAccessControl.js";
+
     const toast = document.getElementById("toast");
     const logoutBtn = document.getElementById("logoutBtn");
     const addBtn = document.getElementById("addBtn");
@@ -443,8 +502,8 @@
 
     function showToast(msg, type = "info") {
       toast.textContent = msg;
-      toast.style.background = type === "error" 
-        ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)" 
+      toast.style.background = type === "error"
+        ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
         : "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)";
       toast.classList.add("show");
       setTimeout(() => toast.classList.remove("show"), 3000);
@@ -453,38 +512,56 @@
     async function checkSession() {
       const { data } = await supabase.auth.getSession();
       if (!data.session) window.location.href = "login.html";
+
+      const profile = await getCurrentUserProfile(supabase);
+      if (profile) {
+        const locDesc = getLocationFilterDescription(profile);
+        const locationBadge = document.getElementById("locationBadge");
+        if (locationBadge) {
+          locationBadge.textContent = "📍 " + locDesc;
+          locationBadge.style.display = "inline-flex";
+        }
+      }
     }
     checkSession();
+
+    let editingId = null;
 
     function toggleForm(show) {
       formContainer.style.display = show ? "block" : "none";
       if (show) formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (!show) {
+        form.reset();
+        editingId = null;
+        document.querySelector('#collectionForm button[type="submit"]').textContent = "Save Collection";
+      }
     }
-    
+
+
     addBtn.addEventListener("click", () => toggleForm(true));
     cancelBtn.addEventListener("click", () => toggleForm(false));
 
     async function loadCollections() {
       cardsContainer.innerHTML = "<div class='empty-state'><p>Loading...</p></div>";
-      
+
       let query = supabase
         .from("waste_collections")
         .select("*", { count: "exact" })
         .order("disposal_date", { ascending: false })
         .eq("site_id", siteId)
         .range(page * limit, page * limit + limit - 1);
-      
+
       const term = searchInput.value.trim();
       if (term) query = query.or(`collection_zone.ilike.%${term}%,contractor.ilike.%${term}%`);
-      
+
       const { data, count, error } = await query;
-      
+
       if (error) {
         console.error(error);
         showToast("Failed to load collection records", "error");
         return;
       }
-      
+
       total = count;
       renderCards(data);
     }
@@ -494,12 +571,18 @@
         cardsContainer.innerHTML = "<div class='empty-state'><svg viewBox='0 0 24 24' fill='currentColor'><path d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'/></svg><p>No collection records found</p></div>";
         return;
       }
-      
+
       cardsContainer.innerHTML = data.map(c => `
         <div class="card">
           <div class="card-header">
             <span>${c.collection_zone || "Collection Zone"}</span>
-            <span style="color: #64748b; font-size: 0.9rem;">${c.disposal_date || "—"}</span>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+              <span style="color: #64748b; font-size: 0.9rem;">${c.disposal_date || "—"}</span>
+              <div class="card-actions">
+                <button onclick="editRecord('${c.id}')" class="btn-icon" title="Edit">✏️</button>
+                <button onclick="deleteRecord('${c.id}')" class="btn-icon delete" title="Delete">🗑️</button>
+              </div>
+            </div>
           </div>
           <div class="material-tags">
             ${(c.waste_type || []).map(w => `<span class="material-tag">${w}</span>`).join('')}
@@ -509,14 +592,51 @@
           <p><strong>Disposal Site:</strong> ${c.disposal_site || "—"} | <strong>Vehicle:</strong> ${c.vehicle_details || "—"}</p>
         </div>
       `).join("");
-      
+
       prevPage.disabled = page === 0;
       nextPage.disabled = (page + 1) * limit >= total;
     }
 
+    window.editRecord = async (id) => {
+      const { data, error } = await supabase.from("waste_collections").select("*").eq("id", id).single();
+      if (error) {
+        console.error(error);
+        showToast("Error loading record", "error");
+        return;
+      }
+
+      document.getElementById("collection_zone").value = data.collection_zone || "";
+      document.getElementById("waste_type").value = (data.waste_type || []).join(", ");
+      document.getElementById("frequency").value = data.frequency || "";
+      document.getElementById("contractor").value = data.contractor || "";
+      document.getElementById("vehicle_details").value = data.vehicle_details || "";
+      document.getElementById("waste_volume").value = data.waste_volume || "";
+      document.getElementById("disposal_method").value = data.disposal_method || "";
+      document.getElementById("disposal_date").value = data.disposal_date || "";
+      document.getElementById("disposal_site").value = data.disposal_site || "";
+
+      editingId = id;
+      document.querySelector('#collectionForm button[type="submit"]').textContent = "Update Collection";
+      toggleForm(true);
+    };
+
+    window.deleteRecord = async (id) => {
+      if (!confirm("Are you sure you want to delete this collection record?")) return;
+
+      const { error } = await supabase.from("waste_collections").delete().eq("id", id);
+      if (error) {
+        console.error(error);
+        showToast("Error deleting record", "error");
+        return;
+      }
+
+      showToast("Collection deleted successfully");
+      loadCollections();
+    };
+
     form.addEventListener("submit", async e => {
       e.preventDefault();
-      
+
       const payload = {
         site_id: siteId,
         collection_zone: document.getElementById("collection_zone").value.trim(),
@@ -529,33 +649,39 @@
         disposal_date: document.getElementById("disposal_date").value || null,
         disposal_site: document.getElementById("disposal_site").value.trim() || null
       };
-      
-      const { error } = await supabase.from("waste_collections").insert([payload]);
-      
+
+      let error;
+      if (editingId) {
+        ({ error } = await supabase.from("waste_collections").update(payload).eq("id", editingId));
+      } else {
+        ({ error } = await supabase.from("waste_collections").insert([payload]));
+      }
+
       if (error) {
         console.error(error);
         showToast("Failed to save collection", "error");
         return;
       }
-      
-      showToast("Collection added successfully");
-      form.reset();
+
+      showToast(editingId ? "Collection updated successfully" : "Collection added successfully");
       toggleForm(false);
+      page = 0;
       loadCollections();
     });
 
     searchInput.addEventListener("input", () => { page = 0; loadCollections(); });
-    prevPage.addEventListener("click", () => { if (page > 0) { page--; loadCollections(); }});
-    nextPage.addEventListener("click", () => { if ((page + 1) * limit < total) { page++; loadCollections(); }});
-    
+    prevPage.addEventListener("click", () => { if (page > 0) { page--; loadCollections(); } });
+    nextPage.addEventListener("click", () => { if ((page + 1) * limit < total) { page++; loadCollections(); } });
+
     logoutBtn.addEventListener("click", async () => {
       await supabase.auth.signOut();
       showToast("Logging out...");
       setTimeout(() => window.location.href = "login.html", 800);
     });
-    
+
     document.getElementById("year").textContent = new Date().getFullYear();
     loadCollections();
   </script>
 </body>
+
 </html>

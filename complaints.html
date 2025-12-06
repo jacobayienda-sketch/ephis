@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,7 +12,7 @@
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #f8fafc;
@@ -19,7 +20,7 @@
       color: #0f172a;
       padding-bottom: 2rem;
     }
-    
+
     /* Animated gradient background */
     body::before {
       content: '';
@@ -32,17 +33,17 @@
       z-index: -1;
       opacity: 0.05;
     }
-    
+
     header {
       background: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       padding: 1.2rem 2rem;
       position: sticky;
       top: 0;
       z-index: 100;
       border-bottom: 1px solid #e2e8f0;
     }
-    
+
     .header-content {
       max-width: 1400px;
       margin: 0 auto;
@@ -52,13 +53,13 @@
       flex-wrap: wrap;
       gap: 1rem;
     }
-    
+
     .logo-section {
       display: flex;
       align-items: center;
       gap: 1rem;
     }
-    
+
     .logo {
       width: 48px;
       height: 48px;
@@ -70,14 +71,41 @@
       box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
       font-size: 24px;
     }
-    
+
     header h1 {
       font-size: 1.4rem;
       color: #0f172a;
       font-weight: 700;
       letter-spacing: -0.02em;
     }
-    
+
+    /* Location Filter Badge */
+    .location-badge {
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      color: #2563eb;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .location-badge::before {
+      content: '📍';
+      font-size: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .location-badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.75rem;
+      }
+    }
+
     .back-btn {
       padding: 0.6rem 1.2rem;
       background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
@@ -90,18 +118,18 @@
       transition: all 0.3s;
       box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
     }
-    
+
     .back-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
-    
+
     main {
       max-width: 1400px;
       margin: 0 auto;
       padding: 2rem 1rem;
     }
-    
+
     .toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -112,15 +140,15 @@
       border-radius: 16px;
       padding: 1rem;
       margin-bottom: 2rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
-    
+
     .search-wrapper {
       flex: 1;
       min-width: 200px;
       position: relative;
     }
-    
+
     .toolbar input {
       width: 100%;
       padding: 0.75rem 1rem;
@@ -130,14 +158,14 @@
       transition: all 0.3s;
       background: #f8fafc;
     }
-    
+
     .toolbar input:focus {
       outline: none;
       border-color: #3b82f6;
       background: white;
       box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
     }
-    
+
     .filter-btn {
       border: 2px solid #e2e8f0;
       background: white;
@@ -150,13 +178,13 @@
       transition: all 0.3s;
       font-size: 0.9rem;
     }
-    
+
     .filter-btn:hover {
       border-color: #3b82f6;
       color: #3b82f6;
       background: #eff6ff;
     }
-    
+
     .filter-btn.active {
       background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
       color: white;
@@ -168,18 +196,18 @@
       background: white;
       border-radius: 20px;
       margin-bottom: 1.5rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       overflow: hidden;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       border: 1px solid #e2e8f0;
     }
-    
+
     .card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
       border-color: #3b82f6;
     }
-    
+
     .card-header {
       background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
       padding: 1.2rem 1.5rem;
@@ -188,7 +216,7 @@
       align-items: flex-start;
       border-bottom: 1px solid #e2e8f0;
     }
-    
+
     .card-header h3 {
       margin: 0 0 0.5rem 0;
       font-size: 1.15rem;
@@ -196,24 +224,25 @@
       color: #0f172a;
       letter-spacing: -0.01em;
     }
-    
+
     .card-header small {
       color: #64748b;
       font-size: 0.85rem;
       display: block;
     }
-    
+
     .card-body {
       padding: 1.2rem 1.5rem;
     }
-    
+
     .card-body p {
       margin: 0.6rem 0;
       font-size: 0.95rem;
       color: #475569;
     }
-    
-    .tag, .urgency {
+
+    .tag,
+    .urgency {
       display: inline-block;
       padding: 0.4rem 0.9rem;
       border-radius: 10px;
@@ -222,47 +251,47 @@
       text-transform: uppercase;
       letter-spacing: 0.03em;
     }
-    
+
     .tag.pending {
       background: #fef3c7;
       color: #92400e;
     }
-    
+
     .tag.resolved {
       background: #d1fae5;
       color: #065f46;
     }
-    
+
     .tag.inprogress {
       background: #dbeafe;
       color: #1e40af;
     }
-    
+
     .tag.escalated {
       background: #fee2e2;
       color: #991b1b;
     }
-    
+
     .urgency.low {
       color: #059669;
       font-weight: 600;
     }
-    
+
     .urgency.medium {
       color: #d97706;
       font-weight: 600;
     }
-    
+
     .urgency.high {
       color: #dc2626;
       font-weight: 600;
     }
-    
+
     .urgency.critical {
       color: #991b1b;
       font-weight: 700;
     }
-    
+
     .details {
       display: none;
       color: #475569;
@@ -271,12 +300,12 @@
       padding: 1.2rem 1.5rem;
       background: #f8fafc;
     }
-    
+
     .details.active {
       display: block;
       animation: fadeIn 0.3s ease-in;
     }
-    
+
     .details h4 {
       color: #0f172a;
       font-size: 1rem;
@@ -284,27 +313,28 @@
       margin-bottom: 0.8rem;
       margin-top: 1rem;
     }
-    
+
     .details h4:first-child {
       margin-top: 0;
     }
-    
+
     .details p {
       margin: 0.5rem 0;
       line-height: 1.6;
     }
-    
+
     @keyframes fadeIn {
       from {
         opacity: 0;
         transform: translateY(-10px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
-    
+
     .fab {
       position: fixed;
       bottom: 24px;
@@ -324,12 +354,12 @@
       justify-content: center;
       z-index: 50;
     }
-    
+
     .fab:hover {
       transform: scale(1.1) rotate(90deg);
       box-shadow: 0 12px 32px rgba(37, 99, 235, 0.5);
     }
-    
+
     #loadMore {
       display: block;
       margin: 2rem auto;
@@ -344,12 +374,12 @@
       transition: all 0.3s;
       box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
     }
-    
+
     #loadMore:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
     }
-    
+
     .action-btn {
       display: inline-block;
       background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
@@ -365,44 +395,203 @@
       transition: all 0.3s;
       box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
     }
-    
+
     .action-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
     }
-    
+
     .docs-section a {
       color: #3b82f6;
       text-decoration: none;
       font-weight: 600;
     }
-    
+
     .docs-section a:hover {
       text-decoration: underline;
     }
-    
+
     @media (max-width: 768px) {
       header {
         padding: 1rem;
       }
-      
+
       .header-content {
         flex-direction: column;
         align-items: stretch;
       }
-      
+
       main {
         padding: 1rem;
       }
-      
+
       .toolbar {
         flex-direction: column;
         align-items: stretch;
       }
-      
+
       .filter-btn {
         width: 100%;
       }
+    }
+
+    /* Escalation Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .modal-header h2 {
+      font-size: 1.5rem;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #64748b;
+      padding: 0.25rem;
+      line-height: 1;
+    }
+
+    .modal-close:hover {
+      color: #dc2626;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .btn-cancel {
+      padding: 0.75rem 1.5rem;
+      background: #f1f5f9;
+      color: #64748b;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-cancel:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-submit {
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+    }
+
+    .escalation-badge {
+      display: inline-block;
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-left: 0.5rem;
     }
   </style>
 </head>
@@ -413,6 +602,7 @@
       <div class="logo-section">
         <div class="logo">📋</div>
         <h1>Complaints & Incidents</h1>
+        <div class="location-badge" id="locationBadge">Loading...</div>
       </div>
       <button class="back-btn" onclick="window.location.href='dashboard.html'">
         ← Back to Dashboard
@@ -438,8 +628,43 @@
 
   <button class="fab" id="addBtn">+</button>
 
+  <!-- Escalation Modal -->
+  <div id="escalationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🚨 Escalate Complaint</h2>
+        <button class="modal-close" onclick="closeEscalationModal()">×</button>
+      </div>
+      <form id="escalationForm">
+        <input type="hidden" id="escalation_complaint_id" />
+
+        <div class="form-group">
+          <label>Escalated To *</label>
+          <input type="text" id="escalated_to" required placeholder="e.g., County Director, NEMA" />
+        </div>
+
+        <div class="form-group">
+          <label>Reason for Escalation *</label>
+          <textarea id="escalation_reason" required
+            placeholder="Explain why this complaint needs to be escalated..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Escalation Date</label>
+          <input type="date" id="escalation_date" />
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeEscalationModal()">Cancel</button>
+          <button type="submit" class="btn-submit">Escalate Complaint</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script type="module">
     import { supabase, showToast, updateRecord, requireLogin } from './main.js';
+    import { getCurrentUserProfile, getLocationFilterDescription } from './locationAccessControl.js';
     const listEl = document.getElementById('list');
     const loadMoreBtn = document.getElementById('loadMore');
     const filters = document.querySelectorAll('.filter-btn');
@@ -450,74 +675,89 @@
     const pageSize = 8;
 
     await requireLogin();
+
+    // Load user profile and update badge
+    const userProfile = await getCurrentUserProfile(supabase);
+    document.getElementById('locationBadge').textContent = getLocationFilterDescription(userProfile);
+
     await loadPage();
 
-    async function loadPage(reset=false){
-      if(reset){ page=0; complaints=[]; listEl.innerHTML=''; }
-      const from=page*pageSize, to=from+pageSize-1;
-      const {data,error}=await supabase.from('complaints')
+    async function loadPage(reset = false) {
+      if (reset) { page = 0; complaints = []; listEl.innerHTML = ''; }
+      const from = page * pageSize, to = from + pageSize - 1;
+      const { data, error } = await supabase.from('complaints')
         .select('id,complaint_type,incident_date,location,urgency,resolution_status,severity,assigned_department')
-        .order('created_at',{ascending:false})
-        .range(from,to);
-      if(error) return console.error(error);
-      if(!data.length && page===0) listEl.innerHTML="<p style='text-align:center;'>No complaints found.</p>";
-      complaints=complaints.concat(data);
+        .order('created_at', { ascending: false })
+        .range(from, to);
+      if (error) return console.error(error);
+      if (!data.length && page === 0) listEl.innerHTML = "<p style='text-align:center;'>No complaints found.</p>";
+      complaints = complaints.concat(data);
       renderList(data);
-      loadMoreBtn.style.display=data.length<pageSize?'none':'block';
+      loadMoreBtn.style.display = data.length < pageSize ? 'none' : 'block';
       page++;
     }
 
-    function renderList(rows){
-      rows.forEach(r=>{
-        const card=document.createElement('div');
-        const status=(r.resolution_status||'Pending').toLowerCase().replace(' ','');
-        const urgency=(r.urgency||'Medium').toLowerCase();
-        card.className='card';
-        card.innerHTML=`
+    function renderList(rows) {
+      rows.forEach(r => {
+        const card = document.createElement('div');
+        const status = (r.resolution_status || 'Pending').toLowerCase().replace(' ', '');
+        const urgency = (r.urgency || 'Medium').toLowerCase();
+        card.className = 'card';
+        card.innerHTML = `
           <div class="card-header">
-            <div><h3>${r.complaint_type||'Unspecified'}</h3>
-              <small>${r.location||'No location'} • ${r.incident_date||''}</small>
+            <div><h3>${r.complaint_type || 'Unspecified'}</h3>
+              <small>${r.location || 'No location'} • ${r.incident_date || ''}</small>
             </div>
-            <span class="tag ${status}">${r.resolution_status||'Pending'}</span>
+            <span class="tag ${status}">${r.resolution_status || 'Pending'}</span>
           </div>
           <div class="card-body">
             <p><b>Urgency:</b> <span class="urgency ${urgency}">${r.urgency}</span></p>
-            ${r.assigned_department?`<p><b>Dept:</b> ${r.assigned_department}</p>`:''}
-            ${r.severity?`<p><b>Severity:</b> ${r.severity}</p>`:''}
+            ${r.assigned_department ? `<p><b>Dept:</b> ${r.assigned_department}</p>` : ''}
+            ${r.severity ? `<p><b>Severity:</b> ${r.severity}</p>` : ''}
             <button class="expandBtn action-btn" data-id="${r.id}">View Details</button>
           </div>
           <div class="details" id="details-${r.id}"></div>`;
         listEl.appendChild(card);
       });
-      document.querySelectorAll('.expandBtn').forEach(btn=>btn.onclick=()=>toggleDetails(btn.dataset.id));
+      document.querySelectorAll('.expandBtn').forEach(btn => btn.onclick = () => toggleDetails(btn.dataset.id));
     }
 
-    async function toggleDetails(id){
-      const section=document.getElementById(`details-${id}`);
-      const open=document.querySelector('.details.active');
-      if(open&&open!==section){open.classList.remove('active');open.innerHTML='';}
+    async function toggleDetails(id) {
+      const section = document.getElementById(`details-${id}`);
+      const open = document.querySelector('.details.active');
+      if (open && open !== section) { open.classList.remove('active'); open.innerHTML = ''; }
       section.classList.toggle('active');
-      if(section.classList.contains('active')&&!section.dataset.loaded){
-        section.innerHTML='<p style="color:gray;">Loading details...</p>';
-        const [u,r,d]=await Promise.all([
-          supabase.from('complaint_updates').select('status_log,officer_name,update_time').eq('complaint_id',id).order('update_time',{ascending:false}).limit(3),
-          supabase.from('complaint_resolution').select('resolution_status,resolution_date,resolution_description,verification_officer,verified_by_supervisor').eq('complaint_id',id).limit(1),
-          supabase.from('complaint_docs').select('evidence_url,investigation_report_url,resolution_report_url,supporting_docs_url').eq('complaint_id',id).limit(5)
+      if (section.classList.contains('active') && !section.dataset.loaded) {
+        section.innerHTML = '<p style="color:gray;">Loading details...</p>';
+        const [u, r, d, esc] = await Promise.all([
+          supabase.from('complaint_updates').select('status_log,officer_name,update_time').eq('complaint_id', id).order('update_time', { ascending: false }).limit(3),
+          supabase.from('complaint_resolution').select('resolution_status,resolution_date,resolution_description,verification_officer,verified_by_supervisor').eq('complaint_id', id).limit(1),
+          supabase.from('complaint_docs').select('evidence_url,investigation_report_url,resolution_report_url,supporting_docs_url').eq('complaint_id', id).limit(5),
+          supabase.from('complaint_escalations').select('escalated_to,reason,escalation_date,outcome,created_at').eq('complaint_id', id).order('created_at', { ascending: false }).limit(5)
         ]);
-        if(u.error||r.error||d.error){section.innerHTML='<p style="color:red;">Error loading details.</p>';return;}
-        const updates=u.data||[],res=r.data?.[0],docs=d.data||[];
-        section.innerHTML=`
+        if (u.error || r.error || d.error || esc.error) { section.innerHTML = '<p style="color:red;">Error loading details.</p>'; return; }
+        const updates = u.data || [], res = r.data?.[0], docs = d.data || [], escalations = esc.data || [];
+        section.innerHTML = `
           <div><h4>Recent Updates</h4>
-            ${updates.length?updates.map(x=>`<p><b>${x.status_log}</b><br><small>${x.officer_name||'N/A'} • ${new Date(x.update_time).toLocaleString()}</small></p>`).join(''):'<p>No updates.</p>'}
+            ${updates.length ? updates.map(x => `<p><b>${x.status_log}</b><br><small>${x.officer_name || 'N/A'} • ${new Date(x.update_time).toLocaleString()}</small></p>`).join('') : '<p>No updates.</p>'}
           </div>
-          ${res?`<div style="margin-top:0.6rem;">
+          ${escalations.length ? `<div style="margin-top:0.6rem;">
+            <h4>Escalation History</h4>
+            ${escalations.map(e => `<p style="background: #fef2f2; padding: 0.75rem; border-radius: 8px; border-left: 3px solid #dc2626; margin-bottom: 0.5rem;">
+              <b>Escalated to:</b> ${e.escalated_to}<br>
+              <b>Reason:</b> ${e.reason}<br>
+              <b>Date:</b> ${e.escalation_date || new Date(e.created_at).toLocaleDateString()}<br>
+              ${e.outcome ? `<b>Outcome:</b> ${e.outcome}` : ''}
+            </p>`).join('')}
+          </div>`: ''}
+          ${res ? `<div style="margin-top:0.6rem;">
             <h4>Resolution</h4>
-            <p><b>Status:</b> ${res.resolution_status||'-'}<br><b>Date:</b> ${res.resolution_date||'-'}<br>
-            <b>Description:</b> ${res.resolution_description||'N/A'}<br>
-            <b>Verified:</b> ${res.verification_officer||'N/A'} (${res.verified_by_supervisor?'Supervisor Verified':'Not Verified'})</p></div>`:''}
+            <p><b>Status:</b> ${res.resolution_status || '-'}<br><b>Date:</b> ${res.resolution_date || '-'}<br>
+            <b>Description:</b> ${res.resolution_description || 'N/A'}<br>
+            <b>Verified:</b> ${res.verification_officer || 'N/A'} (${res.verified_by_supervisor ? 'Supervisor Verified' : 'Not Verified'})</p></div>` : ''}
           <div class="docs-section" style="margin-top:0.6rem;">
             <h4>Evidence & Documents</h4>
-            ${docs.length?docs.map(d=>`<p><a href="${d.evidence_url||d.supporting_docs_url}" target="_blank">${d.evidence_url?'Evidence Photo':'Document'}</a></p>`).join(''):'<p>No documents uploaded.</p>'}
+            ${docs.length ? docs.map(d => `<p><a href="${d.evidence_url || d.supporting_docs_url}" target="_blank">${d.evidence_url ? 'Evidence Photo' : 'Document'}</a></p>`).join('') : '<p>No documents uploaded.</p>'}
             <button class="action-btn" onclick="initUpload('${id}')">Upload</button>
           </div>
           <div style="margin-top:0.6rem;">
@@ -526,59 +766,124 @@
             <button class="action-btn" onclick="window.location.href='complaint_assignment.html?id=${id}'">Assign Officer</button>
             <button class="action-btn" onclick="window.location.href='complaint_resolution.html?id=${id}'">Resolve</button>
             <button class="action-btn" onclick="window.location.href='complaint_feedback.html?id=${id}'">Feedback</button>
+            <button class="action-btn" onclick="escalateComplaint('${id}')" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">🚨 Escalate</button>
           </div>`;
-        section.dataset.loaded=true;
+        section.dataset.loaded = true;
       }
     }
 
-    loadMoreBtn.onclick=()=>loadPage();
+    loadMoreBtn.onclick = () => loadPage();
 
-    filters.forEach(f=>f.addEventListener('click',async()=>{
-      filters.forEach(b=>b.classList.remove('active'));
+    filters.forEach(f => f.addEventListener('click', async () => {
+      filters.forEach(b => b.classList.remove('active'));
       f.classList.add('active');
-      const s=f.dataset.status;
-      listEl.innerHTML='';
-      const {data}=await supabase.from('complaints')
+      const s = f.dataset.status;
+      listEl.innerHTML = '';
+      const { data } = await supabase.from('complaints')
         .select('id,complaint_type,incident_date,location,urgency,resolution_status,severity,assigned_department')
-        .eq('resolution_status',s||undefined).order('created_at',{ascending:false}).range(0,pageSize-1);
-      complaints=data||[];
-      renderList(data);loadMoreBtn.style.display=data.length<pageSize?'none':'block';
+        .eq('resolution_status', s || undefined).order('created_at', { ascending: false }).range(0, pageSize - 1);
+      complaints = data || [];
+      renderList(data); loadMoreBtn.style.display = data.length < pageSize ? 'none' : 'block';
     }));
 
-    searchInput.addEventListener('input',e=>{
-      const term=e.target.value.toLowerCase();
-      document.querySelectorAll('.card').forEach(c=>{c.style.display=c.innerText.toLowerCase().includes(term)?'':'none';});
+    searchInput.addEventListener('input', e => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('.card').forEach(c => { c.style.display = c.innerText.toLowerCase().includes(term) ? '' : 'none'; });
     });
 
-    addBtn.onclick=()=>window.location.href='complaint_form.html';
+    // Escalation functions
+    window.escalateComplaint = function (complaintId) {
+      const modal = document.getElementById('escalationModal');
+      const form = document.getElementById('escalationForm');
+
+      // Set complaint ID
+      document.getElementById('escalation_complaint_id').value = complaintId;
+
+      // Set today's date as default
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('escalation_date').value = today;
+
+      // Show modal
+      modal.classList.add('active');
+    };
+
+    window.closeEscalationModal = function () {
+      const modal = document.getElementById('escalationModal');
+      const form = document.getElementById('escalationForm');
+      modal.classList.remove('active');
+      form.reset();
+    };
+
+    // Handle escalation form submission
+    document.getElementById('escalationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const complaintId = document.getElementById('escalation_complaint_id').value;
+      const complaintData = complaints.find(c => c.id === complaintId);
+
+      const escalationData = {
+        complaint_id: complaintId,
+        escalated_to: document.getElementById('escalated_to').value,
+        reason: document.getElementById('escalation_reason').value,
+        escalation_date: document.getElementById('escalation_date').value || new Date().toISOString().split('T')[0],
+        // Copy location data from complaint
+        county: complaintData?.county || null,
+        sub_county: complaintData?.sub_county || null,
+        ward: complaintData?.ward || null,
+        location: complaintData?.location || null,
+        created_by: (await supabase.auth.getUser()).data.user?.id
+      };
+
+      const { error } = await supabase.from('complaint_escalations').insert([escalationData]);
+
+      if (error) {
+        console.error('Escalation error:', error);
+        showToast('Failed to escalate complaint', 'error');
+        return;
+      }
+
+      showToast('Complaint escalated successfully');
+      closeEscalationModal();
+
+      // Reload the details section to show new escalation
+      const detailsSection = document.getElementById(`details-${complaintId}`);
+      if (detailsSection && detailsSection.classList.contains('active')) {
+        detailsSection.dataset.loaded = false;
+        await toggleDetails(complaintId);
+        await toggleDetails(complaintId);
+      }
+    });
+
+    addBtn.onclick = () => window.location.href = 'complaint_form.html';
   </script>
 
   <script type="module">
     import { supabase, showToast } from './main.js';
-    async function ensureBucket(){
-      const {data}=await supabase.storage.listBuckets();
-      if(!data.some(b=>b.name==='complaint_evidence'))
-        await supabase.storage.createBucket('complaint_evidence',{public:true});
+    async function ensureBucket() {
+      const { data } = await supabase.storage.listBuckets();
+      if (!data.some(b => b.name === 'complaint_evidence'))
+        await supabase.storage.createBucket('complaint_evidence', { public: true });
     }
     ensureBucket();
 
-    window.initUpload=async function(id){
-      const fileInput=document.createElement('input');
-      fileInput.type='file';fileInput.accept='image/*,application/pdf';fileInput.multiple=true;
-      fileInput.style.display='none';document.body.appendChild(fileInput);
-      fileInput.onchange=async e=>{
-        for(const file of e.target.files){
-          const ext=file.name.split('.').pop();
-          const path=`${id}/${Date.now()}.${ext}`;
-          const {error:upErr}=await supabase.storage.from('complaint_evidence').upload(path,file);
-          if(upErr){showToast('Upload failed: '+upErr.message,'error');continue;}
-          const {data:urlData}=supabase.storage.from('complaint_evidence').getPublicUrl(path);
-          const url=urlData.publicUrl;
-          await supabase.from('complaint_docs').insert([{complaint_id:id,
-            evidence_url:file.type.startsWith('image/')?url:null,
-            supporting_docs_url:file.type==='application/pdf'?url:null
+    window.initUpload = async function (id) {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file'; fileInput.accept = 'image/*,application/pdf'; fileInput.multiple = true;
+      fileInput.style.display = 'none'; document.body.appendChild(fileInput);
+      fileInput.onchange = async e => {
+        for (const file of e.target.files) {
+          const ext = file.name.split('.').pop();
+          const path = `${id}/${Date.now()}.${ext}`;
+          const { error: upErr } = await supabase.storage.from('complaint_evidence').upload(path, file);
+          if (upErr) { showToast('Upload failed: ' + upErr.message, 'error'); continue; }
+          const { data: urlData } = supabase.storage.from('complaint_evidence').getPublicUrl(path);
+          const url = urlData.publicUrl;
+          await supabase.from('complaint_docs').insert([{
+            complaint_id: id,
+            evidence_url: file.type.startsWith('image/') ? url : null,
+            supporting_docs_url: file.type === 'application/pdf' ? url : null
           }]);
-          showToast('File uploaded','success');
+          showToast('File uploaded', 'success');
         }
         document.body.removeChild(fileInput);
       };
@@ -587,11 +892,12 @@
   </script>
 
   <script>
-    if('serviceWorker' in navigator){
+    if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js')
-        .then(()=>console.log('Service Worker registered'))
-        .catch(err=>console.error('SW registration failed',err));
+        .then(() => console.log('Service Worker registered'))
+        .catch(err => console.error('SW registration failed', err));
     }
   </script>
 </body>
+
 </html>

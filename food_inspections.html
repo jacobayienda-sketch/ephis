@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#2563eb" />
   <title>EPHIS | Food Inspections</title>
   <link rel="manifest" href="manifest.json" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'SF Pro Display', system-ui, sans-serif;
       background: linear-gradient(135deg, #f8fafc 0%, #dbeafe 100%);
@@ -19,16 +23,16 @@
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
-    
+
     header {
       background: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
       position: sticky;
       top: 0;
       z-index: 100;
       backdrop-filter: blur(10px);
     }
-    
+
     .header-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -38,13 +42,13 @@
       align-items: center;
       gap: 1rem;
     }
-    
+
     .logo-section {
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
-    
+
     .logo-icon {
       width: 40px;
       height: 40px;
@@ -57,7 +61,7 @@
       font-weight: 700;
       font-size: 1.2rem;
     }
-    
+
     header h1 {
       font-size: 1.25rem;
       font-weight: 700;
@@ -66,13 +70,13 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    
+
     .header-actions {
       display: flex;
       gap: 0.75rem;
       align-items: center;
     }
-    
+
     .btn {
       border: none;
       border-radius: 10px;
@@ -86,47 +90,47 @@
       gap: 0.5rem;
       white-space: nowrap;
     }
-    
+
     .btn-primary {
       background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       color: white;
       box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2), 0 2px 4px -1px rgba(37, 99, 235, 0.1);
     }
-    
+
     .btn-primary:hover {
       transform: translateY(-1px);
       box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.15);
     }
-    
+
     .btn-secondary {
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: white;
       box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -1px rgba(16, 185, 129, 0.1);
     }
-    
+
     .btn-secondary:hover {
       transform: translateY(-1px);
       box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.15);
     }
-    
+
     .btn-light {
       background: white;
       color: #2563eb;
       border: 2px solid #e0f2fe;
     }
-    
+
     .btn-light:hover {
       background: #f0f9ff;
       border-color: #bae6fd;
       transform: translateY(-1px);
     }
-    
+
     main {
       max-width: 1200px;
       margin: 0 auto;
       padding: 2rem 1.5rem;
     }
-    
+
     .toolbar {
       display: flex;
       justify-content: space-between;
@@ -135,14 +139,14 @@
       margin-bottom: 2rem;
       flex-wrap: wrap;
     }
-    
+
     .search-wrapper {
       position: relative;
       flex: 1;
       min-width: 250px;
       max-width: 400px;
     }
-    
+
     .search-icon {
       position: absolute;
       left: 1rem;
@@ -151,7 +155,7 @@
       color: #94a3b8;
       pointer-events: none;
     }
-    
+
     .toolbar input {
       width: 100%;
       padding: 0.75rem 1rem 0.75rem 2.75rem;
@@ -161,80 +165,113 @@
       transition: all 0.2s;
       background: white;
     }
-    
+
     .toolbar input:focus {
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
-    
+
     .card {
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      border: 1px solid #f1f5f9;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      padding: 0;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
-    
+
     .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
-      border-color: #dbeafe;
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      border-color: #cbd5e1;
     }
-    
+
     .card-header {
+      background: linear-gradient(to right, #f8fafc, #fff);
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #f1f5f9;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
-      font-weight: 600;
-      color: #1e293b;
-      font-size: 1.05rem;
     }
-    
+
+    .card-header span:first-child {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
     .badge {
-      border-radius: 8px;
-      padding: 0.375rem 0.875rem;
-      font-size: 0.8rem;
+      border-radius: 999px;
+      padding: 0.35rem 0.8rem;
+      font-size: 0.75rem;
       font-weight: 600;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
     }
-    
+
     .badge.Low {
-      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      background: #d1fae5;
       color: #065f46;
     }
-    
+
     .badge.Medium {
-      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      background: #fef3c7;
       color: #92400e;
     }
-    
+
     .badge.High {
-      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      background: #fee2e2;
       color: #991b1b;
     }
-    
-    .card p {
+
+    .card-body {
+      padding: 1.25rem 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .info-group label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       color: #64748b;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    .info-group span {
       font-size: 0.95rem;
-      margin: 0.5rem 0;
+      color: #334155;
+      font-weight: 500;
     }
-    
-    .card p strong {
-      color: #475569;
+
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #eff6ff;
+      color: #1d4ed8;
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
       font-weight: 600;
+      font-size: 0.9rem;
     }
-    
+
     .pagination {
       display: flex;
       justify-content: center;
       gap: 0.75rem;
       margin-top: 2rem;
     }
-    
+
     .pagination button {
       border: none;
       background: white;
@@ -246,27 +283,40 @@
       font-weight: 600;
       transition: all 0.2s;
     }
-    
+
     .pagination button:hover:not(:disabled) {
       background: #f0f9ff;
       border-color: #bae6fd;
       transform: translateY(-1px);
     }
-    
+
     .pagination button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
-    
+
     .form-card {
       background: white;
       border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -1px rgba(0,0,0,0.04);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
       padding: 2rem;
       margin-bottom: 2rem;
       border: 1px solid #f1f5f9;
+      animation: slideDown 0.3s ease-out;
     }
-    
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     form label {
       font-weight: 600;
       display: block;
@@ -275,8 +325,10 @@
       color: #334155;
       font-size: 0.9rem;
     }
-    
-    form input, form select, form textarea {
+
+    form input,
+    form select,
+    form textarea {
       width: 100%;
       padding: 0.75rem 1rem;
       border-radius: 10px;
@@ -285,18 +337,20 @@
       transition: all 0.2s;
       font-family: inherit;
     }
-    
-    form input:focus, form select:focus, form textarea:focus {
+
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
-    
+
     form textarea {
       resize: vertical;
-      min-height: 60px;
+      min-height: 80px;
     }
-    
+
     footer {
       text-align: center;
       background: white;
@@ -306,7 +360,7 @@
       margin-top: 3rem;
       border-top: 1px solid #f1f5f9;
     }
-    
+
     .toast {
       position: fixed;
       bottom: 2rem;
@@ -322,29 +376,50 @@
       font-weight: 500;
       z-index: 1000;
     }
-    
-    .toast.show { opacity: 1; }
-    
+
+    .toast.show {
+      opacity: 1;
+    }
+
     .empty-state {
       text-align: center;
       padding: 3rem 1rem;
       color: #94a3b8;
     }
-    
+
     .empty-state svg {
       width: 64px;
       height: 64px;
       margin: 0 auto 1rem;
       opacity: 0.5;
     }
-    
+
     @media(max-width: 768px) {
-      .header-container { flex-wrap: wrap; padding: 1rem; }
-      header h1 { font-size: 1.1rem; }
-      .toolbar { flex-direction: column; align-items: stretch; }
-      .search-wrapper { max-width: 100%; }
-      .card { padding: 1.25rem; }
-      .form-card { padding: 1.5rem; }
+      .header-container {
+        flex-wrap: wrap;
+        padding: 1rem;
+      }
+
+      header h1 {
+        font-size: 1.1rem;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-wrapper {
+        max-width: 100%;
+      }
+
+      .card {
+        padding: 1.25rem;
+      }
+
+      .form-card {
+        padding: 1.5rem;
+      }
     }
   </style>
 </head>
@@ -357,6 +432,8 @@
         <h1>Food Inspections</h1>
       </div>
       <div class="header-actions">
+        <span id="locationBadge"
+          style="font-size: 0.85rem; font-weight: 600; color: #059669; background: #ecfdf5; padding: 0.4rem 0.8rem; border-radius: 8px; display:none;"></span>
         <button class="btn btn-light" onclick="window.location.href='food_control.html'">← Back</button>
         <button class="btn btn-secondary" id="logoutBtn">Logout</button>
       </div>
@@ -367,7 +444,9 @@
     <div class="toolbar">
       <div class="search-wrapper">
         <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+          <path fill-rule="evenodd"
+            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+            clip-rule="evenodd" />
         </svg>
         <input type="text" id="searchInput" placeholder="Search by type or officer..." />
       </div>
@@ -376,6 +455,8 @@
 
     <div id="formContainer" style="display:none;" class="form-card">
       <form id="inspectionForm">
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.25rem; color: #1e293b;">New Inspection Record</h2>
+
         <label>Inspection Date *</label>
         <input type="date" id="date" required />
 
@@ -394,8 +475,16 @@
         <label>Tool Reference</label>
         <input type="text" id="tool_ref" placeholder="Checklist or form used" />
 
-        <label>Structure Rating</label>
-        <input type="text" id="structure_rating" placeholder="Good, Fair, Poor" />
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label>Structure Rating</label>
+            <input type="text" id="structure_rating" placeholder="Good, Fair, Poor" />
+          </div>
+          <div>
+            <label>Hygiene Score (0–100)</label>
+            <input type="number" step="0.1" id="hygiene_score" placeholder="85.5" />
+          </div>
+        </div>
 
         <label>Food Handling Practices</label>
         <textarea id="food_practices" placeholder="Brief notes"></textarea>
@@ -403,19 +492,24 @@
         <label>Waste Management System</label>
         <input type="text" id="waste_system" placeholder="Describe waste handling" />
 
-        <label>Health Certificates Verified?</label>
-        <select id="health_certificates">
-          <option value="">Select</option>
-          <option value="true">Yes</option>
-          <option value="false">No</option>
-        </select>
-
-        <label>Public Health Act Compliance?</label>
-        <select id="compliance_act">
-          <option value="">Select</option>
-          <option value="true">Yes</option>
-          <option value="false">No</option>
-        </select>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label>Health Certs Verified?</label>
+            <select id="health_certificates">
+              <option value="">Select</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+          <div>
+            <label>PH Act Compliance?</label>
+            <select id="compliance_act">
+              <option value="">Select</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+        </div>
 
         <label>Water Quality</label>
         <input type="text" id="water_quality" placeholder="Safe / Unsafe / Chlorinated" />
@@ -426,23 +520,25 @@
         <label>Pest Control</label>
         <input type="text" id="pest_control" placeholder="Describe pest control measures" />
 
-        <label>Temperature Records Maintained?</label>
-        <select id="temperature_records">
-          <option value="">Select</option>
-          <option value="true">Yes</option>
-          <option value="false">No</option>
-        </select>
-
-        <label>Hygiene Score (0–100)</label>
-        <input type="number" step="0.1" id="hygiene_score" placeholder="85.5" />
-
-        <label>Risk Category</label>
-        <select id="risk_category">
-          <option value="">Select</option>
-          <option>Low</option>
-          <option>Medium</option>
-          <option>High</option>
-        </select>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label>Temp Records?</label>
+            <select id="temperature_records">
+              <option value="">Select</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+          <div>
+            <label>Risk Category</label>
+            <select id="risk_category">
+              <option value="">Select</option>
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+            </select>
+          </div>
+        </div>
 
         <div style="text-align:right;margin-top:1.5rem;display:flex;gap:0.75rem;justify-content:flex-end;">
           <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
@@ -467,6 +563,7 @@
 
   <script type="module">
     import { supabase } from "./main.js";
+    import { getCurrentUserProfile, getLocationFilterDescription } from "./locationAccessControl.js";
 
     const params = new URLSearchParams(window.location.search);
     const premiseId = params.get("id");
@@ -480,15 +577,17 @@
     const cardsContainer = document.getElementById("cardsContainer");
     const prevPage = document.getElementById("prevPage");
     const nextPage = document.getElementById("nextPage");
+    const locationBadge = document.getElementById("locationBadge");
 
     let page = 0;
     const limit = 10;
     let total = 0;
+    let currentUserProfile = null;
 
     function showToast(msg, type = "info") {
       toast.textContent = msg;
-      toast.style.background = type === "error" 
-        ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)" 
+      toast.style.background = type === "error"
+        ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
         : "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)";
       toast.classList.add("show");
       setTimeout(() => toast.classList.remove("show"), 3000);
@@ -497,68 +596,113 @@
     async function checkSession() {
       const { data } = await supabase.auth.getSession();
       if (!data.session) window.location.href = "login.html";
+
+      // RBAC: Load profile and show location badge
+      currentUserProfile = await getCurrentUserProfile(supabase);
+      if (currentUserProfile) {
+        const locDesc = getLocationFilterDescription(currentUserProfile);
+        locationBadge.textContent = "📍 " + locDesc;
+        locationBadge.style.display = "inline-flex";
+      }
     }
-    checkSession();
+
+    // Initial Load
+    await checkSession();
 
     function toggleForm(show) {
       formContainer.style.display = show ? "block" : "none";
       if (show) formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    
+
     addBtn.addEventListener("click", () => toggleForm(true));
     cancelBtn.addEventListener("click", () => toggleForm(false));
 
     async function loadInspections() {
+      if (!premiseId) {
+        showToast("No premise specified", "error");
+        return;
+      }
+
       cardsContainer.innerHTML = "<div class='empty-state'><p>Loading...</p></div>";
-      
+
       let query = supabase
         .from("food_inspections")
         .select("*", { count: "exact" })
         .eq("premises_id", premiseId)
         .order("date", { ascending: false })
         .range(page * limit, page * limit + limit - 1);
-      
+
       const term = searchInput.value.trim();
       if (term) query = query.or(`inspection_type.ilike.%${term}%,officers.ilike.%${term}%`);
-      
+
       const { data, count, error } = await query;
-      
+
       if (error) {
         console.error(error);
         showToast("Failed to load inspections", "error");
         return;
       }
-      
+
       total = count;
       renderCards(data);
     }
 
     function renderCards(data) {
       if (!data.length) {
-        cardsContainer.innerHTML = "<div class='empty-state'><svg viewBox='0 0 24 24' fill='currentColor'><path d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'/></svg><p>No inspections found</p></div>";
+        cardsContainer.innerHTML = `
+            <div class='empty-state'>
+                <svg viewBox='0 0 24 24' fill='currentColor'>
+                    <path d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'/>
+                </svg>
+                <p>No inspections found for this premise</p>
+            </div>`;
         return;
       }
-      
+
       cardsContainer.innerHTML = data.map(i => `
         <div class="card">
           <div class="card-header">
             <span>${i.inspection_type || "Inspection"}</span>
-            <span class="badge ${i.risk_category || "Low"}">${i.risk_category || "Low"}</span>
+            <span class="badge ${i.risk_category || "Low"}">${i.risk_category || "Low"} Risk</span>
           </div>
-          <p><strong>Date:</strong> ${i.date || "—"} | <strong>Officer(s):</strong> ${i.officers || "—"}</p>
-          <p><strong>Structure:</strong> ${i.structure_rating || "—"} | <strong>Score:</strong> ${i.hygiene_score || "—"}</p>
-          <p><strong>Water:</strong> ${i.water_quality || "—"} | <strong>Refrigeration:</strong> ${i.refrigeration || "—"}</p>
-          ${i.food_practices ? `<p><strong>Food Practices:</strong> ${i.food_practices}</p>` : ''}
+          
+          <div class="card-body">
+              <div class="info-group">
+                <label>Date</label>
+                <span>${i.date || "—"}</span>
+              </div>
+              <div class="info-group">
+                <label>Officers</label>
+                <span>${i.officers || "—"}</span>
+              </div>
+              <div class="info-group">
+                <label>Structure</label>
+                <span>${i.structure_rating || "—"}</span>
+              </div>
+              <div class="info-group">
+                <label>Hygiene Score</label>
+                <span class="score-badge">📊 ${i.hygiene_score || "N/A"}</span>
+              </div>
+              <div class="info-group">
+                <label>Water Quality</label>
+                <span>${i.water_quality || "—"}</span>
+              </div>
+               ${i.food_practices ? `
+               <div class="info-group" style="grid-column: 1 / -1;">
+                 <label>Notes</label>
+                 <span>${i.food_practices}</span>
+               </div>` : ''}
+          </div>
         </div>
       `).join("");
-      
+
       prevPage.disabled = page === 0;
       nextPage.disabled = (page + 1) * limit >= total;
     }
 
     form.addEventListener("submit", async e => {
       e.preventDefault();
-      
+
       const payload = {
         premises_id: premiseId,
         date: document.getElementById("date").value,
@@ -577,15 +721,15 @@
         hygiene_score: parseFloat(document.getElementById("hygiene_score").value) || null,
         risk_category: document.getElementById("risk_category").value
       };
-      
+
       const { error } = await supabase.from("food_inspections").insert([payload]);
-      
+
       if (error) {
         console.error(error);
         showToast("Failed to save inspection", "error");
         return;
       }
-      
+
       showToast("Inspection recorded successfully");
       form.reset();
       toggleForm(false);
@@ -593,17 +737,18 @@
     });
 
     searchInput.addEventListener("input", () => { page = 0; loadInspections(); });
-    prevPage.addEventListener("click", () => { if (page > 0) { page--; loadInspections(); }});
-    nextPage.addEventListener("click", () => { if ((page + 1) * limit < total) { page++; loadInspections(); }});
-    
+    prevPage.addEventListener("click", () => { if (page > 0) { page--; loadInspections(); } });
+    nextPage.addEventListener("click", () => { if ((page + 1) * limit < total) { page++; loadInspections(); } });
+
     logoutBtn.addEventListener("click", async () => {
       await supabase.auth.signOut();
       showToast("Logging out...");
       setTimeout(() => window.location.href = "login.html", 800);
     });
-    
+
     document.getElementById("year").textContent = new Date().getFullYear();
     loadInspections();
   </script>
 </body>
+
 </html>

@@ -1,0 +1,53 @@
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+// We need to read the URL and Key from main.js or environment strings
+// Since I can't import local main.js easily in node-like environment without type module complications in this specific
+runner context if not careful,
+// I will just use a generic method or try to read the file content first to grep the keys.
+// Actually, I can just use the user's browser via a test html file to be safe and use existing auth?
+// No, I'll use a simple node script if I have the keys, but I don't see them in previous turns explicitly (they are in
+main.js).
+// I will create a small HTML file to run in the browser which outputs to console/body.
+
+const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Schema Check</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase } from './main.js';
+
+        async function check() {
+            const output = document.getElementById('output');
+            const log = (msg) => output.innerHTML += msg + '<br>';
+
+            log('Checking waste_recycling...');
+            const { error: error1 } = await supabase.from('waste_recycling').select('ward').limit(1);
+            if (error1) log('waste_recycling error: ' + error1.message);
+            else log('waste_recycling has ward column.');
+
+            log('Checking waste_enforcement...');
+            const { error: error2 } = await supabase.from('waste_enforcement').select('ward').limit(1);
+            if (error2) log('waste_enforcement error: ' + error2.message);
+            else log('waste_enforcement has ward column.');
+
+            log('Checking waste_collections...');
+            const { error: error3 } = await supabase.from('waste_collections').select('ward').limit(1);
+            if (error3) log('waste_collections error: ' + error3.message);
+            else log('waste_collections has ward column.');
+        }
+
+        check();
+    </script>
+</head>
+
+<body>
+    <div id="output"></div>
+</body>
+
+</html>
+`;
+console.log("Please ignore this console log, I am writing a file.");

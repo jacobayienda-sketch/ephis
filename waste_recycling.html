@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,8 +10,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'SF Pro Display', system-ui, sans-serif;
       background: linear-gradient(135deg, #f8fafc 0%, #d1fae5 100%);
@@ -19,16 +24,16 @@
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
-    
+
     header {
       background: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
       position: sticky;
       top: 0;
       z-index: 100;
       backdrop-filter: blur(10px);
     }
-    
+
     .header-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -38,13 +43,13 @@
       align-items: center;
       gap: 1rem;
     }
-    
+
     .logo-section {
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
-    
+
     .logo-icon {
       width: 40px;
       height: 40px;
@@ -57,7 +62,7 @@
       font-weight: 700;
       font-size: 1.2rem;
     }
-    
+
     header h1 {
       font-size: 1.25rem;
       font-weight: 700;
@@ -66,13 +71,13 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    
+
     .header-actions {
       display: flex;
       gap: 0.75rem;
       align-items: center;
     }
-    
+
     .btn {
       border: none;
       border-radius: 10px;
@@ -86,47 +91,47 @@
       gap: 0.5rem;
       white-space: nowrap;
     }
-    
+
     .btn-primary {
       background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       color: white;
       box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2), 0 2px 4px -1px rgba(37, 99, 235, 0.1);
     }
-    
+
     .btn-primary:hover {
       transform: translateY(-1px);
       box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.15);
     }
-    
+
     .btn-secondary {
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: white;
       box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -1px rgba(16, 185, 129, 0.1);
     }
-    
+
     .btn-secondary:hover {
       transform: translateY(-1px);
       box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.15);
     }
-    
+
     .btn-light {
       background: white;
       color: #2563eb;
       border: 2px solid #e0f2fe;
     }
-    
+
     .btn-light:hover {
       background: #f0f9ff;
       border-color: #bae6fd;
       transform: translateY(-1px);
     }
-    
+
     main {
       max-width: 1000px;
       margin: 0 auto;
       padding: 2rem 1.5rem;
     }
-    
+
     .toolbar {
       display: flex;
       justify-content: space-between;
@@ -135,14 +140,14 @@
       margin-bottom: 2rem;
       flex-wrap: wrap;
     }
-    
+
     .search-wrapper {
       position: relative;
       flex: 1;
       min-width: 250px;
       max-width: 400px;
     }
-    
+
     .search-icon {
       position: absolute;
       left: 1rem;
@@ -151,7 +156,7 @@
       color: #94a3b8;
       pointer-events: none;
     }
-    
+
     .toolbar input {
       width: 100%;
       padding: 0.75rem 1rem 0.75rem 2.75rem;
@@ -161,29 +166,29 @@
       transition: all 0.2s;
       background: white;
     }
-    
+
     .toolbar input:focus {
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
-    
+
     .card {
       background: white;
       border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
       padding: 1.5rem;
       margin-bottom: 1rem;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       border: 1px solid #f1f5f9;
     }
-    
+
     .card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
       border-color: #d1fae5;
     }
-    
+
     .card-header {
       display: flex;
       justify-content: space-between;
@@ -193,25 +198,25 @@
       color: #1e293b;
       font-size: 1.05rem;
     }
-    
+
     .card p {
       color: #64748b;
       font-size: 0.95rem;
       margin: 0.5rem 0;
     }
-    
+
     .card p strong {
       color: #475569;
       font-weight: 600;
     }
-    
+
     .material-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
       margin-top: 0.75rem;
     }
-    
+
     .material-tag {
       background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
       color: #065f46;
@@ -221,14 +226,14 @@
       font-weight: 600;
       border: 1px solid #a7f3d0;
     }
-    
+
     .pagination {
       display: flex;
       justify-content: center;
       gap: 0.75rem;
       margin-top: 2rem;
     }
-    
+
     .pagination button {
       border: none;
       background: white;
@@ -240,27 +245,27 @@
       font-weight: 600;
       transition: all 0.2s;
     }
-    
+
     .pagination button:hover:not(:disabled) {
       background: #f0f9ff;
       border-color: #bae6fd;
       transform: translateY(-1px);
     }
-    
+
     .pagination button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
-    
+
     .form-card {
       background: white;
       border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -1px rgba(0,0,0,0.04);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
       padding: 2rem;
       margin-bottom: 2rem;
       border: 1px solid #f1f5f9;
     }
-    
+
     form label {
       font-weight: 600;
       display: block;
@@ -269,8 +274,10 @@
       color: #334155;
       font-size: 0.9rem;
     }
-    
-    form input, form select, form textarea {
+
+    form input,
+    form select,
+    form textarea {
       width: 100%;
       padding: 0.75rem 1rem;
       border-radius: 10px;
@@ -279,13 +286,15 @@
       transition: all 0.2s;
       font-family: inherit;
     }
-    
-    form input:focus, form select:focus, form textarea:focus {
+
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
-    
+
     footer {
       text-align: center;
       background: white;
@@ -295,7 +304,7 @@
       margin-top: 3rem;
       border-top: 1px solid #f1f5f9;
     }
-    
+
     .toast {
       position: fixed;
       bottom: 2rem;
@@ -311,29 +320,73 @@
       font-weight: 500;
       z-index: 1000;
     }
-    
-    .toast.show { opacity: 1; }
-    
+
+    .toast.show {
+      opacity: 1;
+    }
+
     .empty-state {
       text-align: center;
       padding: 3rem 1rem;
       color: #94a3b8;
     }
-    
+
     .empty-state svg {
       width: 64px;
       height: 64px;
       margin: 0 auto 1rem;
       opacity: 0.5;
     }
-    
+
     @media(max-width: 768px) {
-      .header-container { flex-wrap: wrap; padding: 1rem; }
-      header h1 { font-size: 1.1rem; }
-      .toolbar { flex-direction: column; align-items: stretch; }
-      .search-wrapper { max-width: 100%; }
-      .card { padding: 1.25rem; }
-      .form-card { padding: 1.5rem; }
+      .header-container {
+        flex-wrap: wrap;
+        padding: 1rem;
+      }
+
+      header h1 {
+        font-size: 1.1rem;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-wrapper {
+        max-width: 100%;
+      }
+
+      .card {
+        padding: 1.25rem;
+      }
+
+      .form-card {
+        padding: 1.5rem;
+      }
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-icon {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 0.25rem;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .btn-icon:hover {
+      background: #f1f5f9;
+    }
+
+    .btn-icon.delete:hover {
+      background: #fee2e2;
     }
   </style>
 </head>
@@ -346,6 +399,8 @@
         <h1>Waste Recycling Reports</h1>
       </div>
       <div class="header-actions">
+        <span id="locationBadge" class="badge"
+          style="display:none; background: #ecfdf5; color: #047857; margin-right: 1rem;"></span>
         <button class="btn btn-light" onclick="history.back()">← Back</button>
         <button class="btn btn-secondary" id="logoutBtn">Logout</button>
       </div>
@@ -356,7 +411,9 @@
     <div class="toolbar">
       <div class="search-wrapper">
         <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+          <path fill-rule="evenodd"
+            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+            clip-rule="evenodd" />
         </svg>
         <input type="text" id="searchInput" placeholder="Search partner or material..." />
       </div>
@@ -364,22 +421,22 @@
     </div>
 
     <div id="formContainer" style="display:none;" class="form-card">
-      <form id="recyclingForm">
+      <form id="recyclingForm" autocomplete="off">
         <label>Material Type (comma separated)</label>
         <input type="text" id="material_type" placeholder="Plastic, Organic, Metal" required />
-        
+
         <label>Quantity (tons)</label>
         <input type="number" step="0.1" id="quantity" placeholder="10.5" />
-        
+
         <label>Partner Agency</label>
         <input type="text" id="partner_agency" placeholder="Company or CBO name" />
-        
+
         <label>Waste to Recycle Ratio</label>
         <input type="number" step="0.01" id="waste_to_recycle_ratio" placeholder="0.75" />
-        
+
         <label>Report Date</label>
         <input type="date" id="report_date" required />
-        
+
         <div style="text-align:right;margin-top:1.5rem;display:flex;gap:0.75rem;justify-content:flex-end;">
           <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
           <button type="submit" class="btn btn-primary">Save Report</button>
@@ -403,6 +460,7 @@
 
   <script type="module">
     import { supabase } from "./main.js";
+    import { getCurrentUserProfile, getLocationFilterDescription, applyLocationFilters, applySiteLocationFilters } from "./locationAccessControl.js";
 
     const toast = document.getElementById("toast");
     const logoutBtn = document.getElementById("logoutBtn");
@@ -415,14 +473,17 @@
     const prevPage = document.getElementById("prevPage");
     const nextPage = document.getElementById("nextPage");
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const siteId = urlParams.get("id");
+
     let page = 0;
     const limit = 10;
     let total = 0;
 
     function showToast(msg, type = "info") {
       toast.textContent = msg;
-      toast.style.background = type === "error" 
-        ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)" 
+      toast.style.background = type === "error"
+        ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
         : "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)";
       toast.classList.add("show");
       setTimeout(() => toast.classList.remove("show"), 3000);
@@ -431,37 +492,63 @@
     async function checkSession() {
       const { data } = await supabase.auth.getSession();
       if (!data.session) window.location.href = "login.html";
+
+      const profile = await getCurrentUserProfile(supabase);
+      if (profile) {
+        const locDesc = getLocationFilterDescription(profile);
+        const locationBadge = document.getElementById("locationBadge");
+        if (locationBadge) {
+          locationBadge.textContent = "📍 " + locDesc;
+          locationBadge.style.display = "inline-flex";
+        }
+      }
     }
     checkSession();
+
+    let editingId = null;
 
     function toggleForm(show) {
       formContainer.style.display = show ? "block" : "none";
       if (show) formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (!show) {
+        form.reset();
+        editingId = null;
+        document.querySelector('#recyclingForm button[type="submit"]').textContent = "Save Report";
+      }
     }
-    
+
     addBtn.addEventListener("click", () => toggleForm(true));
     cancelBtn.addEventListener("click", () => toggleForm(false));
 
     async function loadRecycling() {
       cardsContainer.innerHTML = "<div class='empty-state'><p>Loading...</p></div>";
-      
+
       let query = supabase
         .from("waste_recycling")
         .select("*", { count: "exact" })
         .order("report_date", { ascending: false })
         .range(page * limit, page * limit + limit - 1);
-      
+
+      if (siteId) {
+        query = query.eq("site_id", siteId);
+      }
+
+      // Apply location filters
+      const profile = await getCurrentUserProfile(supabase);
+      if (profile) query = await applySiteLocationFilters(supabase, query, profile);
+
+
       const term = searchInput.value.trim();
       if (term) query = query.or(`partner_agency.ilike.%${term}%,material_type::text.ilike.%${term}%`);
-      
+
       const { data, count, error } = await query;
-      
+
       if (error) {
         console.error(error);
         showToast("Failed to load recycling reports", "error");
         return;
       }
-      
+
       total = count;
       renderCards(data);
     }
@@ -471,12 +558,18 @@
         cardsContainer.innerHTML = "<div class='empty-state'><svg viewBox='0 0 24 24' fill='currentColor'><path d='M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'/></svg><p>No recycling reports found</p></div>";
         return;
       }
-      
+
       cardsContainer.innerHTML = data.map(r => `
         <div class="card">
           <div class="card-header">
             <span>${r.partner_agency || "Unknown Partner"}</span>
-            <span style="color: #64748b; font-size: 0.9rem;">${r.report_date || "—"}</span>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+              <span style="color: #64748b; font-size: 0.9rem;">${r.report_date || "—"}</span>
+              <div class="card-actions">
+                <button onclick="editRecord('${r.id}')" class="btn-icon" title="Edit">✏️</button>
+                <button onclick="deleteRecord('${r.id}')" class="btn-icon delete" title="Delete">🗑️</button>
+              </div>
+            </div>
           </div>
           <div class="material-tags">
             ${(r.material_type || []).map(m => `<span class="material-tag">${m}</span>`).join('')}
@@ -484,48 +577,89 @@
           <p><strong>Quantity:</strong> ${r.quantity || "—"} tons | <strong>Recycle Ratio:</strong> ${r.waste_to_recycle_ratio || "—"}</p>
         </div>
       `).join("");
-      
+
       prevPage.disabled = page === 0;
       nextPage.disabled = (page + 1) * limit >= total;
     }
 
+    window.editRecord = async (id) => {
+      const { data, error } = await supabase.from("waste_recycling").select("*").eq("id", id).single();
+      if (error) {
+        console.error(error);
+        showToast("Error loading record", "error");
+        return;
+      }
+
+      document.getElementById("material_type").value = (data.material_type || []).join(", ");
+      document.getElementById("quantity").value = data.quantity || "";
+      document.getElementById("partner_agency").value = data.partner_agency || "";
+      document.getElementById("waste_to_recycle_ratio").value = data.waste_to_recycle_ratio || "";
+      document.getElementById("report_date").value = data.report_date || "";
+
+      editingId = id;
+      document.querySelector('#recyclingForm button[type="submit"]').textContent = "Update Report";
+      toggleForm(true);
+    };
+
+    window.deleteRecord = async (id) => {
+      if (!confirm("Are you sure you want to delete this report?")) return;
+
+      const { error } = await supabase.from("waste_recycling").delete().eq("id", id);
+      if (error) {
+        console.error(error);
+        showToast("Error deleting record", "error");
+        return;
+      }
+
+      showToast("Report deleted successfully");
+      loadRecycling();
+    };
+
     form.addEventListener("submit", async e => {
       e.preventDefault();
-      
+
       const payload = {
+        site_id: siteId || null,
         material_type: document.getElementById("material_type").value.split(",").map(v => v.trim()).filter(Boolean),
         quantity: parseFloat(document.getElementById("quantity").value) || null,
         partner_agency: document.getElementById("partner_agency").value.trim() || null,
         waste_to_recycle_ratio: parseFloat(document.getElementById("waste_to_recycle_ratio").value) || null,
-        report_date: document.getElementById("report_date").value
+        report_date: document.getElementById("report_date").value || null
       };
-      
-      const { error } = await supabase.from("waste_recycling").insert([payload]);
-      
+
+      let error;
+      if (editingId) {
+        ({ error } = await supabase.from("waste_recycling").update(payload).eq("id", editingId));
+      } else {
+        ({ error } = await supabase.from("waste_recycling").insert([payload]));
+      }
+
       if (error) {
         console.error(error);
-        showToast("Failed to save recycling record", "error");
+        showToast("Failed to save report", "error");
         return;
       }
-      
-      showToast("Recycling record added successfully");
-      form.reset();
+
+      showToast(editingId ? "Report updated successfully" : "Report added successfully");
       toggleForm(false);
+      page = 0;
       loadRecycling();
     });
 
+
     searchInput.addEventListener("input", () => { page = 0; loadRecycling(); });
-    prevPage.addEventListener("click", () => { if (page > 0) { page--; loadRecycling(); }});
-    nextPage.addEventListener("click", () => { if ((page + 1) * limit < total) { page++; loadRecycling(); }});
-    
+    prevPage.addEventListener("click", () => { if (page > 0) { page--; loadRecycling(); } });
+    nextPage.addEventListener("click", () => { if ((page + 1) * limit < total) { page++; loadRecycling(); } });
+
     logoutBtn.addEventListener("click", async () => {
       await supabase.auth.signOut();
       showToast("Logging out...");
       setTimeout(() => window.location.href = "login.html", 800);
     });
-    
+
     document.getElementById("year").textContent = new Date().getFullYear();
     loadRecycling();
   </script>
 </body>
+
 </html>

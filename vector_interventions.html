@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,13 +11,19 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="main.js"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #f8fafc;
       min-height: 100vh;
       color: #0f172a;
+      display: flex;
+      flex-direction: column;
     }
 
     body::before {
@@ -33,7 +40,7 @@
 
     header {
       background: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       padding: 1.2rem 2rem;
       position: sticky;
       top: 0;
@@ -62,48 +69,278 @@
       gap: 1rem;
     }
 
-    .header-content h1 { font-size: 1.3rem; font-weight: 600; color: #0f172a; }
-    .header-actions { display: flex; gap: 0.75rem; }
+    .header-content h1 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
 
-    .btn { border: none; border-radius: 8px; cursor: pointer; font-weight: 600; padding: 0.75rem 1.5rem; font-size: 1rem; transition: all 0.2s; }
-    .btn-primary { background: linear-gradient(135deg, #0ea5e9, #2563eb); color: white; }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
-    .btn-secondary { background: linear-gradient(135deg, #059669, #10b981); color: white; }
-    .btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
-    .btn-light { background: white; color: #2563eb; border: 2px solid #e2e8f0; }
-    .btn-light:hover { border-color: #2563eb; background: #f8fafc; }
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
 
-    main { padding: 2rem; max-width: 1000px; margin: 0 auto; }
-    .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; gap: 1rem; }
-    .toolbar input { padding: 0.75rem 1rem 0.75rem 2.8rem; border: 2px solid #e2e8f0; border-radius: 10px; width: 300px; font-size: 1rem; transition: all 0.2s; background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23475569" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat 0.75rem center; }
-    .toolbar input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .btn {
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
 
-    .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem; margin-bottom: 1rem; transition: transform 0.2s, box-shadow 0.2s; }
-    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .card-header { display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: #0f172a; margin-bottom: 0.75rem; }
+    .btn-primary {
+      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      color: white;
+    }
 
-    .badge { border-radius: 20px; padding: 0.4rem 0.8rem; font-size: 0.85rem; font-weight: 600; }
-    .badge.Effective { background: #d1fae5; color: #047857; }
-    .badge.Moderate { background: #fef3c7; color: #d97706; }
-    .badge.Weak { background: #fee2e2; color: #dc2626; }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
 
-    .pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem; }
-    .pagination button { border: 2px solid #e2e8f0; background: white; color: #2563eb; border-radius: 8px; padding: 0.5rem 1rem; cursor: pointer; font-weight: 600; transition: all 0.2s; }
-    .pagination button:hover { border-color: #2563eb; background: #f8fafc; transform: scale(1.05); }
+    .btn-secondary {
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: white;
+    }
 
-    .form-card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 2rem; margin-bottom: 1rem; }
-    form label { font-weight: 600; display: block; margin-top: 0.75rem; color: #0f172a; }
-    form input, form select, form textarea { width: 100%; padding: 0.75rem; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 0.95rem; transition: all 0.2s; }
-    form input:focus, form select:focus, form textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .btn-secondary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
 
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transition: opacity 0.3s; }
-    .toast.show { opacity: 1; }
+    .btn-light {
+      background: white;
+      color: #2563eb;
+      border: 2px solid #e2e8f0;
+    }
+
+    .btn-light:hover {
+      border-color: #2563eb;
+      background: #f8fafc;
+    }
+
+    main {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+      flex: 1;
+      width: 100%;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      gap: 1rem;
+    }
+
+    .toolbar input {
+      padding: 0.75rem 1rem 0.75rem 2.8rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      width: 300px;
+      font-size: 1rem;
+      transition: all 0.2s;
+      background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23475569" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat 0.75rem center;
+    }
+
+    .toolbar input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 0.75rem;
+    }
+
+    .badge {
+      border-radius: 20px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .badge.Effective {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .badge.Moderate {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .badge.Weak {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 2rem;
+    }
+
+    .pagination button {
+      border: 2px solid #e2e8f0;
+      background: white;
+      color: #2563eb;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .pagination button:hover {
+      border-color: #2563eb;
+      background: #f8fafc;
+      transform: scale(1.05);
+    }
+
+    .form-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    form label {
+      font-weight: 600;
+      display: block;
+      margin-top: 0.75rem;
+      color: #0f172a;
+    }
+
+    form input,
+    form select,
+    form textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 2px solid #e2e8f0;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid #f1f5f9;
+      justify-content: flex-end;
+    }
+
+    .edit-btn {
+      background: #eff6ff;
+      color: #1d4ed8;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .edit-btn:hover {
+      background: #dbeafe;
+    }
+
+    .delete-btn {
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .delete-btn:hover {
+      background: #fee2e2;
+    }
+
+    footer {
+      text-align: center;
+      background: white;
+      color: #64748b;
+      padding: 1.5rem;
+      font-size: 0.85rem;
+      margin-top: auto;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
 
     @media (max-width: 768px) {
-      main { padding: 1rem; }
-      .toolbar { flex-direction: column; align-items: stretch; }
-      .toolbar input { width: 100%; }
-      .header-content h1 { font-size: 1.1rem; }
+      main {
+        padding: 1rem;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .toolbar input {
+        width: 100%;
+      }
+
+      .header-content h1 {
+        font-size: 1.1rem;
+      }
     }
   </style>
 </head>
@@ -112,10 +349,10 @@
   <header>
     <div class="header-content">
       <div class="logo">E</div>
-      <h1>🦟 Vector Control Interventions</h1>
+      <h1>🦟 Vector Interventions</h1>
     </div>
-    <div>
-      <button class="btn btn-light" onclick="history.back()">Back</button>
+    <div class="header-actions">
+      <a href="vector_control.html" class="btn btn-light">← Back to Sites</a>
       <button class="btn btn-secondary" id="logoutBtn">Logout</button>
     </div>
   </header>
@@ -127,16 +364,20 @@
     </div>
 
     <div id="formContainer" style="display:none;" class="form-card">
+      <h3 id="formTitle">New Intervention</h3>
       <form id="interventionForm">
         <label>Date</label><input type="date" id="date" required />
-        <label>Intervention Types (comma separated)</label><input type="text" id="intervention_types" placeholder="Larviciding, Fogging, Cleanup..." required />
+        <label>Intervention Types (comma separated)</label><input type="text" id="intervention_types"
+          placeholder="Larviciding, Fogging, Cleanup..." required />
         <label>Agency</label><input type="text" id="agency" placeholder="County PH Dept, NGO..." />
         <label>Coverage Area (km²)</label><input type="number" step="0.01" id="coverage_area" />
         <label>Materials Used</label><input type="text" id="materials_used" placeholder="Larvicide, spray, etc." />
         <label>Duration (days)</label><input type="number" step="1" id="duration_days" />
         <label>Community Participation</label>
         <select id="community_participation">
-          <option value="">Select</option><option value="true">Yes</option><option value="false">No</option>
+          <option value="">Select</option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
         </select>
         <label>Partners</label><input type="text" id="partners" placeholder="List of partners" />
         <label>Cost (Ksh)</label><input type="number" step="0.1" id="cost" />
@@ -144,10 +385,12 @@
         <label>Effectiveness</label>
         <select id="effectiveness">
           <option value="">Select</option>
-          <option>Effective</option><option>Moderate</option><option>Weak</option>
+          <option>Effective</option>
+          <option>Moderate</option>
+          <option>Weak</option>
         </select>
         <div style="text-align:right;margin-top:0.6rem;">
-          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn">Save</button>
           <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
         </div>
       </form>
@@ -169,92 +412,195 @@
 
   <script type="module">
     import { supabase } from "./main.js";
+    import { getCurrentUserProfile, applyLocationFilters } from "./locationAccessControl.js";
 
-    const toast=document.getElementById("toast");
-    const logoutBtn=document.getElementById("logoutBtn");
-    const addBtn=document.getElementById("addBtn");
-    const cancelBtn=document.getElementById("cancelBtn");
-    const formContainer=document.getElementById("formContainer");
-    const form=document.getElementById("interventionForm");
-    const searchInput=document.getElementById("searchInput");
-    const cardsContainer=document.getElementById("cardsContainer");
-    const prevPage=document.getElementById("prevPage");
-    const nextPage=document.getElementById("nextPage");
+    const toast = document.getElementById("toast");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const addBtn = document.getElementById("addBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const formContainer = document.getElementById("formContainer");
+    const form = document.getElementById("interventionForm");
+    const searchInput = document.getElementById("searchInput");
+    const cardsContainer = document.getElementById("cardsContainer");
+    const prevPage = document.getElementById("prevPage");
+    const nextPage = document.getElementById("nextPage");
+    const headerTitle = document.querySelector(".header-content h1");
+    const formTitle = document.getElementById("formTitle");
+    const saveBtn = document.getElementById("saveBtn");
 
-    const urlParams=new URLSearchParams(window.location.search);
-    const siteId=urlParams.get("id");
+    const urlParams = new URLSearchParams(window.location.search);
+    const siteId = urlParams.get("id");
 
-    let page=0;const limit=10;let total=0;
+    let page = 0; const limit = 10; let total = 0;
+    let currentUserProfile = null;
+    let editingId = null;
 
-    function showToast(msg,type="info"){toast.textContent=msg;toast.style.background=type==="error"?"#c62828":"#1976d2";toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3000);}
+    function showToast(msg, type = "info") { toast.textContent = msg; toast.style.background = type === "error" ? "#c62828" : "#1976d2"; toast.classList.add("show"); setTimeout(() => toast.classList.remove("show"), 3000); }
 
-    async function checkSession(){const {data}=await supabase.auth.getSession();if(!data.session)window.location.href="login.html";}
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) window.location.href = "login.html";
+
+      currentUserProfile = await getCurrentUserProfile(supabase);
+      if (!currentUserProfile) {
+        showToast("Access denied", "error");
+        setTimeout(() => window.location.href = "login.html", 2000);
+        return;
+      }
+
+      if (siteId) {
+        await loadSiteDetails();
+      } else {
+        loadInterventions();
+      }
+    }
+
+    async function loadSiteDetails() {
+      let siteQuery = supabase.from("vector_sites").select("site_name, location_name").eq("id", siteId);
+      siteQuery = applyLocationFilters(siteQuery, currentUserProfile);
+
+      const { data, error } = await siteQuery.single();
+
+      if (error || !data) {
+        console.error("Site not found or access denied", error);
+        showToast("Site not found or access denied", "error");
+        cardsContainer.innerHTML = "<div class='empty-state'><p>Access Denied or Site Not Found</p></div>";
+        addBtn.style.display = 'none';
+        return;
+      }
+
+      const name = data.site_name || data.location_name || "Unknown Site";
+      headerTitle.textContent = `Interventions: ${name}`;
+      loadInterventions();
+    }
+
     checkSession();
 
-    function toggleForm(show){formContainer.style.display=show?"block":"none";}
-    addBtn.addEventListener("click",()=>toggleForm(true));
-    cancelBtn.addEventListener("click",()=>toggleForm(false));
-
-    async function loadInterventions(){
-      cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>Loading…</p>";
-      let query=supabase.from("vector_interventions").select("*",{count:"exact"}).order("date",{ascending:false}).range(page*limit,page*limit+limit-1);
-      if(siteId)query=query.eq("site_id",siteId);
-      const term=searchInput.value.trim();
-      if(term)query=query.or(`agency.ilike.%${term}%,partners.ilike.%${term}%`);
-      const{data,count,error}=await query;
-      if(error){console.error(error);showToast("Load failed","error");return;}
-      total=count;renderCards(data);
+    function toggleForm(show) {
+      formContainer.style.display = show ? "block" : "none";
+      if (show) {
+        formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        form.reset();
+        editingId = null;
+        formTitle.textContent = "New Intervention";
+        saveBtn.textContent = "Save";
+      }
     }
 
-    function renderCards(data){
-      if(!data.length){cardsContainer.innerHTML="<p style='text-align:center;color:gray;'>No interventions found</p>";return;}
-      cardsContainer.innerHTML=data.map(r=>{
-        const badge=r.effectiveness||"Moderate";
-        return`
+    addBtn.addEventListener("click", () => toggleForm(true));
+    cancelBtn.addEventListener("click", () => toggleForm(false));
+
+    async function loadInterventions() {
+      cardsContainer.innerHTML = "<p style='text-align:center;color:gray;'>Loading…</p>";
+      let query = supabase.from("vector_interventions").select("*", { count: "exact" }).order("date", { ascending: false }).range(page * limit, page * limit + limit - 1);
+
+      if (siteId) query = query.eq("site_id", siteId);
+
+      const term = searchInput.value.trim();
+      if (term) query = query.or(`agency.ilike.%${term}%,partners.ilike.%${term}%`);
+      const { data, count, error } = await query;
+      if (error) { console.error(error); showToast("Load failed", "error"); return; }
+      total = count; renderCards(data);
+    }
+
+    function renderCards(data) {
+      if (!data.length) { cardsContainer.innerHTML = "<p style='text-align:center;color:gray;'>No interventions found</p>"; return; }
+      cardsContainer.innerHTML = data.map(r => {
+        const badge = r.effectiveness || "Moderate";
+        const rStr = encodeURIComponent(JSON.stringify(r));
+        return `
           <div class="card">
             <div class="card-header">
-              <span>${(r.intervention_types||[]).join(", ")}</span>
-              <span class="badge ${badge}">${r.effectiveness||"N/A"}</span>
+              <span>${(r.intervention_types || []).join(", ")}</span>
+              <span class="badge ${badge}">${r.effectiveness || "N/A"}</span>
             </div>
-            <p><strong>Date:</strong> ${r.date||"-"} | <strong>Agency:</strong> ${r.agency||"-"}</p>
-            <p><strong>Coverage:</strong> ${r.coverage_area||"-"} km² | <strong>Duration:</strong> ${r.duration_days||"-"} days</p>
-            <p><strong>Community Participation:</strong> ${r.community_participation?"Yes":"No"}</p>
-            <p><strong>Partners:</strong> ${r.partners||"-"} | <strong>Cost:</strong> ${r.cost?("Ksh "+r.cost):"-"}</p>
-            <p><strong>Outcome:</strong> ${r.outcome||"-"}</p>
+            <p><strong>Date:</strong> ${r.date || "-"} | <strong>Agency:</strong> ${r.agency || "-"}</p>
+            <p><strong>Coverage:</strong> ${r.coverage_area || "-"} km² | <strong>Duration:</strong> ${r.duration_days || "-"} days</p>
+            <p><strong>Community Participation:</strong> ${r.community_participation ? "Yes" : "No"}</p>
+            <p><strong>Partners:</strong> ${r.partners || "-"} | <strong>Cost:</strong> ${r.cost ? ("Ksh " + r.cost) : "-"}</p>
+            <p><strong>Outcome:</strong> ${r.outcome || "-"}</p>
+            <div class="actions">
+                <button class="edit-btn" onclick="editIntervention('${rStr}')">✏️ Edit</button>
+                <button class="delete-btn" onclick="deleteIntervention('${r.id}')">🗑️ Delete</button>
+            </div>
           </div>`;
       }).join("");
-      prevPage.disabled=page===0;
-      nextPage.disabled=(page+1)*limit>=total;
+      prevPage.disabled = page === 0;
+      nextPage.disabled = (page + 1) * limit >= total;
     }
 
-    form.addEventListener("submit",async e=>{
+    window.editIntervention = (rStr) => {
+      const r = JSON.parse(decodeURIComponent(rStr));
+      editingId = r.id;
+      document.getElementById("date").value = r.date || "";
+      document.getElementById("intervention_types").value = (r.intervention_types || []).join(", ");
+      document.getElementById("agency").value = r.agency || "";
+      document.getElementById("coverage_area").value = r.coverage_area || "";
+      document.getElementById("materials_used").value = r.materials_used || "";
+      document.getElementById("duration_days").value = r.duration_days || "";
+      document.getElementById("community_participation").value = r.community_participation ? "true" : "false";
+      document.getElementById("partners").value = r.partners || "";
+      document.getElementById("cost").value = r.cost || "";
+      document.getElementById("outcome").value = r.outcome || "";
+      document.getElementById("effectiveness").value = r.effectiveness || "";
+
+      formTitle.textContent = "Edit Intervention";
+      saveBtn.textContent = "Update";
+      toggleForm(true);
+    };
+
+    window.deleteIntervention = async (id) => {
+      if (!confirm("Delete this intervention?")) return;
+      const { error } = await supabase.from("vector_interventions").delete().eq("id", id);
+      if (error) { console.error(error); showToast("Failed to delete", "error"); }
+      else { showToast("Deleted successfully"); loadInterventions(); }
+    };
+
+    form.addEventListener("submit", async e => {
       e.preventDefault();
-      const payload={
-        site_id:siteId,
-        date:document.getElementById("date").value,
-        intervention_types:document.getElementById("intervention_types").value.split(",").map(v=>v.trim()).filter(Boolean),
-        agency:document.getElementById("agency").value.trim()||null,
-        coverage_area:parseFloat(document.getElementById("coverage_area").value)||null,
-        materials_used:document.getElementById("materials_used").value.trim()||null,
-        duration_days:parseInt(document.getElementById("duration_days").value)||null,
-        community_participation:document.getElementById("community_participation").value==="true",
-        partners:document.getElementById("partners").value.trim()||null,
-        cost:parseFloat(document.getElementById("cost").value)||null,
-        outcome:document.getElementById("outcome").value.trim()||null,
-        effectiveness:document.getElementById("effectiveness").value||null
+
+      if (!siteId) {
+        showToast("Error: No site selected", "error");
+        return;
+      }
+
+      const payload = {
+        site_id: siteId,
+        date: document.getElementById("date").value,
+        intervention_types: document.getElementById("intervention_types").value.split(",").map(v => v.trim()).filter(Boolean),
+        agency: document.getElementById("agency").value.trim() || null,
+        coverage_area: parseFloat(document.getElementById("coverage_area").value) || null,
+        materials_used: document.getElementById("materials_used").value.trim() || null,
+        duration_days: parseInt(document.getElementById("duration_days").value) || null,
+        community_participation: document.getElementById("community_participation").value === "true",
+        partners: document.getElementById("partners").value.trim() || null,
+        cost: parseFloat(document.getElementById("cost").value) || null,
+        outcome: document.getElementById("outcome").value.trim() || null,
+        effectiveness: document.getElementById("effectiveness").value || null
       };
-      const{error}=await supabase.from("vector_interventions").insert([payload]);
-      if(error){console.error(error);showToast("Save failed","error");return;}
-      showToast("Intervention added successfully");
-      form.reset();toggleForm(false);loadInterventions();
+
+      let error;
+      if (editingId) {
+        const { error: err } = await supabase.from("vector_interventions").update(payload).eq("id", editingId);
+        error = err;
+      } else {
+        const { error: err } = await supabase.from("vector_interventions").insert([payload]);
+        error = err;
+      }
+
+      if (error) { console.error(error); showToast("Save failed", "error"); return; }
+      showToast(editingId ? "Updated successfully" : "Intervention added successfully");
+      toggleForm(false); loadInterventions();
     });
 
-    searchInput.addEventListener("input",()=>{page=0;loadInterventions();});
-    prevPage.addEventListener("click",()=>{if(page>0){page--;loadInterventions();}});
-    nextPage.addEventListener("click",()=>{if((page+1)*limit<total){page++;loadInterventions();}});
-    logoutBtn.addEventListener("click",async()=>{await supabase.auth.signOut();showToast("Logging out…");setTimeout(()=>window.location.href="login.html",800);});
-    document.getElementById("year").textContent=new Date().getFullYear();
-    loadInterventions();
+    searchInput.addEventListener("input", () => { page = 0; loadInterventions(); });
+    prevPage.addEventListener("click", () => { if (page > 0) { page--; loadInterventions(); } });
+    nextPage.addEventListener("click", () => { if ((page + 1) * limit < total) { page++; loadInterventions(); } });
+    logoutBtn.addEventListener("click", async () => { await supabase.auth.signOut(); showToast("Logging out…"); setTimeout(() => window.location.href = "login.html", 800); });
+    document.getElementById("year").textContent = new Date().getFullYear();
+    // loadInterventions called via checkSession
   </script>
 </body>
+
 </html>

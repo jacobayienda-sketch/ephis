@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Waste Management Form | EPHIS</title>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#059669" />
@@ -33,17 +34,26 @@
       left: 0;
       right: 0;
       height: 500px;
-      background: linear-gradient(135deg, 
-        rgba(5, 150, 105, 0.1) 0%, 
-        rgba(16, 185, 129, 0.1) 50%, 
-        rgba(34, 197, 94, 0.1) 100%);
+      background: linear-gradient(135deg,
+          rgba(5, 150, 105, 0.1) 0%,
+          rgba(16, 185, 129, 0.1) 50%,
+          rgba(34, 197, 94, 0.1) 100%);
       z-index: -1;
       animation: gradientShift 15s ease infinite;
     }
 
     @keyframes gradientShift {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.05); }
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+      }
     }
 
     header {
@@ -126,8 +136,15 @@
     }
 
     @keyframes gradientMove {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
+
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
     }
 
     form h2 {
@@ -192,7 +209,9 @@
       font-weight: normal;
     }
 
-    input, select, textarea {
+    input,
+    select,
+    textarea {
       width: 100%;
       padding: 0.875rem 1rem;
       border: 2px solid #e2e8f0;
@@ -204,7 +223,9 @@
       color: #0f172a;
     }
 
-    input:focus, select:focus, textarea:focus {
+    input:focus,
+    select:focus,
+    textarea:focus {
       outline: none;
       border-color: #10b981;
       box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
@@ -464,6 +485,21 @@
           </div>
         </div>
 
+        <div class="form-row">
+          <div class="form-group">
+            <label for="responsible_officer">Responsible Officer</label>
+            <input type="text" id="responsible_officer" name="responsible_officer"
+              placeholder="Name of officer in charge">
+            <div class="field-description">Person responsible for the site</div>
+          </div>
+
+          <div class="form-group">
+            <label for="contact_details">Contact Details</label>
+            <input type="text" id="contact_details" name="contact_details" placeholder="Phone, Email...">
+            <div class="field-description">Contact information for inquiries</div>
+          </div>
+        </div>
+
         <div class="form-group">
           <label for="site_capacity">Site Capacity (Tons/Day)</label>
           <input type="number" id="site_capacity" name="site_capacity" min="0" step="0.1" placeholder="e.g., 50">
@@ -474,34 +510,13 @@
       <div class="form-section">
         <h3>📍 Location Details</h3>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="county">County</label>
-            <select id="county">
-              <option value="">Select county</option>
-            </select>
-            <div class="field-description">County where site is located</div>
-          </div>
-
-          <div class="form-group">
-            <label for="sub_county">Sub-county</label>
-            <select id="sub_county">
-              <option value="">Select sub-county</option>
-            </select>
-            <div class="field-description">Sub-county location</div>
-          </div>
-        </div>
+        <!-- Hidden inputs for auto-filled location data -->
+        <input type="hidden" id="county" name="county">
+        <input type="hidden" id="sub_county" name="sub_county">
+        <input type="hidden" id="ward" name="ward">
 
         <div class="form-row">
-          <div class="form-group">
-            <label for="ward">Ward</label>
-            <select id="ward">
-              <option value="">Select ward</option>
-            </select>
-            <div class="field-description">Ward location</div>
-          </div>
-
-          <div class="form-group">
+          <div class="form-group" style="grid-column: span 2;">
             <label for="specific_location">Specific Location</label>
             <input type="text" id="specific_location" placeholder="Village, area, landmark...">
             <div class="field-description">Additional location details</div>
@@ -528,268 +543,230 @@
       </div>
 
       <div class="actions">
-        <button type="button" class="btn btn-light" id="cancel-btn">Cancel</button>
-        <button type="button" class="btn btn-danger" id="delete-btn">🗑️ Delete</button>
-        <button type="submit" class="btn btn-primary">💾 Save Site</button>
+        <button type="button" class="btn btn-danger" id="delete-btn" style="display: none;">
+          🗑️ Delete Site
+        </button>
+        <div style="flex: 1;"></div>
+        <button type="button" class="btn btn-light" id="cancel-btn">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary">
+          💾 Save Site
+        </button>
       </div>
-    </form>
-  </main>
 
-  <footer>
-    <p>County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span></p>
-  </footer>
+      <script type="module">
+        import { supabase, showToast, getFormData, populateForm, insertRecord, updateRecord, deleteRecord, fetchById, requireLogin } from "./main.js";
+        import { getCurrentUserProfile } from "./locationAccessControl.js";
 
-  <script type="module">
-    import { supabase, showToast, getFormData, populateForm, insertRecord, updateRecord, deleteRecord, fetchById, requireLogin } from "./main.js";
+        const form = document.getElementById("waste-form");
+        const cancelBtn = document.getElementById("cancel-btn");
+        const deleteBtn = document.getElementById("delete-btn");
+        const title = document.getElementById("form-title");
 
-    const form = document.getElementById("waste-form");
-    const cancelBtn = document.getElementById("cancel-btn");
-    const deleteBtn = document.getElementById("delete-btn");
-    const title = document.getElementById("form-title");
-    const county = document.getElementById("county");
-    const sub_county = document.getElementById("sub_county");
-    const ward = document.getElementById("ward");
-    const specific_location = document.getElementById("specific_location");
-    const getLocationBtn = document.getElementById("getLocationBtn");
-    const locationStatus = document.getElementById("locationStatus");
-    const latitudeInput = document.getElementById("latitude");
-    const longitudeInput = document.getElementById("longitude");
-    const params = new URLSearchParams(window.location.search);
-    const recordId = params.get("id");
+        // Hidden location fields
+        const county = document.getElementById("county");
+        const sub_county = document.getElementById("sub_county");
+        const ward = document.getElementById("ward");
 
-    let wardsData = [];
+        const specific_location = document.getElementById("specific_location");
+        const getLocationBtn = document.getElementById("getLocationBtn");
+        const locationStatus = document.getElementById("locationStatus");
+        const latitudeInput = document.getElementById("latitude");
+        const longitudeInput = document.getElementById("longitude");
+        const params = new URLSearchParams(window.location.search);
+        const recordId = params.get("id");
 
-    await requireLogin();
+        await requireLogin();
 
-    // Get current location
-    getLocationBtn.addEventListener("click", () => {
-      if (!navigator.geolocation) {
-        locationStatus.textContent = "❌ Geolocation is not supported by your browser";
-        locationStatus.style.color = "#dc2626";
-        return;
-      }
-
-      locationStatus.textContent = "📡 Getting your location...";
-      locationStatus.style.color = "#2563eb";
-      getLocationBtn.disabled = true;
-      getLocationBtn.innerHTML = "📡 Getting Location...";
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          
-          latitudeInput.value = lat.toFixed(6);
-          longitudeInput.value = lng.toFixed(6);
-          
-          locationStatus.textContent = `✅ Location captured: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-          locationStatus.style.color = "#10b981";
-          
-          getLocationBtn.disabled = false;
-          getLocationBtn.innerHTML = "📍 Get My Current Location";
-          
-          showToast("✅ Location captured successfully", "success");
-        },
-        (error) => {
-          let errorMsg = "❌ ";
-          switch(error.code) {
-            case error.PERMISSION_DENIED:
-              errorMsg += "Location access denied. Please enable location permissions.";
-              break;
-            case error.POSITION_UNAVAILABLE:
-              errorMsg += "Location information unavailable.";
-              break;
-            case error.TIMEOUT:
-              errorMsg += "Location request timed out.";
-              break;
-            default:
-              errorMsg += "An unknown error occurred.";
+        // Get current location
+        getLocationBtn.addEventListener("click", () => {
+          if (!navigator.geolocation) {
+            locationStatus.textContent = "❌ Geolocation is not supported by your browser";
+            locationStatus.style.color = "#dc2626";
+            return;
           }
-          
-          locationStatus.textContent = errorMsg;
-          locationStatus.style.color = "#dc2626";
-          
-          getLocationBtn.disabled = false;
-          getLocationBtn.innerHTML = "📍 Get My Current Location";
-          
-          showToast(errorMsg, "error");
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
-    });
 
-    // Load wards data
-    async function loadWards() {
-      try {
-        const res = await fetch("./kenya_wards.json");
-        wardsData = await res.json();
-        populateCounties();
-      } catch (error) {
-        console.error("Error loading wards:", error);
-        showToast("⚠️ Error loading location data", "error");
-      }
-    }
+          locationStatus.textContent = "📡 Getting your location...";
+          locationStatus.style.color = "#2563eb";
+          getLocationBtn.disabled = true;
+          getLocationBtn.innerHTML = "📡 Getting Location...";
 
-    function populateCounties() {
-      const counties = [...new Set(wardsData.map(x => x.county))].sort();
-      counties.forEach(c => {
-        county.innerHTML += `<option value="${c}">${c}</option>`;
-      });
-    }
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
 
-    county.addEventListener("change", () => {
-      sub_county.innerHTML = `<option value="">Select sub-county</option>`;
-      ward.innerHTML = `<option value="">Select ward</option>`;
+              latitudeInput.value = lat.toFixed(6);
+              longitudeInput.value = lng.toFixed(6);
 
-      if (!county.value) return;
+              locationStatus.textContent = `✅ Location captured: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+              locationStatus.style.color = "#10b981";
 
-      const subCounties = [...new Set(
-        wardsData
-          .filter(x => x.county === county.value)
-          .map(x => x.sub_county)
-      )].sort();
+              getLocationBtn.disabled = false;
+              getLocationBtn.innerHTML = "📍 Get My Current Location";
 
-      subCounties.forEach(sc => {
-        sub_county.innerHTML += `<option value="${sc}">${sc}</option>`;
-      });
-    });
+              showToast("✅ Location captured successfully", "success");
+            },
+            (error) => {
+              let errorMsg = "❌ ";
+              switch (error.code) {
+                case error.PERMISSION_DENIED:
+                  errorMsg += "Location access denied. Please enable location permissions.";
+                  break;
+                case error.POSITION_UNAVAILABLE:
+                  errorMsg += "Location information unavailable.";
+                  break;
+                case error.TIMEOUT:
+                  errorMsg += "Location request timed out.";
+                  break;
+                default:
+                  errorMsg += "An unknown error occurred.";
+              }
 
-    sub_county.addEventListener("change", () => {
-      ward.innerHTML = `<option value="">Select ward</option>`;
+              locationStatus.textContent = errorMsg;
+              locationStatus.style.color = "#dc2626";
 
-      if (!sub_county.value) return;
+              getLocationBtn.disabled = false;
+              getLocationBtn.innerHTML = "📍 Get My Current Location";
 
-      const wards = wardsData
-        .filter(x => x.county === county.value && x.sub_county === sub_county.value)
-        .map(x => x.ward)
-        .sort();
-
-      wards.forEach(w => {
-        ward.innerHTML += `<option value="${w}">${w}</option>`;
-      });
-    });
-
-    cancelBtn.onclick = () => window.location.href = "waste_management.html";
-    
-    if (!recordId) deleteBtn.style.display = "none";
-
-    if (recordId) {
-      try {
-        const record = await fetchById("waste_management", recordId);
-        
-        // Load wards first
-        await loadWards();
-        
-        // Populate location dropdowns
-        if (record.county) {
-          county.value = record.county;
-          county.dispatchEvent(new Event('change'));
-          
-          setTimeout(() => {
-            if (record.sub_county) {
-              sub_county.value = record.sub_county;
-              sub_county.dispatchEvent(new Event('change'));
-              
-              setTimeout(() => {
-                if (record.ward) {
-                  ward.value = record.ward;
-                }
-              }, 100);
+              showToast(errorMsg, "error");
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 0
             }
-          }, 100);
+          );
+        });
+
+        cancelBtn.onclick = () => window.location.href = "waste_management.html";
+
+        if (!recordId) deleteBtn.style.display = "none";
+
+        async function loadRecord() {
+          if (recordId) {
+            try {
+              const record = await fetchById("waste_management_sites", recordId);
+              populateForm(form, record);
+
+              // Populate location fields from record
+              if (record.county) county.value = record.county;
+              if (record.sub_county) sub_county.value = record.sub_county;
+              if (record.ward) ward.value = record.ward;
+
+              if (record.latitude) latitudeInput.value = record.latitude;
+              if (record.longitude) longitudeInput.value = record.longitude;
+
+              // Map address back to specific_location for the form
+              if (record.address) specific_location.value = record.address;
+              // Map ownership back to ownership_type generic select
+              if (record.ownership) document.getElementById("ownership_type").value = record.ownership;
+
+              if (record.responsible_officer) document.getElementById("responsible_officer").value = record.responsible_officer;
+              if (record.contact_details) document.getElementById("contact_details").value = record.contact_details;
+
+              title.textContent = "✏️ Edit Waste Management Site";
+            } catch (err) {
+              showToast("❌ Error loading record: " + err.message, "error");
+            }
+          } else {
+            // New record: Auto-fill location from profile
+            const profile = await getCurrentUserProfile(supabase);
+            if (profile) {
+              if (profile.constituency) sub_county.value = profile.constituency;
+              if (profile.ward) ward.value = profile.ward;
+              // Assuming county is standard for all (or add logic if multi-county)
+              county.value = "Elgeyo Marakwet";
+            }
+          }
         }
-        
-        // Populate other fields
-        populateForm(form, record);
-        
-        if (record.latitude) latitudeInput.value = record.latitude;
-        if (record.longitude) longitudeInput.value = record.longitude;
-        if (record.specific_location) specific_location.value = record.specific_location;
-        
-        title.textContent = "✏️ Edit Waste Management Site";
-      } catch (err) {
-        showToast("❌ Error loading record: " + err.message, "error");
-      }
-    } else {
-      loadWards();
-    }
+        loadRecord();
 
-    form.onsubmit = async e => {
-      e.preventDefault();
-      
-      const submitBtn = form.querySelector('.btn-primary');
-      const originalText = submitBtn.textContent;
-      submitBtn.textContent = "💾 Saving...";
-      submitBtn.disabled = true;
-      
-      const payload = getFormData(form);
-      
-      // Build location string
-      let locationParts = [];
-      if (ward.value) locationParts.push(ward.value);
-      if (sub_county.value) locationParts.push(sub_county.value);
-      if (county.value) locationParts.push(county.value);
-      if (specific_location.value) locationParts.push(specific_location.value);
-      
-      // Add GPS if provided
-      if (latitudeInput.value && longitudeInput.value) {
-        locationParts.push(`GPS: ${latitudeInput.value}, ${longitudeInput.value}`);
-      }
-      
-      // Add location fields to payload
-      payload.county = county.value || null;
-      payload.sub_county = sub_county.value || null;
-      payload.ward = ward.value || null;
-      payload.specific_location = specific_location.value || null;
-      payload.location = locationParts.join(', ') || null;
-      payload.latitude = parseFloat(latitudeInput.value) || null;
-      payload.longitude = parseFloat(longitudeInput.value) || null;
-      
-      try {
-        const { data: userData } = await supabase.auth.getUser();
-        payload.created_by = userData?.user?.id || null;
-        
-        if (recordId) {
-          await updateRecord("waste_management", recordId, payload);
-          showToast("✅ Site updated successfully", "success");
-        } else {
-          await insertRecord("waste_management", payload);
-          showToast("✅ Site added successfully", "success");
-        }
-        
-        setTimeout(() => window.location.href = "waste_management.html", 800);
-      } catch (err) {
-        console.error(err);
-        showToast("❌ Save failed: " + err.message, "error");
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-      }
-    };
+        form.onsubmit = async e => {
+          e.preventDefault();
 
-    deleteBtn.onclick = async () => {
-      if (!confirm("⚠️ Are you sure you want to delete this waste management site? This action cannot be undone.")) return;
-      
-      const originalText = deleteBtn.textContent;
-      deleteBtn.textContent = "🗑️ Deleting...";
-      deleteBtn.disabled = true;
-      
-      try {
-        await deleteRecord("waste_management", recordId);
-        showToast("✅ Site deleted successfully", "success");
-        setTimeout(() => window.location.href = "waste_management.html", 800);
-      } catch (err) {
-        console.error(err);
-        showToast("❌ Delete failed: " + err.message, "error");
-        deleteBtn.textContent = originalText;
-        deleteBtn.disabled = false;
-      }
-    };
+          const submitBtn = form.querySelector('.btn-primary');
+          const originalText = submitBtn.textContent;
+          submitBtn.textContent = "💾 Saving...";
+          submitBtn.disabled = true;
 
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
+          const formData = getFormData(form);
+
+          // Build location string
+          let locationParts = [];
+          if (ward.value) locationParts.push(ward.value);
+          if (sub_county.value) locationParts.push(sub_county.value);
+          if (county.value) locationParts.push(county.value);
+          if (specific_location.value) locationParts.push(specific_location.value);
+
+          // Add GPS if provided
+          if (latitudeInput.value && longitudeInput.value) {
+            locationParts.push(`GPS: ${latitudeInput.value}, ${longitudeInput.value}`);
+          }
+
+          // Construct correct payload for DB schema
+          const payload = {
+            site_name: formData.site_name,
+            site_type: formData.site_type || null,
+            ownership: formData.ownership_type || null, // Map ownership_type -> ownership
+            managing_agency: formData.managing_agency || null,
+            site_capacity: formData.site_capacity || null,
+            operational_status: formData.operational_status || null,
+            responsible_officer: formData.responsible_officer || null,
+            contact_details: formData.contact_details || null,
+            county: county.value || null,
+            sub_county: sub_county.value || null,
+            ward: ward.value || null,
+            address: specific_location.value || null, // Map specific_location -> address
+            location: locationParts.join(', ') || null,
+            latitude: parseFloat(latitudeInput.value) || null,
+            longitude: parseFloat(longitudeInput.value) || null
+          };
+
+          try {
+            const { data: userData } = await supabase.auth.getUser();
+            payload.created_by = userData?.user?.id || null;
+            if (recordId) payload.last_updated_by = userData?.user?.id || null; // Add tracking
+
+            if (recordId) {
+              await updateRecord("waste_management_sites", recordId, payload);
+              showToast("✅ Site updated successfully", "success");
+            } else {
+              await insertRecord("waste_management_sites", payload);
+              showToast("✅ Site added successfully", "success");
+            }
+
+            setTimeout(() => window.location.href = "waste_management.html", 800);
+          } catch (err) {
+            console.error(err);
+            showToast("❌ Save failed: " + err.message, "error");
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+          }
+        };
+
+        deleteBtn.onclick = async () => {
+          if (!confirm("⚠️ Are you sure you want to delete this waste management site? This action cannot be undone.")) return;
+
+          const originalText = deleteBtn.textContent;
+          deleteBtn.textContent = "🗑️ Deleting...";
+          deleteBtn.disabled = true;
+
+          try {
+            await deleteRecord("waste_management_sites", recordId);
+            showToast("✅ Site deleted successfully", "success");
+            setTimeout(() => window.location.href = "waste_management.html", 800);
+          } catch (err) {
+            console.error(err);
+            showToast("❌ Delete failed: " + err.message, "error");
+            deleteBtn.textContent = originalText;
+            deleteBtn.disabled = false;
+          }
+        };
+
+        document.getElementById("year").textContent = new Date().getFullYear();
+      </script>
 </body>
+
 </html>

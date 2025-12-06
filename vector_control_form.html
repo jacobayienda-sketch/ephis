@@ -1,803 +1,436 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Vector Control Form | EPHIS</title>
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#7c3aed" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
-  <script type="module" src="main.js"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vector Control Form | EPHIS</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#2563eb" />
+    <script type="module" src="main.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            color: #0f172a;
+            padding: 2rem;
+        }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f8fafc;
-      min-height: 100vh;
-      color: #0f172a;
-      display: flex;
-      flex-direction: column;
-    }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 400px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+            z-index: -1;
+            opacity: 0.05;
+        }
 
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 500px;
-      background: linear-gradient(135deg, 
-        rgba(124, 58, 237, 0.1) 0%, 
-        rgba(139, 92, 246, 0.1) 50%, 
-        rgba(167, 139, 250, 0.1) 100%);
-      z-index: -1;
-      animation: gradientShift 15s ease infinite;
-    }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
 
-    @keyframes gradientShift {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.05); }
-    }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            color: #1e293b;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 1rem;
+        }
 
-    header {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      padding: 1rem 2rem;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #e2e8f0;
-    }
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
 
-    .header-content {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
+        .form-section:last-child {
+            border: none;
+        }
 
-    .logo {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      color: white;
-      font-size: 1.5rem;
-      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
-    }
+        .form-section h3 {
+            font-size: 1.1rem;
+            color: #334155;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
 
-    header h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #7c3aed, #8b5cf6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -0.02em;
-    }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
 
-    .header-actions {
-      display: flex;
-      gap: 0.75rem;
-    }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.9rem;
+        }
 
-    main {
-      flex: 1;
-      padding: 2.5rem 2rem;
-      max-width: 900px;
-      margin: 0 auto;
-      width: 100%;
-    }
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
 
-    form {
-      background: white;
-      padding: 2.5rem;
-      border-radius: 16px;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      border: 1px solid #e2e8f0;
-      position: relative;
-      overflow: hidden;
-    }
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
 
-    form::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #7c3aed, #8b5cf6, #a78bfa);
-      background-size: 200% 100%;
-      animation: gradientMove 3s ease infinite;
-    }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
 
-    @keyframes gradientMove {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
 
-    form h2 {
-      font-size: 1.75rem;
-      margin-bottom: 2rem;
-      color: #0f172a;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
 
-    .form-section {
-      margin-bottom: 2rem;
-      padding-bottom: 2rem;
-      border-bottom: 2px solid #f1f5f9;
-    }
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
 
-    .form-section:last-of-type {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
+        .btn-outline {
+            background: white;
+            border: 2px solid #e2e8f0;
+            color: #475569;
+        }
 
-    .form-section h3 {
-      font-size: 1.25rem;
-      color: #1f2937;
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+        .btn-outline:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
 
-    .form-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
 
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #334155;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 50;
+        }
 
-    label {
-      display: block;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 0.5rem;
-      font-size: 0.95rem;
-      letter-spacing: 0.01em;
-    }
+        .toast.show {
+            opacity: 1;
+        }
 
-    label .required {
-      color: #dc2626;
-      margin-left: 0.25rem;
-    }
-
-    .field-description {
-      font-size: 0.85rem;
-      color: #6b7280;
-      margin-top: 0.25rem;
-      font-weight: normal;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 0.875rem 1rem;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      font-family: inherit;
-      background: white;
-      color: #0f172a;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #8b5cf6;
-      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
-      transform: translateY(-1px);
-    }
-
-    textarea {
-      min-height: 100px;
-      resize: vertical;
-      line-height: 1.6;
-    }
-
-    select {
-      cursor: pointer;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-      padding-right: 3rem;
-    }
-
-    .btn {
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 600;
-      padding: 0.75rem 1.5rem;
-      font-size: 0.95rem;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.3);
-      transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
-    }
-
-    .btn:hover::before {
-      width: 300px;
-      height: 300px;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
-    }
-
-    .btn-secondary {
-      background: linear-gradient(135deg, #ec4899 0%, #d946ef 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
-    }
-
-    .btn-secondary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4);
-    }
-
-    .btn-light {
-      background: white;
-      color: #7c3aed;
-      border: 2px solid #e2e8f0;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    }
-
-    .btn-light:hover {
-      background: #faf5ff;
-      border-color: #8b5cf6;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .btn-danger {
-      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-    }
-
-    .btn-danger:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    #locationStatus {
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-      color: #6b7280;
-      text-align: center;
-      min-height: 1.5rem;
-    }
-
-    .actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.75rem;
-      margin-top: 2.5rem;
-      padding-top: 2rem;
-      border-top: 2px solid #f1f5f9;
-      flex-wrap: wrap;
-    }
-
-    footer {
-      text-align: center;
-      padding: 2rem 1rem;
-      font-size: 0.9rem;
-      color: #64748b;
-      background: white;
-      border-top: 1px solid #e2e8f0;
-      margin-top: 4rem;
-    }
-
-    @media (max-width: 768px) {
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 1rem;
-        gap: 1rem;
-      }
-
-      .header-actions {
-        width: 100%;
-      }
-
-      .header-actions .btn {
-        flex: 1;
-      }
-
-      header h1 {
-        font-size: 1.25rem;
-      }
-
-      main {
-        padding: 1.5rem 1rem;
-      }
-
-      form {
-        padding: 1.75rem;
-      }
-
-      form h2 {
-        font-size: 1.5rem;
-      }
-
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-
-      .actions {
-        flex-direction: column;
-      }
-
-      .actions .btn {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  </style>
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+    </style>
 </head>
 
 <body>
-  <header>
-    <div class="header-content">
-      <div class="logo">🦟</div>
-      <h1 id="form-title">New Vector Control Record</h1>
+    <div class="container">
+        <h1 id="pageTitle">New Vector Control Site</h1>
+
+        <form id="siteForm">
+            <div class="form-section">
+                <h3>📍 Site Information</h3>
+                <div class="form-grid">
+                    <div>
+                        <label>Site Name *</label>
+                        <input type="text" id="site_name" required placeholder="e.g. Central Market Dumpsite">
+                    </div>
+                    <div>
+                        <label>Site Type</label>
+                        <select id="site_type">
+                            <option value="">Select type</option>
+                            <option>Residential Area</option>
+                            <option>Water Body</option>
+                            <option>Market</option>
+                            <option>School</option>
+                            <option>Hospital</option>
+                            <option>Dumpsite</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div>
+                        <label>Reporting Agency</label>
+                        <input type="text" id="reporting_agency" placeholder="Dept. of Health">
+                    </div>
+                    <div>
+                        <label>Responsible Officer</label>
+                        <input type="text" id="responsible_officer">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>🦟 Vector & Risk</h3>
+                <div class="form-grid">
+                    <div>
+                        <label>Vector Type *</label>
+                        <select id="vector_type" required>
+                            <option value="">Select vector type</option>
+                            <option>Mosquito</option>
+                            <option>Rodent</option>
+                            <option>Fly</option>
+                            <option>Tick</option>
+                            <option>Flea</option>
+                            <option>Bedbug</option>
+                            <option>Cockroach</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Risk Level</label>
+                        <select id="risk_level">
+                            <option value="">Select risk level</option>
+                            <option>Low</option>
+                            <option>Medium</option>
+                            <option>High</option>
+                            <option>Critical</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div>
+                        <label>Initial Intervention Type</label>
+                        <select id="intervention_type">
+                            <option value="">Select intervention</option>
+                            <option>Fumigation/Spraying</option>
+                            <option>Larviciding</option>
+                            <option>Drainage Clearance</option>
+                            <option>Public Awareness</option>
+                            <option>Environmental Cleanup</option>
+                            <option>Bednet Distribution</option>
+                            <option>Rodent Control</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Intervention Date</label>
+                        <input type="date" id="intervention_date">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>🌍 Location</h3>
+                <!-- RBAC Auto-filled -->
+                <input type="hidden" id="county">
+                <input type="hidden" id="sub_county">
+                <input type="hidden" id="ward">
+
+                <div class="form-grid">
+                    <div>
+                        <label>Specific Location Name *</label>
+                        <input type="text" id="location_name" required placeholder="Village, Street, Landmark">
+                    </div>
+                    <div>
+                        <label>Description</label>
+                        <input type="text" id="location" placeholder="Additional details">
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div>
+                        <label>Latitude</label>
+                        <input type="number" step="any" id="latitude">
+                    </div>
+                    <div>
+                        <label>Longitude</label>
+                        <input type="number" step="any" id="longitude">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline" id="getLocationBtn" style="width:100%">📡 Get Current
+                    GPS</button>
+                <p id="locationStatus" style="font-size:0.85rem; color:#64748b; margin-top:0.5rem; text-align:center;">
+                </p>
+            </div>
+
+            <div class="form-section">
+                <h3>📝 Remarks</h3>
+                <textarea id="remarks" rows="3" placeholder="Any additional notes..."></textarea>
+            </div>
+
+            <div class="actions">
+                <button type="button" class="btn btn-outline" onclick="history.back()">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="saveBtn">Save Record</button>
+            </div>
+        </form>
     </div>
-    <div class="header-actions">
-      <button class="btn btn-light" onclick="window.location.href='vector_control.html'">← Back to List</button>
-    </div>
-  </header>
 
-  <main>
-    <form id="vector-form">
-      <h2>🦟 Vector Control Activity</h2>
+    <div id="toast" class="toast"></div>
 
-      <div class="form-section">
-        <h3>🎯 Activity Information</h3>
+    <script type="module">
+        import { supabase } from "./main.js";
+        import { getCurrentUserProfile } from "./locationAccessControl.js";
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="vector_type">
-              Vector Type<span class="required">*</span>
-            </label>
-            <select id="vector_type" name="vector_type" required>
-              <option value="">Select vector type</option>
-              <option>Mosquito</option>
-              <option>Rodent</option>
-              <option>Fly</option>
-              <option>Tick</option>
-              <option>Flea</option>
-              <option>Bedbug</option>
-              <option>Cockroach</option>
-              <option>Other</option>
-            </select>
-            <div class="field-description">Type of disease vector targeted</div>
-          </div>
+        const form = document.getElementById('siteForm');
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        const pageTitle = document.getElementById('pageTitle');
+        const saveBtn = document.getElementById('saveBtn');
+        const toast = document.getElementById('toast');
 
-          <div class="form-group">
-            <label for="risk_level">Risk Level</label>
-            <select id="risk_level" name="risk_level">
-              <option value="">Select risk level</option>
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
-              <option>Critical</option>
-            </select>
-            <div class="field-description">Assessment of vector-borne disease risk</div>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="intervention_type">Intervention Type</label>
-            <select id="intervention_type" name="intervention_type">
-              <option value="">Select intervention</option>
-              <option>Fumigation/Spraying</option>
-              <option>Larviciding</option>
-              <option>Drainage Clearance</option>
-              <option>Public Awareness</option>
-              <option>Environmental Cleanup</option>
-              <option>Bednet Distribution</option>
-              <option>Rodent Control</option>
-              <option>Other</option>
-            </select>
-            <div class="field-description">Type of control measure applied</div>
-          </div>
-
-          <div class="form-group">
-            <label for="intervention_date">Intervention Date</label>
-            <input type="date" id="intervention_date" name="intervention_date">
-            <div class="field-description">Date when intervention was conducted</div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="responsible_officer">Responsible Officer</label>
-          <input type="text" id="responsible_officer" name="responsible_officer" placeholder="Name of officer in charge">
-          <div class="field-description">Officer coordinating the vector control activity</div>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <h3>📍 Location Details</h3>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="county">County</label>
-            <select id="county">
-              <option value="">Select county</option>
-            </select>
-            <div class="field-description">County where intervention occurred</div>
-          </div>
-
-          <div class="form-group">
-            <label for="sub_county">Sub-county</label>
-            <select id="sub_county">
-              <option value="">Select sub-county</option>
-            </select>
-            <div class="field-description">Sub-county location</div>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="ward">Ward</label>
-            <select id="ward">
-              <option value="">Select ward</option>
-            </select>
-            <div class="field-description">Ward location</div>
-          </div>
-
-          <div class="form-group">
-            <label for="location_name">
-              Specific Location<span class="required">*</span>
-            </label>
-            <input type="text" id="location_name" name="location_name" placeholder="Village, area, site name..." required>
-            <div class="field-description">Specific location or site name</div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>GPS Coordinates (Optional)</label>
-          <div class="field-description">Precise coordinates of intervention site</div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <input type="number" step="0.000001" id="latitude" placeholder="Latitude" />
-          </div>
-          <div class="form-group">
-            <input type="number" step="0.000001" id="longitude" placeholder="Longitude" />
-          </div>
-        </div>
-
-        <button type="button" class="btn btn-secondary" id="getLocationBtn" style="width: 100%;">
-          📍 Get My Current Location
-        </button>
-        <div id="locationStatus"></div>
-      </div>
-
-      <div class="form-section">
-        <h3>📝 Additional Information</h3>
-
-        <div class="form-group">
-          <label for="remarks">Remarks / Observations</label>
-          <textarea id="remarks" name="remarks" rows="4" placeholder="Details about the intervention, results, challenges, or recommendations..."></textarea>
-          <div class="field-description">Any additional notes or observations</div>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button type="button" class="btn btn-light" id="cancel-btn">Cancel</button>
-        <button type="button" class="btn btn-danger" id="delete-btn">🗑️ Delete</button>
-        <button type="submit" class="btn btn-primary">💾 Save Record</button>
-      </div>
-    </form>
-  </main>
-
-  <footer>
-    <p>County Government of Elgeyo Marakwet • Department of Health Services • EPHIS © <span id="year"></span></p>
-  </footer>
-
-  <script type="module">
-    import { supabase, showToast, getFormData, populateForm, insertRecord, updateRecord, deleteRecord, fetchById, requireLogin } from "./main.js";
-
-    const form = document.getElementById("vector-form");
-    const cancelBtn = document.getElementById("cancel-btn");
-    const deleteBtn = document.getElementById("delete-btn");
-    const title = document.getElementById("form-title");
-    const county = document.getElementById("county");
-    const sub_county = document.getElementById("sub_county");
-    const ward = document.getElementById("ward");
-    const location_name = document.getElementById("location_name");
-    const getLocationBtn = document.getElementById("getLocationBtn");
-    const locationStatus = document.getElementById("locationStatus");
-    const latitudeInput = document.getElementById("latitude");
-    const longitudeInput = document.getElementById("longitude");
-    const params = new URLSearchParams(window.location.search);
-    const recordId = params.get("id");
-
-    let wardsData = [];
-
-    await requireLogin();
-
-    // Get current location
-    getLocationBtn.addEventListener("click", () => {
-      if (!navigator.geolocation) {
-        locationStatus.textContent = "❌ Geolocation is not supported by your browser";
-        locationStatus.style.color = "#dc2626";
-        return;
-      }
-
-      locationStatus.textContent = "📡 Getting your location...";
-      locationStatus.style.color = "#8b5cf6";
-      getLocationBtn.disabled = true;
-      getLocationBtn.innerHTML = "📡 Getting Location...";
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          
-          latitudeInput.value = lat.toFixed(6);
-          longitudeInput.value = lng.toFixed(6);
-          
-          locationStatus.textContent = `✅ Location captured: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-          locationStatus.style.color = "#10b981";
-          
-          getLocationBtn.disabled = false;
-          getLocationBtn.innerHTML = "📍 Get My Current Location";
-          
-          showToast("✅ Location captured successfully", "success");
-        },
-        (error) => {
-          let errorMsg = "❌ ";
-          switch(error.code) {
-            case error.PERMISSION_DENIED:
-              errorMsg += "Location access denied. Please enable location permissions.";
-              break;
-            case error.POSITION_UNAVAILABLE:
-              errorMsg += "Location information unavailable.";
-              break;
-            case error.TIMEOUT:
-              errorMsg += "Location request timed out.";
-              break;
-            default:
-              errorMsg += "An unknown error occurred.";
-          }
-          
-          locationStatus.textContent = errorMsg;
-          locationStatus.style.color = "#dc2626";
-          
-          getLocationBtn.disabled = false;
-          getLocationBtn.innerHTML = "📍 Get My Current Location";
-          
-          showToast(errorMsg, "error");
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
+        function showToast(msg, type = 'info') {
+            toast.textContent = msg;
+            toast.style.background = type === 'error' ? '#dc2626' : '#2563eb';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
-      );
-    });
 
-    // Load wards data
-    async function loadWards() {
-      try {
-        const res = await fetch("./kenya_wards.json");
-        wardsData = await res.json();
-        populateCounties();
-      } catch (error) {
-        console.error("Error loading wards:", error);
-        showToast("⚠️ Error loading location data", "error");
-      }
-    }
+        async function init() {
+            // Check Session & RBAC
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) window.location.href = 'login.html';
 
-    function populateCounties() {
-      const counties = [...new Set(wardsData.map(x => x.county))].sort();
-      counties.forEach(c => {
-        county.innerHTML += `<option value="${c}">${c}</option>`;
-      });
-    }
-
-    county.addEventListener("change", () => {
-      sub_county.innerHTML = `<option value="">Select sub-county</option>`;
-      ward.innerHTML = `<option value="">Select ward</option>`;
-
-      if (!county.value) return;
-
-      const subCounties = [...new Set(
-        wardsData
-          .filter(x => x.county === county.value)
-          .map(x => x.sub_county)
-      )].sort();
-
-      subCounties.forEach(sc => {
-        sub_county.innerHTML += `<option value="${sc}">${sc}</option>`;
-      });
-    });
-
-    sub_county.addEventListener("change", () => {
-      ward.innerHTML = `<option value="">Select ward</option>`;
-
-      if (!sub_county.value) return;
-
-      const wards = wardsData
-        .filter(x => x.county === county.value && x.sub_county === sub_county.value)
-        .map(x => x.ward)
-        .sort();
-
-      wards.forEach(w => {
-        ward.innerHTML += `<option value="${w}">${w}</option>`;
-      });
-    });
-
-    cancelBtn.onclick = () => window.location.href = "vector_control.html";
-    
-    if (!recordId) deleteBtn.style.display = "none";
-
-    if (recordId) {
-      try {
-        const record = await fetchById("vector_sites", recordId);
-        
-        // Load wards first
-        await loadWards();
-        
-        // Populate location dropdowns
-        if (record.county) {
-          county.value = record.county;
-          county.dispatchEvent(new Event('change'));
-          
-          setTimeout(() => {
-            if (record.sub_county) {
-              sub_county.value = record.sub_county;
-              sub_county.dispatchEvent(new Event('change'));
-              
-              setTimeout(() => {
-                if (record.ward) {
-                  ward.value = record.ward;
+            const profile = await getCurrentUserProfile(supabase);
+            if (profile) {
+                // Auto-fill location for new records
+                if (!id) {
+                    if (profile.county) document.getElementById('county').value = profile.county;
+                    if (profile.sub_county) document.getElementById('sub_county').value = profile.sub_county;
+                    if (profile.ward) document.getElementById('ward').value = profile.ward;
                 }
-              }, 100);
             }
-          }, 100);
+
+            if (id) {
+                pageTitle.textContent = 'Edit Vector Control Site';
+                await loadSite(id);
+            }
         }
-        
-        // Populate other fields
-        populateForm(form, record);
-        
-        if (record.latitude) latitudeInput.value = record.latitude;
-        if (record.longitude) longitudeInput.value = record.longitude;
-        
-        title.textContent = "✏️ Edit Vector Control Record";
-      } catch (err) {
-        showToast("❌ Error loading record: " + err.message, "error");
-      }
-    } else {
-      loadWards();
-    }
 
-    form.onsubmit = async e => {
-      e.preventDefault();
-      
-      const submitBtn = form.querySelector('.btn-primary');
-      const originalText = submitBtn.textContent;
-      submitBtn.textContent = "💾 Saving...";
-      submitBtn.disabled = true;
-      
-      const payload = getFormData(form);
-      
-      // Build location string
-      let locationParts = [];
-      if (ward.value) locationParts.push(ward.value);
-      if (sub_county.value) locationParts.push(sub_county.value);
-      if (county.value) locationParts.push(county.value);
-      if (location_name.value) locationParts.push(location_name.value);
-      
-      // Add GPS if provided
-      if (latitudeInput.value && longitudeInput.value) {
-        locationParts.push(`GPS: ${latitudeInput.value}, ${longitudeInput.value}`);
-      }
-      
-      // Add location fields to payload
-      payload.county = county.value || null;
-      payload.sub_county = sub_county.value || null;
-      payload.ward = ward.value || null;
-      payload.location = locationParts.join(', ') || location_name.value;
-      payload.latitude = parseFloat(latitudeInput.value) || null;
-      payload.longitude = parseFloat(longitudeInput.value) || null;
-      
-      try {
-        const { data: userData } = await supabase.auth.getUser();
-        payload.created_by = userData?.user?.id || null;
-        
-        if (recordId) {
-          await updateRecord("vector_sites", recordId, payload);
-          showToast("✅ Record updated successfully", "success");
-        } else {
-          await insertRecord("vector_sites", payload);
-          showToast("✅ Record added successfully", "success");
+        async function loadSite(siteId) {
+            const { data, error } = await supabase.from('vector_sites').select('*').eq('id', siteId).single();
+            if (error) {
+                console.error(error);
+                showToast('Error loading site data', 'error');
+                return;
+            }
+
+            // Fill form
+            for (const key in data) {
+                const input = document.getElementById(key);
+                if (input) {
+                    if (input.type === 'date' && data[key]) {
+                        input.value = data[key].split('T')[0];
+                    } else {
+                        input.value = data[key] || '';
+                    }
+                }
+            }
         }
-        
-        setTimeout(() => window.location.href = "vector_control.html", 800);
-      } catch (err) {
-        console.error(err);
-        showToast("❌ Save failed: " + err.message, "error");
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-      }
-    };
 
-    deleteBtn.onclick = async () => {
-      if (!confirm("⚠️ Are you sure you want to delete this vector control record? This action cannot be undone.")) return;
-      
-      const originalText = deleteBtn.textContent;
-      deleteBtn.textContent = "🗑️ Deleting...";
-      deleteBtn.disabled = true;
-      
-      try {
-        await deleteRecord("vector_sites", recordId);
-        showToast("✅ Record deleted successfully", "success");
-        setTimeout(() => window.location.href = "vector_control.html", 800);
-      } catch (err) {
-        console.error(err);
-        showToast("❌ Delete failed: " + err.message, "error");
-        deleteBtn.textContent = originalText;
-        deleteBtn.disabled = false;
-      }
-    };
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
 
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
+            const formData = {
+                site_name: document.getElementById('site_name').value,
+                site_type: document.getElementById('site_type').value,
+                reporting_agency: document.getElementById('reporting_agency').value,
+                responsible_officer: document.getElementById('responsible_officer').value,
+                vector_type: document.getElementById('vector_type').value,
+                risk_level: document.getElementById('risk_level').value,
+                intervention_type: document.getElementById('intervention_type').value,
+                intervention_date: document.getElementById('intervention_date').value || null,
+                county: document.getElementById('county').value,
+                sub_county: document.getElementById('sub_county').value,
+                ward: document.getElementById('ward').value,
+                location_name: document.getElementById('location_name').value,
+                location: document.getElementById('location').value,
+                latitude: document.getElementById('latitude').value || null,
+                longitude: document.getElementById('longitude').value || null,
+                remarks: document.getElementById('remarks').value,
+            };
+
+            let error;
+            if (id) {
+                const { error: updateError } = await supabase.from('vector_sites').update(formData).eq('id', id);
+                error = updateError;
+            } else {
+                const { error: insertError } = await supabase.from('vector_sites').insert([formData]);
+                error = insertError;
+            }
+
+            if (error) {
+                console.error(error);
+                showToast('Failed to save record', 'error');
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save Record';
+            } else {
+                showToast('Record saved successfully');
+                setTimeout(() => window.location.href = 'vector_control.html', 1000);
+            }
+        });
+
+        // GPS Logic
+        document.getElementById('getLocationBtn').addEventListener('click', () => {
+            const status = document.getElementById('locationStatus');
+            if (!navigator.geolocation) {
+                status.textContent = 'Geolocation not supported';
+                return;
+            }
+            status.textContent = 'Acquiring signal...';
+            navigator.geolocation.getCurrentPosition(pos => {
+                document.getElementById('latitude').value = pos.coords.latitude.toFixed(6);
+                document.getElementById('longitude').value = pos.coords.longitude.toFixed(6);
+                status.textContent = '✅ Location Updated';
+                status.style.color = 'green';
+            }, err => {
+                status.textContent = '❌ Error: ' + err.message;
+                status.style.color = 'red';
+            });
+        });
+
+        init();
+    </script>
 </body>
+
 </html>

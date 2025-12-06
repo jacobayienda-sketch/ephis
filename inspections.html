@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -38,7 +39,7 @@
 
     header {
       background: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       padding: 1.2rem 2rem;
       border-bottom: 1px solid #e2e8f0;
       position: sticky;
@@ -80,6 +81,33 @@
       color: #0f172a;
       font-weight: 700;
       letter-spacing: -0.02em;
+    }
+
+    /* Location Filter Badge */
+    .location-badge {
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      color: #2563eb;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .location-badge::before {
+      content: '📍';
+      font-size: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .location-badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.75rem;
+      }
     }
 
     .header-actions {
@@ -185,14 +213,14 @@
       border-radius: 12px;
       padding: 1.5rem;
       margin-bottom: 1rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       border: 1px solid #e2e8f0;
       transition: all 0.2s ease;
     }
 
     .card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
     .card-header {
@@ -230,9 +258,20 @@
       font-weight: 600;
     }
 
-    .badge.High { background: #fee2e2; color: #dc2626; }
-    .badge.Medium { background: #fef3c7; color: #d97706; }
-    .badge.Low { background: #d1fae5; color: #047857; }
+    .badge.High {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .badge.Medium {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .badge.Low {
+      background: #d1fae5;
+      color: #047857;
+    }
 
     .actions {
       margin-top: 1.2rem;
@@ -272,8 +311,15 @@
     }
 
     @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .pagination {
@@ -313,7 +359,7 @@
       color: #64748b;
       background: white;
       border-top: 1px solid #e2e8f0;
-      margin-top: 3rem;
+      margin-top: auto;
     }
 
     .toast {
@@ -327,11 +373,13 @@
       border-radius: 10px;
       opacity: 0;
       transition: opacity 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       z-index: 1000;
     }
 
-    .toast.show { opacity: 1; }
+    .toast.show {
+      opacity: 1;
+    }
 
     .empty-state {
       text-align: center;
@@ -380,43 +428,45 @@
 
 <body>
 
-<header>
-  <div class="header-content">
-    <div class="header-left">
-      <div class="logo">E</div>
-      <h1>Inspections</h1>
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo">E</div>
+        <h1>Inspections</h1>
+        <div class="location-badge" id="locationBadge">Loading...</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-light" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+        <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+      </div>
     </div>
-    <div class="header-actions">
-      <button class="btn btn-light" onclick="window.location.href='dashboard.html'">← Dashboard</button>
-      <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search by type or team..." />
+      </div>
+      <button class="btn btn-primary" id="newBtn">+ New Inspection</button>
     </div>
-  </div>
-</header>
 
-<main>
-  <div class="toolbar">
-    <div class="search-box">
-      <input type="text" id="searchInput" placeholder="Search by type or team..." />
+    <div id="cardsContainer"></div>
+
+    <div class="pagination">
+      <button id="prevPage">← Previous</button>
+      <button id="nextPage">Next →</button>
     </div>
-    <button class="btn btn-primary" id="newBtn">+ New Inspection</button>
-  </div>
+  </main>
 
-  <div id="cardsContainer"></div>
+  <footer>
+    <p>EPHIS 2025</p>
+  </footer>
 
-  <div class="pagination">
-    <button id="prevPage">← Previous</button>
-    <button id="nextPage">Next →</button>
-  </div>
-</main>
-
-<footer>
-  <p>&copy; <span id="year"></span> EPHIS - Elgeyo Marakwet County Environmental Health System</p>
-</footer>
-
-<div id="toast" class="toast"></div>
+  <div id="toast" class="toast"></div>
 
   <script type="module">
     import { supabase } from "./main.js";
+    import { getCurrentUserProfile, applyLocationFilters, getLocationFilterDescription } from './locationAccessControl.js';
 
     const cardsContainer = document.getElementById("cardsContainer");
     const searchInput = document.getElementById("searchInput");
@@ -429,8 +479,9 @@
     let page = 0;
     const limit = 10;
     let total = 0;
+    let userProfile = null;
 
-    function showToast(msg, type="info") {
+    function showToast(msg, type = "info") {
       toast.textContent = msg;
       toast.style.background = type === "error" ? "#c62828" : "#1976d2";
       toast.classList.add("show");
@@ -441,16 +492,26 @@
       const { data } = await supabase.auth.getSession();
       if (!data.session) window.location.href = "login.html";
     }
-    checkSession();
+    await checkSession();
+
+    // Load user profile for location filtering
+    userProfile = await getCurrentUserProfile(supabase);
+    console.log('User profile:', userProfile);
+
+    // Show location filter description
+    document.getElementById('locationBadge').textContent = getLocationFilterDescription(userProfile);
 
     async function loadInspections() {
       cardsContainer.innerHTML = "<p style='text-align:center;color:gray;'>Loading...</p>";
 
       let query = supabase
         .from("inspections")
-        .select("id, inspection_type, scheduled_date, inspector_details, assigned_team, business_type, priority, inspection_date, notification_status", { count: "exact" })
+        .select("id, inspection_type, scheduled_date, inspector_details, assigned_team, business_type, priority, inspection_date, notification_status, county, sub_county, ward, location, premises_id", { count: "exact" })
         .order("created_at", { ascending: false })
         .range(page * limit, page * limit + limit - 1);
+
+      // Apply location-based filtering
+      query = applyLocationFilters(query, userProfile);
 
       const term = searchInput.value.trim();
       if (term) query = query.or(`inspection_type.ilike.%${term}%,assigned_team.ilike.%${term}%`);
@@ -479,16 +540,28 @@
         return;
       }
 
-      cardsContainer.innerHTML = data.map(i => `
+      cardsContainer.innerHTML = data.map(i => {
+        // Build location badge
+        let locationBadge = '';
+        if (i.ward || i.sub_county || i.county) {
+          const locParts = [i.ward, i.sub_county, i.county].filter(Boolean);
+          locationBadge = `<span style="display: inline-block; background: #f3f4f6; color: #374151; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-left: 0.5rem;">📍 ${locParts.join(', ')}</span>`;
+        }
+
+        return `
         <div class="card">
           <div class="card-header">
-            <span class="card-title">${i.inspection_type || "Inspection"}</span>
+            <div>
+              <span class="card-title">${i.inspection_type || "Inspection"}</span>
+              ${locationBadge}
+            </div>
             <span class="badge ${i.priority || "Low"}">${i.priority || "Low"}</span>
           </div>
           <div class="card-body">
             <p><strong>Scheduled:</strong> ${i.scheduled_date || "-"} | <strong>Team:</strong> ${i.assigned_team || "-"}</p>
             <p><strong>Inspector:</strong> ${i.inspector_details || "-"} | <strong>Business:</strong> ${i.business_type || "-"}</p>
             <p><strong>Status:</strong> ${i.notification_status || "Pending"} | <strong>Date:</strong> ${i.inspection_date || "-"}</p>
+            ${i.location ? `<p><strong>Location:</strong> ${i.location}</p>` : ''}
           </div>
           <div class="actions">
             <a href="inspection_form.html?id=${i.id}">✏️ Edit</a>
@@ -496,24 +569,28 @@
             <a href="inspection_reinspections.html?id=${i.id}">🔄 Re-Inspection</a>
             <a href="inspection_actions.html?id=${i.id}">⚡ Actions</a>
             <a href="inspection_docs.html?id=${i.id}">📄 Docs</a>
-            <a href="#" onclick="event.preventDefault(); toggleExpand('${i.id}')">ℹ️ Details</a>
-          </div>
-          <div class="expand" id="expand-${i.id}">
-            <p><strong>Notification Status:</strong> ${i.notification_status || "Pending"}</p>
-            <p><strong>Priority:</strong> ${i.priority || "-"}</p>
-            <p><strong>Team Assigned:</strong> ${i.assigned_team || "-"}</p>
-            <p><strong>Inspector:</strong> ${i.inspector_details || "-"}</p>
+            <a href="#" onclick="event.preventDefault(); deleteInspection('${i.id}', '${i.inspection_type}')" style="background: #fee2e2; color: #dc2626; border-color: #fecaca;">🗑️ Delete</a>
           </div>
         </div>
-      `).join("");
+      `}).join("");
 
       prevPage.disabled = page === 0;
       nextPage.disabled = (page + 1) * limit >= total;
     }
 
-    window.toggleExpand = (id) => {
-      const el = document.getElementById("expand-" + id);
-      el.style.display = el.style.display === "block" ? "none" : "block";
+    window.deleteInspection = async (id, type) => {
+      if (!confirm(`Delete ${type} inspection? This action cannot be undone.`)) return;
+
+      try {
+        const { error } = await supabase.from('inspections').delete().eq('id', id);
+        if (error) throw error;
+
+        showToast('Inspection deleted successfully');
+        loadInspections();
+      } catch (error) {
+        console.error('Delete error:', error);
+        showToast('Delete failed', 'error');
+      }
     };
 
     prevPage.addEventListener("click", () => { if (page > 0) { page--; loadInspections(); } });
@@ -527,8 +604,8 @@
       setTimeout(() => (window.location.href = "login.html"), 800);
     });
 
-    document.getElementById("year").textContent = new Date().getFullYear();
     loadInspections();
   </script>
 </body>
+
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,7 +12,11 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -29,17 +34,26 @@
       left: 0;
       right: 0;
       height: 500px;
-      background: linear-gradient(135deg, 
-        rgba(14, 165, 233, 0.1) 0%, 
-        rgba(37, 99, 235, 0.1) 50%, 
-        rgba(59, 130, 246, 0.1) 100%);
+      background: linear-gradient(135deg,
+          rgba(14, 165, 233, 0.1) 0%,
+          rgba(37, 99, 235, 0.1) 50%,
+          rgba(59, 130, 246, 0.1) 100%);
       z-index: -1;
       animation: gradientShift 15s ease infinite;
     }
 
     @keyframes gradientShift {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.05); }
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+      }
     }
 
     header {
@@ -86,7 +100,10 @@
       letter-spacing: -0.02em;
     }
 
-    .header-actions { display: flex; gap: 0.75rem; }
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
 
     .btn {
       border: none;
@@ -224,8 +241,15 @@
     }
 
     @keyframes gradientMove {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
+
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
     }
 
     .card:hover {
@@ -426,7 +450,9 @@
       z-index: 1000;
     }
 
-    .toast.show { opacity: 1; }
+    .toast.show {
+      opacity: 1;
+    }
 
     footer {
       text-align: center;
@@ -487,6 +513,8 @@
       <h1>Water Samples</h1>
     </div>
     <div class="header-actions">
+      <span id="locationBadge" class="badge"
+        style="display:none; background: #ecfdf5; color: #047857; padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.875rem; font-weight: 500;"></span>
       <button class="btn btn-light" onclick="history.back()">← Back</button>
       <button class="btn btn-secondary" id="logoutBtn">Logout</button>
     </div>
@@ -502,25 +530,25 @@
       <form id="sampleForm">
         <label>Sample Date</label>
         <input type="date" id="date" required />
-        
+
         <label>Sample Type</label>
         <input type="text" id="sample_type" placeholder="e.g., Routine, Follow-up, Emergency" />
-        
+
         <label>Sampler Name</label>
         <input type="text" id="sampler_name" placeholder="Officer name" />
-        
+
         <label>Collection Method</label>
         <input type="text" id="method" placeholder="e.g., Grab, Composite, Integrated" />
-        
+
         <label>Volume (ml)</label>
         <input type="number" id="volume_ml" placeholder="Sample volume in milliliters" />
-        
+
         <label>Condition on Arrival</label>
         <input type="text" id="condition" placeholder="e.g., Clear, Turbid, Odorous" />
-        
+
         <label>Preservative Used</label>
         <input type="text" id="preservative" placeholder="e.g., Acidified, None, Refrigerated" />
-        
+
         <div style="text-align:right; margin-top:1.5rem;">
           <button type="button" class="btn btn-light" id="cancelBtn">Cancel</button>
           <button type="submit" class="btn btn-primary">Save Sample</button>
@@ -544,7 +572,8 @@
 
   <script type="module">
     import { supabase } from "./main.js";
-    
+    import { getCurrentUserProfile, getLocationFilterDescription } from "./locationAccessControl.js";
+
     const toast = document.getElementById("toast");
     const logoutBtn = document.getElementById("logoutBtn");
     const addBtn = document.getElementById("addBtn");
@@ -573,6 +602,16 @@
     async function checkSession() {
       const { data } = await supabase.auth.getSession();
       if (!data.session) window.location.href = "login.html";
+
+      const profile = await getCurrentUserProfile(supabase);
+      if (profile) {
+        const locDesc = getLocationFilterDescription(profile);
+        const locationBadge = document.getElementById("locationBadge");
+        if (locationBadge) {
+          locationBadge.textContent = "📍 " + locDesc;
+          locationBadge.style.display = "inline-flex";
+        }
+      }
     }
     checkSession();
 
@@ -586,7 +625,7 @@
 
     async function loadSamples() {
       cardsContainer.innerHTML = "<div class='empty-state'><div class='icon'>⏳</div><p>Loading samples...</p></div>";
-      
+
       let query = supabase
         .from("water_samples")
         .select("*", { count: "exact" })
@@ -600,14 +639,14 @@
       }
 
       const { data, count, error } = await query;
-      
+
       if (error) {
         console.error(error);
         showToast("❌ Failed to load samples", "error");
         cardsContainer.innerHTML = "<div class='empty-state'><div class='icon'>⚠️</div><p>Error loading data</p></div>";
         return;
       }
-      
+
       total = count;
       renderCards(data);
     }
@@ -642,14 +681,14 @@
           </div>
         </div>
       `).join("");
-      
+
       prevPage.disabled = page === 0;
       nextPage.disabled = (page + 1) * limit >= total;
     }
 
     form.addEventListener("submit", async e => {
       e.preventDefault();
-      
+
       const submitBtn = form.querySelector('.btn-primary');
       const originalText = submitBtn.textContent;
       submitBtn.textContent = "💾 Saving...";
@@ -667,7 +706,7 @@
       };
 
       const { error } = await supabase.from("water_samples").insert([payload]);
-      
+
       if (error) {
         console.error(error);
         showToast("❌ Save failed", "error");
@@ -675,7 +714,7 @@
         submitBtn.disabled = false;
         return;
       }
-      
+
       showToast("✅ Sample added successfully", "success");
       form.reset();
       toggleForm(false);
@@ -711,4 +750,5 @@
     loadSamples();
   </script>
 </body>
+
 </html>

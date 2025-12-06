@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,7 +16,7 @@
       margin: 0;
       padding: 0;
     }
-    
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
       background: #f8fafc;
@@ -33,19 +34,28 @@
       left: 0;
       right: 0;
       height: 500px;
-      background: linear-gradient(135deg, 
-        rgba(245, 158, 11, 0.1) 0%, 
-        rgba(251, 146, 60, 0.1) 50%, 
-        rgba(251, 191, 36, 0.1) 100%);
+      background: linear-gradient(135deg,
+          rgba(245, 158, 11, 0.1) 0%,
+          rgba(251, 146, 60, 0.1) 50%,
+          rgba(251, 191, 36, 0.1) 100%);
       z-index: -1;
       animation: gradientShift 15s ease infinite;
     }
 
     @keyframes gradientShift {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.05); }
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+      }
     }
-    
+
     header {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(12px);
@@ -55,7 +65,7 @@
       z-index: 100;
       border-bottom: 1px solid #e2e8f0;
     }
-    
+
     .header-container {
       max-width: 900px;
       margin: 0 auto;
@@ -65,13 +75,13 @@
       align-items: center;
       gap: 1rem;
     }
-    
+
     .logo-section {
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
-    
+
     .logo-icon {
       width: 48px;
       height: 48px;
@@ -85,7 +95,7 @@
       font-size: 1.5rem;
       box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
     }
-    
+
     header h1 {
       font-size: 1.5rem;
       font-weight: 700;
@@ -95,13 +105,13 @@
       background-clip: text;
       letter-spacing: -0.02em;
     }
-    
+
     .header-actions {
       display: flex;
       gap: 0.75rem;
       align-items: center;
     }
-    
+
     .btn {
       border: none;
       border-radius: 10px;
@@ -135,36 +145,36 @@
       width: 300px;
       height: 300px;
     }
-    
+
     .btn-primary {
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
       color: white;
       box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
     }
-    
+
     .btn-primary:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
     }
-    
+
     .btn-secondary {
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: white;
       box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     }
-    
+
     .btn-secondary:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
     }
-    
+
     .btn-light {
       background: white;
       color: #f59e0b;
       border: 2px solid #e2e8f0;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
-    
+
     .btn-light:hover {
       background: #fef3c7;
       border-color: #fbbf24;
@@ -177,7 +187,7 @@
       cursor: not-allowed;
       transform: none;
     }
-    
+
     main {
       flex: 1;
       max-width: 900px;
@@ -185,7 +195,7 @@
       padding: 2.5rem 2rem;
       width: 100%;
     }
-    
+
     .form-card {
       background: white;
       border-radius: 16px;
@@ -209,8 +219,15 @@
     }
 
     @keyframes gradientMove {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
+
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
     }
 
     .form-section {
@@ -224,7 +241,7 @@
       margin-bottom: 0;
       padding-bottom: 0;
     }
-    
+
     .form-card h2 {
       margin: 0 0 2rem 0;
       color: #0f172a;
@@ -253,7 +270,7 @@
     .form-group {
       margin-bottom: 1.5rem;
     }
-    
+
     form label {
       font-weight: 600;
       display: block;
@@ -274,8 +291,10 @@
       margin-top: 0.25rem;
       font-weight: normal;
     }
-    
-    form input, form select, form textarea {
+
+    form input,
+    form select,
+    form textarea {
       width: 100%;
       padding: 0.875rem 1rem;
       border-radius: 10px;
@@ -286,14 +305,16 @@
       background: white;
       color: #0f172a;
     }
-    
-    form input:focus, form select:focus, form textarea:focus {
+
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
       outline: none;
       border-color: #f59e0b;
       box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
       transform: translateY(-1px);
     }
-    
+
     form textarea {
       resize: vertical;
       min-height: 100px;
@@ -316,7 +337,7 @@
       text-align: center;
       min-height: 1.5rem;
     }
-    
+
     .form-actions {
       display: flex;
       gap: 1rem;
@@ -325,7 +346,7 @@
       padding-top: 2rem;
       border-top: 2px solid #f1f5f9;
     }
-    
+
     footer {
       text-align: center;
       background: white;
@@ -335,7 +356,7 @@
       margin-top: 4rem;
       border-top: 1px solid #e2e8f0;
     }
-    
+
     .toast {
       position: fixed;
       bottom: 2rem;
@@ -353,12 +374,12 @@
       min-width: 250px;
       text-align: center;
     }
-    
+
     .toast.show {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
-    
+
     @media(max-width: 768px) {
       .header-container {
         flex-direction: column;
@@ -419,7 +440,7 @@
   <main>
     <div class="form-card">
       <h2>🏪 Food Premise Registration</h2>
-      
+
       <form id="foodForm">
         <div class="form-section">
           <h3>📋 Basic Information</h3>
@@ -471,62 +492,23 @@
           </div>
         </div>
 
+        <!-- Hidden Location Fields (Auto-filled from User Profile) -->
+        <input type="hidden" id="county" />
+        <input type="hidden" id="sub_county" />
+        <input type="hidden" id="ward" />
+        <input type="hidden" id="latitude" />
+        <input type="hidden" id="longitude" />
+
         <div class="form-section">
           <h3>📍 Location Details</h3>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>County</label>
-              <select id="county">
-                <option value="">Select county</option>
-              </select>
-              <div class="field-description">County where premise is located</div>
-            </div>
-
-            <div class="form-group">
-              <label>Sub-county</label>
-              <select id="sub_county">
-                <option value="">Select sub-county</option>
-              </select>
-              <div class="field-description">Sub-county location</div>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Ward</label>
-              <select id="ward">
-                <option value="">Select ward</option>
-              </select>
-              <div class="field-description">Ward location</div>
-            </div>
-
-            <div class="form-group">
-              <label>
-                Specific Address<span class="required">*</span>
-              </label>
-              <input type="text" id="address" placeholder="Building, street, landmark..." required />
-              <div class="field-description">Physical address details</div>
-            </div>
-          </div>
-
+          <!-- Only Specific Address is visible, rest is auto-filled -->
           <div class="form-group">
-            <label>GPS Coordinates (Optional)</label>
-            <div class="field-description">Precise location coordinates</div>
+            <label>
+              Specific Address<span class="required">*</span>
+            </label>
+            <input type="text" id="address" placeholder="Building, street, landmark..." required />
+            <div class="field-description">Physical address details</div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <input type="number" step="0.000001" id="latitude" placeholder="Latitude" />
-            </div>
-            <div class="form-group">
-              <input type="number" step="0.000001" id="longitude" placeholder="Longitude" />
-            </div>
-          </div>
-
-          <button type="button" class="btn btn-secondary" id="getLocationBtn" style="width: 100%;">
-            📍 Get My Current Location
-          </button>
-          <div id="locationStatus"></div>
         </div>
 
         <div class="form-section">
@@ -573,6 +555,7 @@
 
   <script type="module">
     import { supabase } from "./main.js";
+    import { getCurrentUserProfile, getLocationFilterDescription } from "./locationAccessControl.js";
 
     const toast = document.getElementById("toast");
     const logoutBtn = document.getElementById("logoutBtn");
@@ -581,14 +564,11 @@
     const county = document.getElementById("county");
     const sub_county = document.getElementById("sub_county");
     const ward = document.getElementById("ward");
-    const getLocationBtn = document.getElementById("getLocationBtn");
-    const locationStatus = document.getElementById("locationStatus");
     const latitudeInput = document.getElementById("latitude");
     const longitudeInput = document.getElementById("longitude");
+
     const params = new URLSearchParams(window.location.search);
     const foodId = params.get("id");
-
-    let wardsData = [];
 
     function showToast(msg, type = "info") {
       toast.textContent = msg;
@@ -600,120 +580,20 @@
     async function checkSession() {
       const { data } = await supabase.auth.getSession();
       if (!data.session) window.location.href = "login.html";
+
+      const profile = await getCurrentUserProfile(supabase);
+      if (profile) {
+        // Auto-fill hidden location fields based on profile
+        if (profile.county) county.value = profile.county;
+        if (profile.sub_county) sub_county.value = profile.sub_county;
+        if (profile.ward) ward.value = profile.ward;
+
+        console.log("Location auto-filled from profile:", profile.county, profile.sub_county, profile.ward);
+      } else {
+        showToast("⚠️ Could not load user profile for location", "error");
+      }
     }
     checkSession();
-
-    // Get current location
-    getLocationBtn.addEventListener("click", () => {
-      if (!navigator.geolocation) {
-        locationStatus.textContent = "❌ Geolocation is not supported by your browser";
-        locationStatus.style.color = "#dc2626";
-        return;
-      }
-
-      locationStatus.textContent = "📡 Getting your location...";
-      locationStatus.style.color = "#2563eb";
-      getLocationBtn.disabled = true;
-      getLocationBtn.innerHTML = "📡 Getting Location...";
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          
-          latitudeInput.value = lat.toFixed(6);
-          longitudeInput.value = lng.toFixed(6);
-          
-          locationStatus.textContent = `✅ Location captured: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-          locationStatus.style.color = "#10b981";
-          
-          getLocationBtn.disabled = false;
-          getLocationBtn.innerHTML = "📍 Get My Current Location";
-          
-          showToast("✅ Location captured successfully");
-        },
-        (error) => {
-          let errorMsg = "❌ ";
-          switch(error.code) {
-            case error.PERMISSION_DENIED:
-              errorMsg += "Location access denied. Please enable location permissions.";
-              break;
-            case error.POSITION_UNAVAILABLE:
-              errorMsg += "Location information unavailable.";
-              break;
-            case error.TIMEOUT:
-              errorMsg += "Location request timed out.";
-              break;
-            default:
-              errorMsg += "An unknown error occurred.";
-          }
-          
-          locationStatus.textContent = errorMsg;
-          locationStatus.style.color = "#dc2626";
-          
-          getLocationBtn.disabled = false;
-          getLocationBtn.innerHTML = "📍 Get My Current Location";
-          
-          showToast(errorMsg, "error");
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
-    });
-
-    // Load wards data
-    async function loadWards() {
-      try {
-        const res = await fetch("./kenya_wards.json");
-        wardsData = await res.json();
-        populateCounties();
-      } catch (error) {
-        console.error("Error loading wards:", error);
-        showToast("⚠️ Error loading location data", "error");
-      }
-    }
-
-    function populateCounties() {
-      const counties = [...new Set(wardsData.map(x => x.county))].sort();
-      counties.forEach(c => {
-        county.innerHTML += `<option value="${c}">${c}</option>`;
-      });
-    }
-
-    county.addEventListener("change", () => {
-      sub_county.innerHTML = `<option value="">Select sub-county</option>`;
-      ward.innerHTML = `<option value="">Select ward</option>`;
-
-      if (!county.value) return;
-
-      const subCounties = [...new Set(
-        wardsData
-          .filter(x => x.county === county.value)
-          .map(x => x.sub_county)
-      )].sort();
-
-      subCounties.forEach(sc => {
-        sub_county.innerHTML += `<option value="${sc}">${sc}</option>`;
-      });
-    });
-
-    sub_county.addEventListener("change", () => {
-      ward.innerHTML = `<option value="">Select ward</option>`;
-
-      if (!sub_county.value) return;
-
-      const wards = wardsData
-        .filter(x => x.county === county.value && x.sub_county === sub_county.value)
-        .map(x => x.ward)
-        .sort();
-
-      wards.forEach(w => {
-        ward.innerHTML += `<option value="${w}">${w}</option>`;
-      });
-    });
 
     async function loadFoodPremise() {
       if (!foodId) return;
@@ -734,54 +614,44 @@
         }
       }
 
-      // Populate location dropdowns
-      if (data.county) {
-        county.value = data.county;
-        county.dispatchEvent(new Event('change'));
-        
-        setTimeout(() => {
-          if (data.sub_county) {
-            sub_county.value = data.sub_county;
-            sub_county.dispatchEvent(new Event('change'));
-            
-            setTimeout(() => {
-              if (data.ward) {
-                ward.value = data.ward;
-              }
-            }, 100);
-          }
-        }, 100);
-      }
+      // Override hidden location fields if editing existing logic preserved
+      if (data.county) county.value = data.county;
+      if (data.sub_county) sub_county.value = data.sub_county;
+      if (data.ward) ward.value = data.ward;
+
+      // Handle address parts if they were joined
+      // For now, we assume 'address' field in DB might be combined
+      // We fill the specific 'address' input with whatever is in 'address' column
+      const addressInput = document.getElementById("address");
+      if (data.address) addressInput.value = data.address;
     }
 
-    // Initialize
-    loadWards().then(() => {
-      if (foodId) {
-        loadFoodPremise();
-      }
-    });
+    if (foodId) {
+      loadFoodPremise();
+    }
 
     form.addEventListener("submit", async e => {
       e.preventDefault();
-      
+
       const submitBtn = form.querySelector('button[type="submit"]');
       const originalText = submitBtn.textContent;
       submitBtn.textContent = "💾 Saving...";
       submitBtn.disabled = true;
 
-      // Build full address with location components
-      let addressParts = [];
-      if (ward.value) addressParts.push(ward.value);
-      if (sub_county.value) addressParts.push(sub_county.value);
-      if (county.value) addressParts.push(county.value);
-      const specificAddress = document.getElementById("address").value.trim();
-      if (specificAddress) addressParts.push(specificAddress);
-
-      // Add GPS if provided
-      if (latitudeInput.value && longitudeInput.value) {
-        addressParts.push(`GPS: ${latitudeInput.value}, ${longitudeInput.value}`);
+      // Validation: Ensure location is set
+      if (!county.value) {
+        showToast("❌ Unable to determine location from user profile.", "error");
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        return;
       }
-      
+
+      // Build full address with location components
+      // Actually, standard practice: Address column usually holds the specific physical address
+      // County/Sub/Ward are separate columns in the DB structure
+      // But if we want to store a formatted address string, we can
+      const specificAddress = document.getElementById("address").value.trim();
+
       const payload = {
         name: document.getElementById("name").value.trim(),
         type: document.getElementById("type").value.trim() || null,
@@ -791,7 +661,7 @@
         responsible_agency: document.getElementById("responsible_agency").value.trim() || null,
         registration_status: document.getElementById("registration_status").value || null,
         date_registered: document.getElementById("date_registered").value || null,
-        address: addressParts.join(', ') || specificAddress,
+        address: specificAddress,
         operating_hours: document.getElementById("operating_hours").value.trim() || null,
         county: county.value || null,
         sub_county: sub_county.value || null,
@@ -829,4 +699,5 @@
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </body>
+
 </html>

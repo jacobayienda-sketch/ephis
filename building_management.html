@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Building Management | EPHIS</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <script type="module" src="main.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --primary-light: #3b82f6;
+      --secondary: #10b981;
+      --secondary-dark: #059669;
+      --accent: #8b5cf6;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+      --radius: 12px;
+      --radius-lg: 16px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-main);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 500px;
+      background: linear-gradient(135deg,
+          rgba(37, 99, 235, 0.1) 0%,
+          rgba(139, 92, 246, 0.1) 50%,
+          rgba(16, 185, 129, 0.1) 100%);
+      z-index: -1;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+      }
+    }
+
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex: 1;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: white;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: rotate(45deg);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+      }
+
+      100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+      }
+    }
+
+    .logo:hover {
+      transform: scale(1.05) rotate(-5deg);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .location-badge {
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      color: var(--primary);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .location-badge::before {
+      content: '📍';
+      font-size: 1rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.01em;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-light {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-light:hover {
+      border-color: var(--primary);
+      background: var(--bg-main);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    main {
+      flex: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 450px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.875rem 1.125rem 0.875rem 3rem;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      background: white;
+      color: var(--text-primary);
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+      background: var(--bg-main);
+    }
+
+    .search-box::before {
+      content: '🔍';
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.125rem;
+      opacity: 0.6;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1.75rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: var(--shadow);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      animation: cardFadeIn 0.4s ease;
+    }
+
+    @keyframes cardFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-light);
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.25rem;
+      gap: 1rem;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+
+    .badge {
+      padding: 0.4rem 0.875rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      border: 1.5px solid;
+      white-space: nowrap;
+      position: relative;
+      padding-left: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .badge::before {
+      content: '';
+      position: absolute;
+      left: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: translateY(-50%) scale(0.8);
+      }
+    }
+
+    .badge.Compliant {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      color: #047857;
+      border-color: #86efac;
+    }
+
+    .badge.Compliant::before {
+      background: #047857;
+    }
+
+    .badge.NonCompliant {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      color: #dc2626;
+      border-color: #fca5a5;
+    }
+
+    .badge.NonCompliant::before {
+      background: #dc2626;
+    }
+
+    .badge.Pending {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      color: #d97706;
+      border-color: #fcd34d;
+    }
+
+    .badge.Pending::before {
+      background: #d97706;
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.625rem;
+      line-height: 1.7;
+    }
+
+    .card strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-actions a,
+    .card-actions button {
+      text-decoration: none;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      color: var(--primary);
+      padding: 0.625rem 1.125rem;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: 1px solid #dbeafe;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-actions a:hover,
+    .card-actions button:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-danger-subtle {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%) !important;
+      color: #dc2626 !important;
+      border-color: #fca5a5 !important;
+    }
+
+    .btn-danger-subtle:hover {
+      background: #dc2626 !important;
+      color: white !important;
+      border-color: #dc2626 !important;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3) !important;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 3rem;
+    }
+
+    .pagination button {
+      border: none;
+      background: white;
+      color: var(--primary);
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .pagination button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .floating-btn {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 64px;
+      height: 64px;
+      font-size: 2rem;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .floating-btn:hover {
+      transform: scale(1.1) rotate(90deg);
+      box-shadow: 0 12px 28px rgba(16, 185, 129, 0.5);
+    }
+
+    .floating-btn:active {
+      transform: scale(0.95) rotate(90deg);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      background: white;
+      border-top: 1px solid var(--border);
+      margin-top: 4rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text-primary);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-xl);
+      z-index: 1000;
+      font-weight: 500;
+      min-width: 250px;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.5;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .loading::after {
+      content: '';
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-top: 1rem;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo">E</div>
+        <h1>Building Management</h1>
+        <div class="location-badge" id="locationBadge">Loading...</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-light" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+        <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search buildings..." />
+      </div>
+      <button class="btn btn-primary" id="addBtn">+ Add Building</button>
+    </div>
+
+    <div id="cardsContainer" class="cards-grid"></div>
+
+    <div class="pagination">
+      <button id="prevPage">← Previous</button>
+      <button id="nextPage">Next →</button>
+    </div>
+  </main>
+
+  <button class="floating-btn" onclick="window.location.href='building_form.html'" title="Add Building">+</button>
+
+  <footer>
+    <p>&copy; <span id="year"></span> EPHIS - Elgeyo Marakwet County Environmental Health System</p>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { supabase } from "./main.js";
+    import {
+      getCurrentUserProfile,
+      applyLocationFilters,
+      getLocationFilterDescription
+    } from "./locationAccessControl.js";
+
+    const toast = document.getElementById("toast");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const addBtn = document.getElementById("addBtn");
+    const searchInput = document.getElementById("searchInput");
+    const cardsContainer = document.getElementById("cardsContainer");
+    const prevPage = document.getElementById("prevPage");
+    const nextPage = document.getElementById("nextPage");
+    const locationBadge = document.getElementById("locationBadge");
+
+    let page = 0;
+    const limit = 10;
+    let total = 0;
+    let userProfile = null;
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    function showToast(msg, type = "info") {
+      toast.textContent = msg;
+      toast.style.background = type === "error" ? "#dc2626" : "#2563eb";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      try {
+        userProfile = await getCurrentUserProfile(supabase);
+        const description = getLocationFilterDescription(userProfile);
+        locationBadge.textContent = description || "All Locations";
+      } catch (err) {
+        console.error("Profile error:", err);
+        showToast("Could not load user profile", "error");
+      }
+
+      loadApplications();
+    }
+
+    async function loadApplications() {
+      cardsContainer.innerHTML = '<div class="loading">Loading Applications...</div>';
+
+      try {
+        let query = supabase
+          .from("building_applications")
+          .select("*", { count: "exact" });
+
+        query = applyLocationFilters(query, userProfile);
+
+        const searchTerm = searchInput.value.trim();
+        if (searchTerm) {
+          query = query.or(`applicant_name.ilike.%${searchTerm}%,application_type.ilike.%${searchTerm}%,location.ilike.%${searchTerm}%`);
+        }
+
+        const { data, error, count } = await query
+          .order("created_at", { ascending: false })
+          .range(page * limit, (page + 1) * limit - 1);
+
+        if (error) throw error;
+
+        total = count || 0;
+        prevPage.disabled = page === 0;
+        nextPage.disabled = (page + 1) * limit >= total;
+
+        if (!data || data.length === 0) {
+          cardsContainer.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">🏢</div>
+              <h3>No Building Applications</h3>
+              <p>Start by adding a new building application</p>
+            </div>
+          `;
+          return;
+        }
+
+        cardsContainer.innerHTML = data.map(app => `
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">${app.applicant_name || 'Unnamed'}</div>
+              <div class="badge ${app.status || 'Pending'}">${app.status || 'Pending'}</div>
+            </div>
+            <p><strong>Type:</strong> ${app.application_type || '-'}</p>
+            <p><strong>Plot #:</strong> ${app.plot_number || '-'}</p>
+            <p><strong>Location:</strong> ${app.location || '-'}</p>
+            <p><strong>Area:</strong> ${app.county || '-'}${app.sub_county ? ' > ' + app.sub_county : ''}${app.ward ? ' > ' + app.ward : ''}</p>
+            <div class="card-actions">
+              <a href="building_inspections.html?application_id=${app.id}">📋 Insp</a>
+              <a href="building_enforcements.html?application_id=${app.id}" style="border-color:#d97706">⚖️ Enf</a>
+              <a href="building_alerts.html?application_id=${app.id}" style="border-color:#9333ea">🚨 Alerts</a>
+              <a href="building_form.html?id=${app.id}">✏️</a>
+              <button onclick="deleteApplication('${app.id}')" class="btn-danger-subtle" style="margin-left:auto">🗑️</button>
+            </div>
+          </div>
+        `).join("");
+
+      } catch (err) {
+        console.error("Load error:", err);
+        cardsContainer.innerHTML = `<div class="empty-state" style="color:#dc2626">Error: ${err.message}</div>`;
+      }
+    }
+
+    window.deleteApplication = async (id) => {
+      if (!confirm("Delete this building application?")) return;
+      try {
+        const { error } = await supabase.from("building_applications").delete().eq("id", id);
+        if (error) throw error;
+        showToast("Application deleted");
+        loadApplications();
+      } catch (err) {
+        showToast("Delete failed: " + err.message, "error");
+      }
+    };
+
+    searchInput.addEventListener("input", () => {
+      page = 0;
+      loadApplications();
+    });
+
+    prevPage.addEventListener("click", () => {
+      if (page > 0) {
+        page--;
+        loadApplications();
+      }
+    });
+
+    nextPage.addEventListener("click", () => {
+      if ((page + 1) * limit < total) {
+        page++;
+        loadApplications();
+      }
+    });
+
+    addBtn.addEventListener("click", () => {
+      window.location.href = "building_form.html";
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      window.location.href = "login.html";
+    });
+
+    checkSession();
+  </script>
+</body>
+
+</html>

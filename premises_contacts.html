@@ -601,6 +601,8 @@
       <h1>📞 Premise Contacts</h1>
     </div>
     <div class="header-actions">
+      <span id="locationBadge" class="badge"
+        style="display:none; background: #ecfdf5; color: #047857; margin-right: 1rem;"></span>
       <button class="btn btn-light" onclick="window.location.href='premises_management.html'">← Back</button>
       <button class="btn btn-secondary" id="logoutBtn">Logout</button>
     </div>
@@ -653,6 +655,7 @@
   <script type="module">
     import { supabase } from "./main.js";
     import { loadPremiseContext } from "./premiseContext.js";
+    import { getCurrentUserProfile, getLocationFilterDescription } from "./locationAccessControl.js";
 
     const params = new URLSearchParams(window.location.search);
     const premiseId = params.get("id");
@@ -679,6 +682,17 @@
     async function checkSession() {
       const { data } = await supabase.auth.getSession();
       if (!data.session) window.location.href = "login.html";
+
+      // RBAC: Load profile and show location badge
+      const profile = await getCurrentUserProfile(supabase);
+      if (profile) {
+        const locDesc = getLocationFilterDescription(profile);
+        const locationBadge = document.getElementById("locationBadge");
+        if (locationBadge) {
+          locationBadge.textContent = "📍 " + locDesc;
+          locationBadge.style.display = "inline-flex";
+        }
+      }
     }
     checkSession();
 

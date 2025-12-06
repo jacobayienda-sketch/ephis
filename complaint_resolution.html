@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -39,7 +40,7 @@
 
     header {
       background: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       padding: 1.2rem 2rem;
       border-bottom: 1px solid #e2e8f0;
       position: sticky;
@@ -134,7 +135,7 @@
       background: white;
       border-radius: 16px;
       padding: 2rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       border: 1px solid #e2e8f0;
     }
 
@@ -179,7 +180,9 @@
       font-weight: normal;
     }
 
-    input, textarea, select {
+    input,
+    textarea,
+    select {
       width: 100%;
       padding: 0.75rem;
       border: 1px solid #d1d5db;
@@ -190,7 +193,9 @@
       font-family: inherit;
     }
 
-    input:focus, textarea:focus, select:focus {
+    input:focus,
+    textarea:focus,
+    select:focus {
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
@@ -361,9 +366,14 @@
   </header>
 
   <div class="container">
+    <div id="complaintInfo"
+      style="background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+    </div>
+
     <div class="page-intro">
       <h2>✅ Record Final Resolution</h2>
-      <p>Complete this form to officially resolve and close the complaint. Ensure all details are accurate before submitting.</p>
+      <p>Complete this form to officially resolve and close the complaint. Ensure all details are accurate before
+        submitting.</p>
     </div>
 
     <div id="errorMessage"></div>
@@ -391,7 +401,9 @@
         <label for="resolution_description">
           Resolution Description<span class="required">*</span>
         </label>
-        <textarea id="resolution_description" rows="5" placeholder="Describe in detail how the complaint was addressed, what actions were taken, and the final outcome..." required></textarea>
+        <textarea id="resolution_description" rows="5"
+          placeholder="Describe in detail how the complaint was addressed, what actions were taken, and the final outcome..."
+          required></textarea>
         <div class="field-description">Provide a comprehensive description of the resolution process and outcome</div>
       </div>
 
@@ -442,12 +454,42 @@
       form.style.display = 'none';
     } else {
       await requireLogin();
+      // Load complaint info
+      loadComplaintInfo();
+    }
+
+    async function loadComplaintInfo() {
+      try {
+        const { data, error } = await supabase
+          .from('complaints')
+          .select('tracking_code, complaint_type, location, urgency, resolution_status')
+          .eq('id', complaintId)
+          .single();
+
+        if (error) throw error;
+
+        const urgencyColors = { Low: '#059669', Medium: '#d97706', High: '#dc2626', Critical: '#991b1b' };
+        const statusColors = { Pending: '#d97706', 'In Progress': '#2563eb', Resolved: '#059669', Escalated: '#dc2626' };
+
+        document.getElementById('complaintInfo').innerHTML = `
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; color: #1f2937;">📋 Complaint Information</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div><strong style="color: #6b7280; font-size: 0.85rem;">Tracking Code:</strong><br><code style="background: #f3f4f6; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.9rem;">${data.tracking_code || 'N/A'}</code></div>
+            <div><strong style="color: #6b7280; font-size: 0.85rem;">Type:</strong><br><span style="font-size: 0.95rem;">${data.complaint_type || 'N/A'}</span></div>
+            <div><strong style="color: #6b7280; font-size: 0.85rem;">Location:</strong><br><span style="font-size: 0.95rem;">${data.location || 'N/A'}</span></div>
+            <div><strong style="color: #6b7280; font-size: 0.85rem;">Urgency:</strong><br><span style="color: ${urgencyColors[data.urgency] || '#6b7280'}; font-weight: 600; font-size: 0.95rem;">${data.urgency || 'N/A'}</span></div>
+            <div><strong style="color: #6b7280; font-size: 0.85rem;">Current Status:</strong><br><span style="color: ${statusColors[data.resolution_status] || '#6b7280'}; font-weight: 600; font-size: 0.95rem;">${data.resolution_status || 'Pending'}</span></div>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Error loading complaint info:', error);
+      }
     }
 
     // Radio button styling
     const radioOptions = document.querySelectorAll('.radio-option');
     const radioInputs = document.querySelectorAll('input[name="verified_by_supervisor"]');
-    
+
     radioInputs.forEach(input => {
       input.addEventListener('change', () => {
         radioOptions.forEach(option => option.classList.remove('selected'));
@@ -520,7 +562,7 @@
           .eq('id', complaintId);
 
         showToast('✅ Resolution saved successfully', 'success');
-        
+
         setTimeout(() => {
           history.back();
         }, 1000);
@@ -535,4 +577,5 @@
     };
   </script>
 </body>
+
 </html>
